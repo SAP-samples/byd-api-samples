@@ -1,0 +1,2661 @@
+{
+	"info": {
+		"_postman_id": "3b55a0e4-15d8-43ae-9c52-aae43ef0114d",
+		"name": "Sales Orders",
+		"description": "Sales Order - OData Examples\n============================\n\nExamples to create and change sales orders using SAP Business ByDesign Custom OData Services.\n\nRequired user authorizations (ByD Work Center Views):\n- *Sales Orders - Sales Orders*\n\nSales order origin type codes (*DataOriginTypeCode*):\n- 1 - Manual data entry\n- 4 - Internet order (webshop integration)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Sales Order (nested create)",
+			"item": [
+				{
+					"name": "Get collections",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "4b5f4d9c-55db-4cb2-a6b6-ffc9e31c7d2b",
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									"pm.environment.set(\"SalesOrderExternalReference\", \"\");",
+									"pm.environment.set(\"SalesOrderObjectID\", \"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "25c89d78-824a-437d-b5fc-b234e9389390",
+								"type": "text/javascript",
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									"pm.environment.set(\"SalesOrderExternalReference\", \"\");",
+									"pm.environment.set(\"SalesOrderObjectID\", \"\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create sales order (nested create)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
+								"exec": [
+									"// Get sales order ID and set variable for filtering",
+									"//var jsonResponse = xml2Json(responseBody);",
+									"//console.log(jsonResponse);",
+									"//var jsonResponseData = JSON.parse(jsonResponse);",
+									"//console.log(jsonResponse['d:\"http://schemas.microsoft.com/ado/2007/08/dataservices\"']['m:\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\"'].entry.content['m:properties']['d:ID']);",
+									"//pm.environment.set(\"ID\", jsonResponseData.entry.content.properties.ID);",
+									"",
+									"//var jsonRequest = pm.request.json();",
+									"var jsonRequest = JSON.parse(request.data);",
+									"//console.log(jsonRequest.BuyerID);",
+									"pm.environment.set(\"SalesOrderExternalReference\", jsonRequest.ExternalReference);",
+									"",
+									"// Validations",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});",
+									"pm.test(\"201 - Sales order created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
+								"exec": [
+									"// Set External Reference of pattern KH-<UTC datetime>",
+									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
+									"pm.environment.set(\"SalesOrderExternalReference\", generatedBuyerID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}\",\n\t\"Name\": \"Sample Sales Order (OData Nested Create)\",\n\t\"DataOriginTypeCode\": \"4\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": false\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TAN\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"ID\": \"20\",\n\t\t\t\t\"ProcessingTypeCode\": \"TASC\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{ServiceProductID}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"HUR\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order and expand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"//pm.environment.set(\"BuyerPartyObjectID\", jsonResponse.d.results[0].SalesOrderBuyerParty.ObjectID);",
+									"//pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].SalesOrderPricingTerms.ObjectID);",
+									"//pm.environment.set(\"ItemProductObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemProduct.ObjectID);",
+									"//pm.environment.set(\"ItemScheduleLineObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemScheduleLine[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"201 - Sales order data returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Check Pricing Terms\", function () { pm.expect(jsonResponse.d.results[0].PricingTerms.CurrencyCode).to.eql(\"EUR\") });",
+									"pm.test(\"Item 10 created\", function () { pm.expect(jsonResponse.d.results[0].Item[0].ID).to.eql(\"10\") });",
+									"pm.test(\"Item 20 created\", function () { pm.expect(jsonResponse.d.results[0].Item[1].ID).to.eql(\"20\") });",
+									"pm.test(\"Sales Order consistent\", function () { pm.expect(jsonResponse.d.results[0].ConsistencyStatusCodeText).to.eql(\"Consistent\") });",
+									"pm.test(\"Sales Order released\", function () { pm.expect(jsonResponse.d.results[0].ReleaseStatusCodeText).to.eql(\"Not Released\") });",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine&$filter=ExternalReference eq '{{SalesOrderExternalReference}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine"
+								},
+								{
+									"key": "$filter",
+									"value": "ExternalReference eq '{{SalesOrderExternalReference}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Release customer request (submit internet order)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0b50fcc9-9d81-49c6-afe7-adf9c96a8a5d",
+								"type": "text/javascript",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});",
+									"pm.test(\"200 - Customer request released\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderReleaseCustomerRequest2?ObjectID='{{SalesOrderObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderReleaseCustomerRequest2"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{SalesOrderObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Release sales order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
+								"type": "text/javascript",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});",
+									"pm.test(\"200 - Sales order released\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderRelease3?ObjectID='{{SalesOrderObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderRelease3"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{SalesOrderObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order (expand and select)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7288997b-8a67-4eda-a761-852bea77f42f",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"201 - Sales order data returned\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Sales Order consistent\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].ConsistencyStatusCodeText).to.eql(\"Consistent\");",
+									"});",
+									"pm.test(\"Sales Order released\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].ReleaseStatusCodeText).to.eql(\"Released\");",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=Item&$filter=ExternalReference eq '{{SalesOrderExternalReference}}'&$select=ExternalReference,ObjectID,ID,Name,ReleaseStatusCode,ReleaseStatusCodeText,ConsistencyStatusCode,ConsistencyStatusCodeText,Item/ID,Item/ObjectID,Item/ReleaseStatusCode,Item/ReleaseStatusCodeText,Item/ExecutionReleaseStatusCode,Item/ExecutionReleaseStatusCodeText",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "Item"
+								},
+								{
+									"key": "$filter",
+									"value": "ExternalReference eq '{{SalesOrderExternalReference}}'"
+								},
+								{
+									"key": "$select",
+									"value": "ExternalReference,ObjectID,ID,Name,ReleaseStatusCode,ReleaseStatusCodeText,ConsistencyStatusCode,ConsistencyStatusCodeText,Item/ID,Item/ObjectID,Item/ReleaseStatusCode,Item/ReleaseStatusCodeText,Item/ExecutionReleaseStatusCode,Item/ExecutionReleaseStatusCodeText"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "62e7970b-a897-41c8-8ea8-f2ce155983ea",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "f356b732-53d3-44dd-b61c-4a9c42181a1c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Create Sales Order using batch",
+			"item": [
+				{
+					"name": "Get collections",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "157c5a67-4e10-4ebe-a5c5-44f1a37e03db",
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									"pm.environment.set(\"SalesOrderExternalReference\", \"\");",
+									"pm.environment.set(\"SalesOrderObjectID\", \"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6ba446ed-9def-4127-b41f-1114dbf92652",
+								"type": "text/javascript",
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									"pm.environment.set(\"SalesOrderExternalReference\", \"\");",
+									"pm.environment.set(\"SalesOrderObjectID\", \"\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create 2 sales orders + get (batch)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1bc87aee-2d90-451f-aaf1-2cb391af6300",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "480884b9-6708-4048-a355-2bc5d209de37",
+								"exec": [
+									"// Set External Reference of pattern KH-<UTC datetime>",
+									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
+									"pm.environment.set(\"SalesOrderExternalReference\", generatedBuyerID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/mixed; boundary=batch_1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n--batch_1\nContent-Type: multipart/mixed; boundary=changeset_2\n\n--changeset_2\nContent-Type: application/http \nContent-Transfer-Encoding: binary\n\nPOST SalesOrderCollection HTTP/1.1\nContent-Type: application/json\nContent-ID: 1\nContent-Length: 10000\nAccept: application/json\n\n{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}-1\",\n\t\"Name\": \"Sample Sales Order 1 (batch)\",\n\t\"DataOriginTypeCode\": \"1\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": false\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TAN\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"ID\": \"20\",\n\t\t\t\t\"ProcessingTypeCode\": \"TASC\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{ServiceProductID}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"HUR\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t\n\n--changeset_2\nContent-Type: application/http \nContent-Transfer-Encoding: binary\n\nPOST SalesOrderCollection HTTP/1.1\nContent-Type: application/json\nContent-ID: 1\nContent-Length: 10000\nAccept: application/json\n\n{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}-2\",\n\t\"Name\": \"Sample Sales Order 2 (batch)\",\n\t\"DataOriginTypeCode\": \"1\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": false\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"ID\": \"20\",\n\t\t\t\t\"ProcessingTypeCode\": \"TASC\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{ServiceProductID}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"HUR\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t\n\n--changeset_2--\n\n\n--batch_1\nContent-Type: application/http\nContent-Transfer-Encoding: binary\n\nGET SalesOrderCollection?$format=json&$expand=BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine&$filter=startswith(ExternalReference,'{{SalesOrderExternalReference}}') HTTP/1.1\n\n\n--batch_1--"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/$batch",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"$batch"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create Sales Order (node by node)",
+			"item": [
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "75577150-4aaa-4880-9ee4-c206aee1d3c9",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create sales order root",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "510deefb-6650-4ff1-818e-7b70d0162e4e",
+								"type": "text/javascript",
+								"exec": [
+									"// Set environment variables",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"ID\", jsonResponse.d.results.ID);",
+									"",
+									"// Validations",
+									"pm.test(\"Sales order root created\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b0eff683-5300-451e-8bde-426c08cceb24",
+								"type": "text/javascript",
+								"exec": [
+									"// Set External Reference of pattern KH-<UTC datetime>",
+									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
+									"pm.environment.set(\"SalesOrderExternalReference\", generatedBuyerID);",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}\",\n\t\"Name\": \"Sample Sales Order (OData node-by-code create)\",\n\t\"DataOriginTypeCode\": \"4\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order and expand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e071df17-ad9b-4808-8547-98437a761e18",
+								"exec": [
+									"",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"ID\", jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"BuyerPartyObjectID\", jsonResponse.d.results[0].BuyerParty.ObjectID);",
+									"pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].PricingTerms.ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty,SalesUnitParty,PricingTerms&$filter=ID eq '{{ID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty,SalesUnitParty,PricingTerms"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{ID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create sales unit party",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dde7e485-8849-4a24-826f-43f26685ebd8",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Sales unit party created ... ok\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesOrderObjectID}}\",\n\t\"PartyID\": \"{{SalesUnitID}}\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesUnitPartyCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesUnitPartyCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update buyer party",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0750ddd8-3d86-4603-b475-1165717da398",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Buyer party added ... ok\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202,204]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "x-http-method",
+								"value": "MERGE"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ObjectID\": \"{{BuyerPartyObjectID}}\",\n\t\"PartyID\": \"{{CustomerID}}\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/BuyerPartyCollection('{{BuyerPartyObjectID}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"BuyerPartyCollection('{{BuyerPartyObjectID}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update pricing terms",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b06e8088-66a6-4a89-9b1c-424f08d0c06f",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Update pricing terms ... ok\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202,204]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "x-http-method",
+								"value": "MERGE"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ObjectID\": \"{{PricingTermsObjectID}}\",\n\t\"CurrencyCode\": \"EUR\",\n\t\"GrossAmountIndicator\": false\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/PricingTermsCollection('{{PricingTermsObjectID}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"PricingTermsCollection('{{PricingTermsObjectID}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create item",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c85e789f-be4f-43ed-abf7-44ea3fd269a9",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Item created ... ok\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesOrderObjectID}}\",\n\t\"ID\": \"10\",\n\t\"ProcessingTypeCode\": \"TAN\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/ItemCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"ItemCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order and expand (with item)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7b157ad3-df67-485e-b51a-5dd326cc1ca3",
+								"exec": [
+									"",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"BuyerPartyObjectID\", jsonResponse.d.results[0].BuyerParty.ObjectID);",
+									"pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].PricingTerms.ObjectID);",
+									"pm.environment.set(\"ItemProductObjectID\", jsonResponse.d.results[0].Item[0].ItemProduct.ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty,SalesUnitParty,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine&$filter=ID eq '{{ID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty,SalesUnitParty,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{ID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update item product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a8561c32-35c9-4a9c-b67d-e480cdee725e",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Update item product\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202,204]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "x-http-method",
+								"value": "MERGE"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ObjectID\": \"{{ItemProductObjectID}}\",\n\t\"ProductID\": \"P100401\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/ItemProductCollection('{{ItemProductObjectID}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"ItemProductCollection('{{ItemProductObjectID}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order and expand (with item schedule line)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7cb97c99-ddff-4b47-bc6e-ccb21ce40084",
+								"exec": [
+									"",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"BuyerPartyObjectID\", jsonResponse.d.results[0].BuyerParty.ObjectID);",
+									"pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].PricingTerms.ObjectID);",
+									"pm.environment.set(\"ItemProductObjectID\", jsonResponse.d.results[0].Item[0].ItemProduct.ObjectID);",
+									"pm.environment.set(\"ItemScheduleLineObjectID\", jsonResponse.d.results[0].Item[0].ItemScheduleLine[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty,SalesUnitParty,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine&$filter=ID eq '{{ID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty,SalesUnitParty,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{ID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update item schedule line",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e6c00b8e-9b04-4ea8-ba2e-2e1ba543a9b1",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Update item quantity\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202,204]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "x-http-method",
+								"value": "MERGE"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ObjectID\": \"{{ItemScheduleLineObjectID}}\",\n\t\"Quantity\": \"3\",\n\t\"unitCode\": \"EA\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/ItemScheduleLineCollection('{{ItemScheduleLineObjectID}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"ItemScheduleLineCollection('{{ItemScheduleLineObjectID}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Release customer request (submit internet order)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"disabled": true
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "x-http-method",
+								"value": "MERGE",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderReleaseCustomerRequest2?ObjectID='{{SalesOrderObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderReleaseCustomerRequest2"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{SalesOrderObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order and expand all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7cb97c99-ddff-4b47-bc6e-ccb21ce40084",
+								"exec": [
+									"",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"BuyerPartyObjectID\", jsonResponse.d.results[0].BuyerParty.ObjectID);",
+									"pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].PricingTerms.ObjectID);",
+									"pm.environment.set(\"ItemProductObjectID\", jsonResponse.d.results[0].Item[0].ItemProduct.ObjectID);",
+									"pm.environment.set(\"ItemScheduleLineObjectID\", jsonResponse.d.results[0].Item[0].ItemScheduleLine[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty,SalesUnitParty,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine&$filter=ID eq '{{ID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty,SalesUnitParty,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{ID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c81c315c-2066-46ea-ac66-e3c7f926a7cc",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "6e1cce4e-1bd6-47a3-bcd9-781db596a27c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Create Sales Order with Attachments",
+			"item": [
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "43002d5b-0c70-4769-8278-9de67558d992",
+								"type": "text/javascript",
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									"pm.environment.set(\"SalesOrderExternalReference\", \"\");",
+									"pm.environment.set(\"SalesOrderObjectID\", \"\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create sales order with attachment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "21ff1eaa-b09f-4001-9117-e791b4adef1a",
+								"exec": [
+									"// Get sales order ID and set variable for filtering",
+									"//var jsonResponse = xml2Json(responseBody);",
+									"//console.log(jsonResponse);",
+									"//var jsonResponseData = JSON.parse(jsonResponse);",
+									"//console.log(jsonResponse['d:\"http://schemas.microsoft.com/ado/2007/08/dataservices\"']['m:\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\"'].entry.content['m:properties']['d:ID']);",
+									"//pm.environment.set(\"ID\", jsonResponseData.entry.content.properties.ID);",
+									"",
+									"//var jsonRequest = pm.request.json();",
+									"var jsonRequest = JSON.parse(request.data);",
+									"//console.log(jsonRequest.BuyerID);",
+									"pm.environment.set(\"SalesOrderExternalReference\", jsonRequest.ExternalReference);",
+									"",
+									"// Validations",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});",
+									"pm.test(\"201 - Sales order with attachments created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ff990dde-5b63-43bc-ac00-0fa57b2996c3",
+								"exec": [
+									"// Set BuyerID of pattern KH-<UTC datetime>",
+									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
+									"pm.environment.set(\"SalesOrderExternalReference\", generatedBuyerID);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}\",\n\t\"Name\": \"Sample Sales Order with attachments\",\n\t\"DataOriginTypeCode\": \"1\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": false\n\t\t},\n\t\"AttachmentFolder\": \n\t\t[\n\t\t\t{\n\t\t\t\t\"CategoryCode\": \"2\",\n\t\t\t\t\"TypeCode\": \"10076\",\n\t\t\t\t\"Title\": \"Image of Document\",\n\t\t\t\t\"OutputRelevanceIndicator\": true,\n\t\t\t\t\"Name\": \"Document_1.jpg\",\n\t\t\t\t\"MimeType\": \"image/jpg\",\n\t\t\t\t\"Binary\": \"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\"\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"CategoryCode\": \"3\",\n\t\t\t\t\"TypeCode\": \"10001\",\n\t\t\t\t\"Title\": \"SAP Business ByDesign product page\",\n\t\t\t\t\"Name\": \"SAP Business ByDesign product page\",\n\t\t\t\t\"LinkWebURI\": \"https://www.sap.com/products/business-bydesign.html\"\n\t\t\t}\n\t\t],\t\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TAN\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t],\n\t\t\t\t\"ItemAttachmentFolder\": \n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"CategoryCode\": \"2\",\n\t\t\t\t\t\t\t\"TypeCode\": \"10001\",\n\t\t\t\t\t\t\t\"Title\": \"Image of Icecream\",\n\t\t\t\t\t\t\t\"OutputRelevanceIndicator\": false,\n\t\t\t\t\t\t\t\"Name\": \"Product_Icecream.jpg\",\n\t\t\t\t\t\t\t\"MimeType\": \"image/jpg\",\n\t\t\t\t\t\t\t\"Binary\": \"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\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"ID\": \"20\",\n\t\t\t\t\"ProcessingTypeCode\": \"TASC\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{ServiceProductID}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"HUR\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							]
+						},
+						"description": "Data Origin Type Code: 1 - Manual data entry, 4 - Internet order.\n\nAttachment Category Codes: 2 - Document, 3 - Link.\n\nAttachment Type Codes: 10076 - Pro Forma Invoice, 10001 - Standard Attachment.\n\nAttachment binaries are base64 encoded."
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order and expand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "70784133-1e3f-4485-b3a0-2581bbae4d18",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"SalesOrderItemObjectID\", jsonResponse.d.results[0].Item[0].ObjectID);",
+									"pm.environment.set(\"AttachmentObjectID\", jsonResponse.d.results[0].Item[0].ItemAttachmentFolder[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"201 - Sales order data returned\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Check Pricing Terms\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].PricingTerms.CurrencyCode).to.eql(\"EUR\");",
+									"});",
+									"pm.test(\"Check Item 10\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].Item[0].ID).to.eql(\"10\");",
+									"});",
+									"pm.test(\"Check Item 20\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].Item[1].ID).to.eql(\"20\");",
+									"});",
+									"pm.test(\"Sales Order consistent\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].ConsistencyStatusCodeText).to.eql(\"Consistent\");",
+									"});",
+									"pm.test(\"Sales Order Released\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].ReleaseStatusCodeText).to.eql(\"Not Released\");",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine,AttachmentFolder,Item/ItemAttachmentFolder&$filter=ExternalReference eq '{{SalesOrderExternalReference}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine,AttachmentFolder,Item/ItemAttachmentFolder"
+								},
+								{
+									"key": "$filter",
+									"value": "ExternalReference eq '{{SalesOrderExternalReference}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get item attachment (key access)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6f134c15-adc5-42cf-938e-e778a244bfa6",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"AttachmentObjectID\", jsonResponse.d.results.ObjectID);",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Attachment returned\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/ItemAttachmentFolderCollection('{{AttachmentObjectID}}')?$format=json",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"ItemAttachmentFolderCollection('{{AttachmentObjectID}}')"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete item attachment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f3cde6c0-cfa4-420a-a56f-b64abc5a60f6",
+								"exec": [
+									"// Validations",
+									"pm.test(\"204 - Attachment deleted\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "x-http-method",
+								"value": "DELETE"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/ItemAttachmentFolderCollection('{{AttachmentObjectID}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"ItemAttachmentFolderCollection('{{AttachmentObjectID}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add item attachment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e9920369-b0a3-4ca6-af69-beb6640eaa9f",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Successful POST request - Attachment added\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202,204]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesOrderItemObjectID}}\",\n\t\"CategoryCode\": \"2\",\n\t\"TypeCode\": \"10001\",\n\t\"Title\": \"Image of sport shoes (added)\",\n\t\"OutputRelevanceIndicator\": true,\n\t\"Name\": \"Product_Shoes.jpg\",\n\t\"MimeType\": \"image/jpg\",\n\t\"Binary\": \"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tckZYda+44X8L+GOH5KrluEiqi+3K85+qlJtx/7dsjzM04ozPMFy4mq3HstF9ytf53PrCvzO/wCC+H/Bwb4X/wCCX/g2++H/AIDutP8AEnx61a1HkWQ2zW3hKORAyXd6OnmFWDxW55YFXcCMr5nw3+1x/wAHVXxo/b18Vn4T/sX/AAr8U6XqmvBootYmsl1TxNLF8pd4LSHzILMKN4eZ3mCo28GFl3D3n/gij/wbESfBL4hJ8df2rLi38dfFe8uv7XsfDtzd/wBp2ukXsjGWS81C4JYXt95jEjDNEjBn3TuyPF98eAch/wAG73/BBLUfFHiK6/ao/aq0VvFXjTxhLJqvh3QPE8Iu5EkuG8x9Yv4pQd91IWJiSQHywxlI8wxGH9y6KKACiiigAooooAKKKKACiiigAooooAKKKKACuP8AH/7PngH4rlj4p8D+D/Evmfe/tXRre83fXzEauwooA8B1P/glF+y7rJka6/Zv+A80k335D4B0oSH/AIEIM/jmuN13/ghZ+x/4iZjcfs7/AAwj3f8APrpK2v8A6KK19YUUAfEes/8ABuH+xNrsbLN8A/DsYbr9n1PUbc/gY7hSPwrl9S/4Nav2F9QgdY/grLaSP/y0h8Y67uX6Br0r+lfoJRQB+WvjP/gz7/Y88UBvsNr8TPDe7odO8S+Zt+n2iKX9c15r4t/4Mnv2db2z26F8TvjVptxz899d6Zexj0+VLOI/+PV+ylFAH4F+Lf8Agxtspp5pNC/aUurePH7qC/8AAqzMT/tSJfp+YSuR07/g1B/bN/Z+vU/4VH+054c0m3h+48HiPXPDsi46YW2ilAP/AAIV/RFRQB/O7afsN/8ABZr9l3Uh/wAIr8SPEnj5I2J86Tx3p+tR+udusuGI9tp+lNm/a5/4LUfCqZl1fwZ4m8RbTyF8FaJer+BsYhn8DX9ElFAH87Sf8FjP+Ct3h0+Xdfs5+J9QZRgsfhDqcme3WHA7dvX6Urf8Fp/+Cs16PLj/AGZ/E0Lddw+DutL/AOhHFf0SUUAfzrn/AIKCf8FlPigPL0n4X+KvDrScB/8AhXVpabfxvY2H51Y1P4Uf8FuP2gLaG31XWPEXh+yuRtNzDrPhfQmiHqws2Scfgua/ogooA/nbP/BrL+23+1zc2X/C+v2l9NutJYBnTUvE+seK7y0IPQQzrHCSOo2zYr6e/Za/4Mxf2e/hVcWd98TvGPjn4sX1uxMtnG66BpN0PRooC9yPqt0K/YaigDzj9mf9kD4XfsaeCG8OfCvwD4X8B6RJsNxFpFglvJesi7VkuJQPMnkC8b5WZsd69HoooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD//Z\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/ItemAttachmentFolderCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"ItemAttachmentFolderCollection"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0d4d74bf-ff74-4dcb-9608-3391963d2496",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3857f6d0-4d7c-4b47-a658-a13155b06109",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Search and Query",
+			"item": [
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "70359fc5-f246-427d-a45c-3f7a41d75168",
+								"type": "text/javascript",
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									"pm.environment.set(\"SalesOrderExternalReference\", \"\");",
+									"pm.environment.set(\"SalesOrderObjectID\", \"\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order using filter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"201 - Sales order data returned\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine&$filter=ID eq '3*' and (ExternalReference eq 'KH-2018*' or ExternalReference eq 'KH-2019*')&$inlinecount=allpages&$top=10",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '3*' and (ExternalReference eq 'KH-2018*' or ExternalReference eq 'KH-2019*')"
+								},
+								{
+									"key": "$inlinecount",
+									"value": "allpages"
+								},
+								{
+									"key": "$top",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order using search",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bc5c7d0b-8e34-4678-9484-ccf2c8266885",
+								"exec": [
+									"",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$search=KH*&$top=3&$inlinecount=allpages&$expand=BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{ID}}'",
+									"disabled": true
+								},
+								{
+									"key": "$search",
+									"value": "KH*"
+								},
+								{
+									"key": "$top",
+									"value": "3"
+								},
+								{
+									"key": "$inlinecount",
+									"value": "allpages"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Query sales order by elements",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
+								"exec": [
+									"",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderQueryByElements?NumberOfRows='20'&SalesOrganisationID='{{SalesUnitID}}'&ID='3*'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderQueryByElements"
+							],
+							"query": [
+								{
+									"key": "NumberOfRows",
+									"value": "'20'"
+								},
+								{
+									"key": "StartRow",
+									"value": "'5'",
+									"disabled": true
+								},
+								{
+									"key": "SalesOrganisationID",
+									"value": "'{{SalesUnitID}}'"
+								},
+								{
+									"key": "ID",
+									"value": "'3*'"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ee97c9c1-6868-4133-9d4b-f28ee2250490",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b4f4f31b-a619-4b54-9f88-8b677c078dd3",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get codelists",
+			"item": [
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "65823112-7d5a-4ed2-ab1b-c78b1ba6c0cc",
+								"type": "text/javascript",
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									"pm.environment.set(\"SalesOrderExternalReference\", \"\");",
+									"pm.environment.set(\"SalesOrderObjectID\", \"\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get codelist for currency codes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2b4e734-e01c-45a9-97ce-cb86306ea5d6",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderGrossAmountCurrencyCodeCollection?$format=json&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderGrossAmountCurrencyCodeCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get codelist for item processing type code",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2b4e734-e01c-45a9-97ce-cb86306ea5d6",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderItemProcessingTypeCodeCollection?$format=json&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderItemProcessingTypeCodeCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{Password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{User}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "2c7a694f-aab0-42b4-aa6d-19aa1d73f24e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "baabd46e-19e9-4a85-b0ca-55fd0e7f783d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
