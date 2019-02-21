@@ -143,6 +143,9 @@ Configure additional Web Service APIs used in the Postman collection:
 	- *Manage Production Lots*
 3. Work center view *Application and User Management - Communication Arrangements*: Create a communication arrangement using the communication scenario and communication system and enter the credentials
 
+Deactivate approval for service confirmations:
+Open the ByD work center *Business Configuration* and deactivate the scoping question *Service* > *Service and Repair* > *Service Confirmation* > *Do you want to use an approval process for service confirmations?*.
+
 Configure bank statement processing: 
 The bank statements created by this scenario are automatically allocated if you apply the following business configuration in your ByD system:
 1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  
