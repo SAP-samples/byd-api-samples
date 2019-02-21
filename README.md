@@ -32,9 +32,11 @@ Please check the description of the respective Postman collection for more infor
 
 ## Requirements
 
-The API usage samples are for people familiar with SAP Business ByDesign and Postman.
-- [SAP Business ByDesign Help Portal](https://help.sap.com/viewer/product/SAP_BUSINESS_BYDESIGN/)
-- [Postman Learning Center](https://learning.getpostman.com/)
+Users must be familiar with SAP Business ByDesign, and with Postman.
+    - [SAP Business ByDesign Help Portal](https://help.sap.com/viewer/product/SAP_BUSINESS_BYDESIGN/)
+    - [Postman Learning Center](https://learning.getpostman.com/)
+    
+User must have an SAP Business ByDesign license.  *This is a paid product, no trial version is available at this time.*
 
 ## Download and Installation
 
@@ -191,10 +193,10 @@ Required business user authorizations (ByD Work Center Views):
 
 ## How to obtain support
 
-This repository is provided "as-is": there is no guarantee that raised issues will be answered or addressed in future releases.
+This repository is provided "as-is"; no support is available.
 
 ## License
 
 Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
-This file is licensed under the [SAP Sample Code License](/LICENSE.txt) except as noted otherwise in the [LICENSE](/LICENSE.txt) file.
+This file is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE](/LICENSE.txt) file.
 
