@@ -33,8 +33,8 @@ Please check the description of the respective Postman collection for more infor
 ## Requirements
 
 Users must be familiar with SAP Business ByDesign, and with Postman.
-    - [SAP Business ByDesign Help Portal](https://help.sap.com/viewer/product/SAP_BUSINESS_BYDESIGN/)
-    - [Postman Learning Center](https://learning.getpostman.com/)
+- [SAP Business ByDesign Help Portal](https://help.sap.com/viewer/product/SAP_BUSINESS_BYDESIGN/)
+- [Postman Learning Center](https://learning.getpostman.com/)
     
 User must have an SAP Business ByDesign license.  *This is a paid product, no trial version is available at this time.*
 
