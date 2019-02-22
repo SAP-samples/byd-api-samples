@@ -201,11 +201,14 @@ Required business user authorizations (ByD Work Center Views):
 - *Project Management - Projects*
 - *Sales Orders - Sales Orders*
 
+Assign your user (employee or service agent) to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.
+
 #### Sales Orders
 
 Required business user authorizations (ByD Work Center Views):
 - *Sales Orders - Sales Orders*
 
+Assign your user (employee or service agent) to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.
 
 ## How to obtain support
 
