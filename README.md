@@ -48,7 +48,9 @@ Users must have an SAP Business ByDesign license.  *This is a paid product, no t
 All sample Postman collections are tailored to run on SAP Business ByDesign reference systems with preconfigured and loaded sample data provided by SAP. 
 Nevertheless you can use the Postman collections and sample Custom OData Services in other ByD systems as well, if you adopt Postman environment variables and Postman requests according the business configuration and master data of your ByD system.
 
-Using the examples in SAP Business ByDesign reference systems with preconfigured and loaded sample data provided by SAP:
+All configuration settings described below are based SAP Business ByDesign reference systems with preconfigured and loaded sample data provided by SAP.
+
+Configuration steps:
 1. Open SAP ByDesign work center view "*Application and User Management - OData Services*" and upload the Custom OData Services in sub-folder "*Custom OData Service*".
 2. Open the desktop app *Postman* and import the Postman collections and Postman environments in sub-folder "*Postman Collection*".
 3. Check the configuration description of the respective API sample package below for package specific setup instructions.
@@ -60,7 +62,7 @@ Using the examples in SAP Business ByDesign reference systems with preconfigured
 
 API sample package specific configurations:
 
-#### *Analytics* 
+#### Analytics 
 
 OData API for reports: Assign the following work center views to your SAP ByDesign business user to be able to access the reports used in the OData request samples:
 - *Customer Invoicing - Invoice Documents*
@@ -86,7 +88,7 @@ OData API for data sources: Create a communication user and expose data sources 
 
 You may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.
 
-#### *Business Partner Data* 
+#### Business Partner Data
 
 Required business user authorizations (ByD Work Center Views):
 - *Business Parnter Data - Business Partners*
@@ -104,7 +106,7 @@ Configure additional Web Service APIs used in the Postman collection:
 	- *Query Suppliers*
 3. Work center view *Application and User Management - Communication Arrangements*: Create a communication arrangement using the communication scenario and communication system and enter the credentials
 
-#### *End-to-End Scenarios*
+#### End-to-End Scenarios
 
 Required business user authorizations (ByD Work Center Views):
 - *Marketing - Leads*
@@ -131,6 +133,33 @@ Required business user authorizations (ByD Work Center Views):
 - *Liquidity Management - Inbound Files*
 - *Liquidity Management - Bank Statements*
 
+Assign your user (employee or service agent) to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.
+
+Configure the determination methode for external references:
+Business configuration fine tuning activity *External Reference Number Determination for Customer Invoice*: Set the determination method to *Copied from Predecessor Reference ID*.
+
+Deactivate approval for service confirmations:
+Open the ByD work center *Business Configuration* and deactivate the scoping question *Service* > *Service and Repair* > *Service Confirmation* > *Do you want to use an approval process for service confirmations?*.
+
+Configure bank statement processing: 
+The bank statements created by this scenario are automatically allocated if you apply the following business configuration in your ByD system:
+1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  
+Add row using the values: Company ID: 1000 | Bank ID: 1000002 | Bank Statement Format: 02 - BAI2 US
+2. Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  
+Add row using the values: Seq.: 1 | *Company: * | Bank Country: * | Bank ID: * | Currency: * | Bank Account ID: * | Manual Post Necessary: False
+3. Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  
+Add 4 rows using the following values:
+	- Rule 1: Description: Customer | Rule Type: 4 | Rule Definition Mode: Expert | Regular Expression: (ORIG CO NAME\=).*
+	- Rule 2: Description: AR External Reference (w seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2}\d{2})
+	- Rule 3: Description: AR External Reference 1INV | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (1INV-\d{1,}\-\d{1,})
+	- Rule 4: Description: AR External Reference (w/o seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2})
+
+Create company payment file register:
+Open work center view *Liquidity Management - Inbound Files*, click on *New* > *Inbound File* and enter the following values:
+	Type: Bank Statement | Company: 1000 | Bank ID: 1000002 | Import Format: BAI2 US.
+Save without adding an attachment.
+The system created a company payment file register for company 1000 that can now be used for file uploads via OData.
+
 Configure additional Web Service APIs used in the Postman collection:
 1. Work center view *Application and User Management - Communication Systems*: Create a communication system representing the remote system
 2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with the following web service APIs:
@@ -143,27 +172,11 @@ Configure additional Web Service APIs used in the Postman collection:
 	- *Manage Production Lots*
 3. Work center view *Application and User Management - Communication Arrangements*: Create a communication arrangement using the communication scenario and communication system and enter the credentials
 
-Deactivate approval for service confirmations:
-Open the ByD work center *Business Configuration* and deactivate the scoping question *Service* > *Service and Repair* > *Service Confirmation* > *Do you want to use an approval process for service confirmations?*.
-
-Configure bank statement processing: 
-The bank statements created by this scenario are automatically allocated if you apply the following business configuration in your ByD system:
-1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  
-Add row using the values: Company ID: 1000 | Bank ID: 1000002 | Bank Statement Format: 02 - BAI2 US
-2. Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  
-Add row using the values: Seq.: 1 | Company: * | Bank Country: * | Bank ID: * | Currency: * | Bank Account ID: * | Manual Post Necessary: False
-3. Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  
-Add 4 rows using the following values:
-	- Rule 1: Description: Customer | Rule Type: 4 | Rule Definition Mode: Expert | Regular Expression: (ORIG CO NAME\=).*
-	- Rule 2: Description: AR External Reference (w seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2}\d{2})
-	- Rule 3: Description: AR External Reference 1INV | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (1INV-\d{1,}\-\d{1,})
-	- Rule 4: Description: AR External Reference (w/o seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2})
-
 You can use the Postman collection folder *Procure to Stock* to fill up your stock before running the process *Sell from Stock* to avoid any failure of availability-to-promise checks.
 
 The Postman collection folder *Pay Due Items using Bank Statements* clears due items originating from customer invoices created by all other folders in this collection.
 
-#### *Product and Service Portfolio*
+#### Product and Service Portfolio
 
 Required business user authorizations (ByD Work Center Views):
 - *Product and Service Portfolio - Pricing*
@@ -176,19 +189,19 @@ Configure additional Web Service APIs used in the Postman collection:
 	- *Query Price Lists*
 3. Work center view *Application and User Management - Communication Arrangements*: Create a communication arrangement using the communication scenario and communication system and enter the credentials
 
-#### *Product Data* 
+#### Product Data
 
 Required business user authorizations (ByD Work Center Views):
 - *Product Data - Materials*
 - *Product Data - Services*
 
-#### *Projects*
+#### Projects
 
 Required business user authorizations (ByD Work Center Views):
 - *Project Management - Projects*
 - *Sales Orders - Sales Orders*
 
-#### *Sales Orders*
+#### Sales Orders
 
 Required business user authorizations (ByD Work Center Views):
 - *Sales Orders - Sales Orders*
