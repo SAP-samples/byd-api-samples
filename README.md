@@ -91,9 +91,9 @@ You may need to clear cookies stored in Postman to retrigger authentication usin
 #### Business Partner Data
 
 Required business user authorizations (ByD Work Center Views):
-- *Business Parnter Data - Business Partners*
-- *Business Parnter Data - Accounts*
-- *Business Parnter Data - Suppliers*
+- *Business Partner Data - Business Partners*
+- *Business Partner Data - Accounts*
+- *Business Partner Data - Suppliers*
 
 Configure additional Web Service APIs used in the Postman collection:
 1. Work center view *Application and User Management - Communication Systems*: Create a communication system representing the remote system
