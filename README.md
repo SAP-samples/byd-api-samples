@@ -45,7 +45,7 @@ Users must have an SAP Business ByDesign license.  *This is a paid product, no t
 
 ## Configuration
 
-All sample Postman collections are tailored to run on SAP Business ByDesign reference systems with preconfigured and loaded sample data provided by SAP. 
+All sample Postman collections are tailored to run on SAP Business ByDesign Partner Demo Tenants (reference systems) with preconfigured and loaded sample data provided by SAP. 
 Nevertheless you can use the Postman collections and sample Custom OData Services in other ByD systems as well, if you adopt Postman environment variables and Postman requests according the business configuration and master data of your ByD system.
 
 All configuration settings described below are based SAP Business ByDesign reference systems with preconfigured and loaded sample data provided by SAP.
