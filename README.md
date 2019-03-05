@@ -5,7 +5,7 @@
 This repository provides example Postman collections consuming SAP Business ByDesign APIs and can be used to get insights how to integrate and extend SAP Business ByDesign.
 
 [SAP Business ByDesign](https://www.sap.com/products/business-bydesign.html) is a cloud ERP solution for small and mid-market companies. 
-SAP Business ByDesign (ByD) is designed as open business process platform and provides a comprehensive portfolio of APIs and integration capabilities.
+SAP Business ByDesign (ByD) is designed as open business process platform and provides a comprehensive portfolio of APIs and integration capabilities.  
 The sample Postman collections illustrate hands-on how to access master data, business documents and analytical data in context of ByD business processes with a focus on ByD OData APIs.
 
 The repository is structured in API sample packages. 
@@ -45,7 +45,7 @@ Users must have an SAP Business ByDesign license.  *This is a paid product, no t
 
 ## Configuration
 
-All sample Postman collections are tailored to run on SAP Business ByDesign Partner Demo Tenants (reference systems) with preconfigured and loaded sample data provided by SAP. 
+All sample Postman collections are tailored to run on SAP Business ByDesign Partner Demo Tenants (reference systems) with preconfigured and loaded sample data provided by SAP.  
 Nevertheless you can use the Postman collections and sample Custom OData Services in other ByD systems as well, if you adopt Postman environment variables and Postman requests according the business configuration and master data of your ByD system.
 
 All configuration settings described below are based SAP Business ByDesign reference systems with preconfigured and loaded sample data provided by SAP.
@@ -135,13 +135,13 @@ Required business user authorizations (ByD Work Center Views):
 
 Assign your user (employee or service agent) to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.
 
-Configure the determination methode for external references:
+Configure the determination methode for external references:  
 ByD work center *Business Configuration*: Open the fine tuning activity *External Reference Number Determination for Customer Invoice* and set the determination method to *Copied from Predecessor Reference ID*.
 
-Deactivate approval for service confirmations:
+Deactivate approval for service confirmations:  
 ByD work center *Business Configuration*: Open your project scope and deactivate the scoping question: *Service* > *Service and Repair* > *Service Confirmation* > *Do you want to use an approval process for service confirmations?*
 
-Configure bank statement processing: 
+Configure bank statement processing:  
 The bank statements created by this scenario are automatically allocated if you apply the following business configuration in your ByD system:
 1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  
 Add row using the values: Company ID: 1000 | Bank ID: 1000002 | Bank Statement Format: 02 - BAI2 US
@@ -154,10 +154,10 @@ Add 4 rows using the following values:
 	- Rule 3: Description: AR External Reference 1INV | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (1INV-\d{1,}\-\d{1,})
 	- Rule 4: Description: AR External Reference (w/o seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2})
 
-Create company payment file register:
+Create company payment file register:  
 Open work center view *Liquidity Management - Inbound Files*, click on *New* > *Inbound File* and enter the following values:
 	Type: Bank Statement | Company: 1000 | Bank ID: 1000002 | Import Format: BAI2 US.
-Save without adding an attachment.
+Save without adding an attachment.  
 The system created a company payment file register for company 1000 that can now be used for file uploads via OData.
 
 Configure additional Web Service APIs used in the Postman collection:
