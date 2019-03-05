@@ -165,7 +165,6 @@ Configure additional Web Service APIs used in the Postman collection:
 2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with the following web service APIs:
 	- *Query Service Confirmations*
 	- *Manage Service Confirmations*
-	- *Manage Third Party Order Delivery Notifications*
 	- *Manage Production Proposals*
 	- *Query Production Orders*
 	- *Query Production Lots*
