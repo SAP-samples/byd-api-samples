@@ -155,8 +155,8 @@ Add 4 rows using the following values:
 	- Rule 4: Description: AR External Reference (w/o seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2})
 
 Create company payment file register:  
-Open work center view *Liquidity Management - Inbound Files*, click on *New* > *Inbound File* and enter the following values:
-	Type: Bank Statement | Company: 1000 | Bank ID: 1000002 | Import Format: BAI2 US.
+Open work center view *Liquidity Management - Inbound Files*, click on *New* > *Inbound File* and enter the following values:  
+	Type: Bank Statement | Company: 1000 | Bank ID: 1000002 | Import Format: BAI2 US.  
 Save without adding an attachment.  
 The system created a company payment file register for company 1000 that can now be used for file uploads via OData.
 
