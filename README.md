@@ -199,6 +199,8 @@ Required business user authorizations (ByD Work Center Views):
 Required business user authorizations (ByD Work Center Views):
 - *Project Management - Projects*
 - *Sales Orders - Sales Orders*
+- *Time Administration - Employees*
+- *Time Administration - Time Sheet*
 
 Assign your user (employee or service agent) to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.
 
