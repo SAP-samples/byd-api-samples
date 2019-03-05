@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "8611db0f-3a4c-4841-b306-c8db5607a439",
 		"name": "End-to-End Scenarios",
-		"description": "SAP Business ByDesign API Samples - End-to-End Business Scenarios\n=================================================================\n\nA Postman collection with examples to run end-to-end business processes using SAP Business ByDesign Custom OData Services.\nEach collection folder corresponds to an end-to-end process; execute the web service requests in the listed order with each folder.\nAll sample data is aligned to and ready to run on SAP Business ByDesign Reference Systems with preconfigured and loaded sample data provided by SAP.\n\n\n\n&nbsp; \n\nScenario 1: Lead to Opportunity to Quote\n----------------------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Marketing - Leads*\n- *New Business - Opportunity List*\n- *New Business - Sales Quotes*\n\nScenario:\n1. Create lead\n2. Get and check lead\n3. Hand over lead to sales\n4. Accept and update lead\n5. Create opportunity with reference to lead\n6. Update opportunity status to \"in process\" and \"won\", and update opportunity\n7. Get and check opportunity\n8. Create sales quote\n9. Add reference to opportunity and copy opportunity data into the quote\n10. Get and check quote\n\n\n&nbsp;\n\nScenario 2: Selling Services\n----------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Sales Orders - Sales Orders*\n- *Customer Invoicing - Invoice Requests*\n- *Customer Invoicing - Invoice Documents*\n\nScenario:\n1. Create sales order with service items (fix price w/o actuals)\n2. Release and confirm execution of sales order items\n3. Release the customer invoice request\n4. Release customer invoice\n\nOpen items created by this scenario can be paid using scenario *Pay Due Items using Bank Statements*.\n\n\n&nbsp;\n\nScenario 3: Field Service and Repair\n------------------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Service Desk - Service Requests*\n- *Service Orders - Service Order Processing*\n- *Field Service and Repair - Service Confirmations*\n\nSetup:\nThis scenario requires to configure SOAP web service APIs:\n1. Work center view *Application and User Management - Communication Systems*: Create a communication system using work center view\n2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with the following web service APIs: \n\t- *Query Service Confirmations*\n\t- *Manage Service Confirmations*\n3. Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials\n\nScenario: \n1. Create service request\n2. Create service order as follow-up document of the service request\n3. Add services and spare parts and release execution\n4. Create service order confirmation (SOAP Web Service API)\n5. Submit, comfirm and complete the service execution\n6. Complete the service request\n7. Invoice the service confirmation\n\nOpen items created by this scenario can be paid using scenario *Pay Due Items using Bank Statements*.\n\n\n&nbsp;\n\nScenario 4: Procure to Stock\n----------------------------\n\nRequired user authorizations (ByD Work Center Views) and preconditions:\n- *Purchase Requests and Orders - Purchase Orders*\n- *Inbound Logistics - Purchase Orders*\n- *Inbound Logistics - Inbound Delivery Notifications*\n- *Inbound Logistics - Inbound Deliveries*\n- *Supplier Invoicing - Invoices and Credit Memos*\n- Supplier invoices can only be posted if the user is authorized to post supplier invoices (see for example *Organizational Management > Employee Work Distribution > Employee Responsible for Supplier Invoices*) and if supplier invoices with total amount 50540.00 USD do not require approvals (see *Business Configuration* activity *Supplier Invoice Approvals*). Otherwise supplier invoices remain in status \"ready for posting\".\n\nScenario:\n1. Create and submit purchase order with 1 item (material to stock)\n2. Confirm purchase order by supplier (creates purchase order acknowledgment)\n3. Get and check inbound delivery request (BO *InboundDeliveryRequest*)\n4. Create inbound delivery notification (BO *InboundDelivery*)\n5. Post goods receipt and check the confirmed inbound delivery (BO *ConfirmedInboundDelivery*)\n6. Create supplier invoice\n7. Accept supplier invoice exception and post supplier invoice => Workaround for missing PSM-release of BO Element *InboundDelivery/FollowUpInvoicingDueNotificationRequirementCode*: The supplier invoice entry is not updated by the confirmed inbound delivery and hence the system raises a supplier invoice exception \"Missing Receipt or Return Document\"\n8. Check purchase order status\n\nMaterials purchased using this scenario can be sold using scenario *Sell from Stock*.\n\n\n&nbsp;\n\nScenario 5: Sell from Stock\n---------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Sales Orders - Sales Orders*\n- *Outbound Logistics - Delivery Proposals*\n- *Outbound Logistics - Outbound Deliveries*\n- *Customer Invoicing - Invoice Requests*\n- *Customer Invoicing - Invoice Documents*\n\nScenario:\n1. Create sales order with 1 material item\n2. Check availability and release the sales order to execution\n3. Check delivery proposal (BO *OutboundDeliveryRequest*)\n4. Post goods issue\n5. Get, check and release outbound delivery (BO *OutboundDelivery*)\n6. Get, check and release the customer invoice request\n7. Get, check and release customer invoice\n8. Check sales order status\n\nIf the availability check fails, you can fill up your stock using scenario *Procure to Stock*.\n\nOpen items created by this scenario can be paid using scenario *Pay Due Items using Bank Statements*.\n\n\n&nbsp;\n\nScenario 6: Drop Shipment\n-------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Sales Orders - Sales Orders*\n- *Purchase Requests and Orders - Purchase Orders*\n- *Inbound Logistics - Purchase Orders*\n- *Inbound Logistics - Inbound Delivery Notifications*\n- *Supplier Invoicing - Invoices and Credit Memos*\n- Supplier invoices can only be posted if the user is authorized to post supplier invoices (see for example *Organizational Management > Employee Work Distribution > Employee Responsible for Supplier Invoices*) and if supplier invoices with total amount 79200.00 USD do not require approvals (see *Business Configuration* activity *Supplier Invoice Approvals*). Otherwise supplier invoices remain in status \"ready for posting\".\n- *Outbound Logistics - Outbound Deliveries*\n- *Customer Invoicing - Invoice Requests*\n- *Customer Invoicing - Invoice Documents*\n\nSetup:\nThis scenario requires to configure a SOAP web service API:\n1. Work center view *Application and User Management - Communication Systems*: Create a communication system using work center view\n2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with the web service API *Manage Third Party Order Delivery Notifications*\n3. Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials\n\nScenario:\n1. Create sales order with material item and external fullfillment\n2. Release sales order to execution\n3. Get and check purchase order\n4. Get and check inbound delivery request (BO *InboundDeliveryRequest*)\n5. Create third-party delivery notification (BO *InboundDelivery*) (SOAP Web Service API)\n6. Get and release 3rd-party delivery notification \n7. Create and release supplier invoice\n8. Get and check supplier invoice\n9. Check purchase order status\n10. Get outbound delivery (BO *OutboundDelivery*)\n11. Get customer invoice request with reference to outbound delivery\n12. Release customer invoice request and create customer invoice\n13. Query and release customer invoice\n14. Get and check customer invoice\n15. Check sales order status\n\n\n&nbsp;\n\nScenario 7: Make to Stock\n-------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Purchase Requests and Orders - Purchase Orders*\n- *Inbound Logistics - Inbound Delivery Notifications*\n- *Inbound Logistics - Inbound Deliveries*\n- *Supply Control - Process Production Proposals*\n- *Production Control - Production Orders*\n- *Execution - Production Tasks*\n\nSetup:\nThis scenario requires to configure SOAP web service APIs:\n1. Work center view *Application and User Management - Communication Systems*: Create a communication system using work center view\n2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with the following web service APIs: \n\t- *Manage Production Proposals*\n\t- *Query Production Orders*\n\t- *Query Production Lots*\n\t- *Manage Production Lots*\n3. Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials\n\nScenario:\n1. Procure production materials:\n\ta. Create and submit purchase order with 2 item (material to stock)\n\tb. Confirm purchase order by supplier (creates purchase order acknowledgment)\n\tc. Get and check inbound delivery request (BO *InboundDeliveryRequest*)\n\td. Create inbound delivery notification (BO *InboundDelivery*)\n\te. Post goods receipt and check the confirmed inbound delivery (BO *ConfirmedInboundDelivery*)\n\tf. Check purchase order status\n2. Create production proposal (SOAP Web Service API)\n3. Check and release production proposal\n4. Query production order (SOAP Web Service API)\n5. Check and release production order\n6. Query production lot (SOAP Web Service API)\n7. Assign production task responsible (SOAP Web Service API)\n8. Confirm and finish production task (SOAP Web Service API)\n\n\n&nbsp;\n\nScenario 8: Pay Due Items using Bank Statements\n-----------------------------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Receivables - Customer Accounts*\n- *Liquidity Management - My Banks*\n- *Liquidity Management - Inbound Files*\n- *Liquidity Management - Bank Statements*\n\nSetup: \nThe bank statements created by this scenario are automatically allocated if you apply the following business configuration in your ByD system:\n1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  \nAdd row using the values: Company ID: 1000 | Bank ID: 1000002 | Bank Statement Format: 02 - BAI2 US\n2. Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  \nAdd row using the values: Seq.: 1 | Company: * | Bank Country: * | Bank ID: * | Currency: * | Bank Account ID: * | Manual Post Necessary: False\n3. Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  \nAdd 4 rows using the following values:\n\t- Rule 1: Description: Customer | Rule Type: 4 | Rule Definition Mode: Expert | Regular Expression: (ORIG CO NAME\\=).*\n\t- Rule 2: Description: AR External Reference (w seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\\R\\-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2}\\d{2})\n\t- Rule 3: Description: AR External Reference 1INV | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (1INV-\\d{1,}\\-\\d{1,})\n\t- Rule 4: Description: AR External Reference (w/o seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\\R\\-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2})\n\nScenario:\n1. Read previous bank statement to get last closing balance (BO *HouseBankStatement*)\n2. Get open items to be cleared and create BAI2 bank statement file (Report *Accounts Receivable - Open Items*)\n\t- The request creates a BAI2 bank statement file for the number of due items as specified in environment variable \"TotalNumberOfDueItemsToBeCleared\"\n\t- By environment variable \"MaxNumberOfDueItemsToBeClearedPartially\" you specify the max. number of due items that are cleared partially. Which due items are cleared partially is a random choice; clearing amount = due amount - 3% discount.\n3. Get company house bank account (BO *HouseBankAccount*)\n4. Get company payment file register (BO *CompanyPaymentFileRegister*)\n5. Create incoming file using the file of step 2 (BO *CompanyPaymentFileRegister*)\n6. Trigger file upload (Alternatively start the file via ByD work center view *Liquidity Management - Inbound Files*) \n7. ByD UI: Allocate unmatched payments via work center view *Liquidity Management - Bank Statements*",
+		"description": "SAP Business ByDesign API Samples - End-to-End Business Scenarios\n=================================================================\n\nA Postman collection with examples to run end-to-end business processes using SAP Business ByDesign Custom OData Services.\nEach collection folder corresponds to an end-to-end process; execute the web service requests in the listed order with each folder.\nAll sample data is aligned to and ready to run on SAP Business ByDesign Reference Systems with preconfigured and loaded sample data provided by SAP.\n\n\n\n&nbsp; \n\nScenario 1: Lead to Opportunity to Quote\n----------------------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Marketing - Leads*\n- *New Business - Opportunity List*\n- *New Business - Sales Quotes*\n\nScenario:\n1. Create lead\n2. Get and check lead\n3. Hand over lead to sales\n4. Accept and update lead\n5. Create opportunity with reference to lead\n6. Update opportunity status to \"in process\" and \"won\", and update opportunity\n7. Get and check opportunity\n8. Create sales quote\n9. Add reference to opportunity and copy opportunity data into the quote\n10. Get and check quote\n\n\n&nbsp;\n\nScenario 2: Selling Services\n----------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Sales Orders - Sales Orders*\n- *Customer Invoicing - Invoice Requests*\n- *Customer Invoicing - Invoice Documents*\n\nScenario:\n1. Create sales order with service items (fix price w/o actuals)\n2. Release and confirm execution of sales order items\n3. Release the customer invoice request\n4. Release customer invoice\n\nOpen items created by this scenario can be paid using scenario *Pay Due Items using Bank Statements*.\n\n\n&nbsp;\n\nScenario 3: Field Service and Repair\n------------------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Service Desk - Service Requests*\n- *Service Orders - Service Order Processing*\n- *Field Service and Repair - Service Confirmations*\n\nSetup:\nThis scenario requires to configure SOAP web service APIs:\n1. Work center view *Application and User Management - Communication Systems*: Create a communication system using work center view\n2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with the following web service APIs: \n\t- *Query Service Confirmations*\n\t- *Manage Service Confirmations*\n3. Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials\n\nCheck Business Configuration and deactivate the scoping question *Service* > *Service and Repair* > *Service Confirmation* > *Do you want to use an approval process for service confirmations?*\n\nScenario: \n1. Create service request\n2. Create service order as follow-up document of the service request\n3. Add services and spare parts and release execution\n4. Create service order confirmation (SOAP Web Service API)\n5. Submit, comfirm and complete the service execution\n6. Complete the service request\n7. Invoice the service confirmation\n\nOpen items created by this scenario can be paid using scenario *Pay Due Items using Bank Statements*.\n\n\n&nbsp;\n\nScenario 4: Procure to Stock\n----------------------------\n\nRequired user authorizations (ByD Work Center Views) and preconditions:\n- *Purchase Requests and Orders - Purchase Orders*\n- *Inbound Logistics - Purchase Orders*\n- *Inbound Logistics - Inbound Delivery Notifications*\n- *Inbound Logistics - Inbound Deliveries*\n- *Supplier Invoicing - Invoices and Credit Memos*\n- Supplier invoices can only be posted if the user is authorized to post supplier invoices (see for example *Organizational Management > Employee Work Distribution > Employee Responsible for Supplier Invoices*) and if supplier invoices with total amount 50540.00 USD do not require approvals (see *Business Configuration* activity *Supplier Invoice Approvals*). Otherwise supplier invoices remain in status \"ready for posting\".\n\nScenario:\n1. Create and submit purchase order with 1 item (material to stock)\n2. Confirm purchase order by supplier (creates purchase order acknowledgment)\n3. Get and check inbound delivery request (BO *InboundDeliveryRequest*)\n4. Create inbound delivery notification (BO *InboundDelivery*)\n5. Post goods receipt and check the confirmed inbound delivery (BO *ConfirmedInboundDelivery*)\n6. Create supplier invoice\n7. Check supplier invoice exceptions \n8. Post supplier invoice\n9. Check purchase order status\n\nMaterials purchased using this scenario can be sold using scenario *Sell from Stock*.\n\n\n&nbsp;\n\nScenario 5: Sell from Stock\n---------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Sales Orders - Sales Orders*\n- *Outbound Logistics - Delivery Proposals*\n- *Outbound Logistics - Outbound Deliveries*\n- *Customer Invoicing - Invoice Requests*\n- *Customer Invoicing - Invoice Documents*\n\nScenario:\n1. Create sales order with 1 material item\n2. Check availability and release the sales order to execution\n3. Check delivery proposal (BO *OutboundDeliveryRequest*)\n4. Post goods issue\n5. Get, check and release outbound delivery (BO *OutboundDelivery*)\n6. Get, check and release the customer invoice request\n7. Get, check and release customer invoice\n8. Check sales order status\n\nIf the availability check fails, you can fill up your stock using scenario *Procure to Stock*.\n\nOpen items created by this scenario can be paid using scenario *Pay Due Items using Bank Statements*.\n\n\n&nbsp;\n\nScenario 6: Drop Shipment\n-------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Sales Orders - Sales Orders*\n- *Purchase Requests and Orders - Purchase Orders*\n- *Inbound Logistics - Purchase Orders*\n- *Inbound Logistics - Inbound Delivery Notifications*\n- *Supplier Invoicing - Invoices and Credit Memos*\n- Supplier invoices can only be posted if the user is authorized to post supplier invoices (see for example *Organizational Management > Employee Work Distribution > Employee Responsible for Supplier Invoices*) and if supplier invoices with total amount 79200.00 USD do not require approvals (see *Business Configuration* activity *Supplier Invoice Approvals*). Otherwise supplier invoices remain in status \"ready for posting\".\n- *Outbound Logistics - Outbound Deliveries*\n- *Customer Invoicing - Invoice Requests*\n- *Customer Invoicing - Invoice Documents*\n\nScenario:\n1. Create sales order with material item and external fullfillment\n2. Release sales order to execution\n3. Get and check purchase order\n4. Get and check inbound delivery request (BO *InboundDeliveryRequest*)\n5. Create third-party delivery notification (BO *InboundDelivery*)\n6. Release third-party delivery notification \n7. Get and check third-party delivery notification\n8. Create and release supplier invoice\n9. Get and check supplier invoice\n10. Check purchase order status\n11. Get outbound delivery (BO *OutboundDelivery*)\n12. Get customer invoice request with reference to outbound delivery\n13. Release customer invoice request and create customer invoice\n14. Query and release customer invoice\n15. Get and check customer invoice\n16. Check sales order status\n\n\n&nbsp;\n\nScenario 7: Make to Stock\n-------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Purchase Requests and Orders - Purchase Orders*\n- *Inbound Logistics - Inbound Delivery Notifications*\n- *Inbound Logistics - Inbound Deliveries*\n- *Supply Control - Process Production Proposals*\n- *Production Control - Production Orders*\n- *Execution - Production Tasks*\n\nSetup:\nThis scenario requires to configure SOAP web service APIs:\n1. Work center view *Application and User Management - Communication Systems*: Create a communication system using work center view\n2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with the following web service APIs: \n\t- *Manage Production Proposals*\n\t- *Query Production Orders*\n\t- *Query Production Lots*\n\t- *Manage Production Lots*\n3. Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials\n\nScenario:\n1. Procure production materials:\n\ta. Create and submit purchase order with 2 item (material to stock)\n\tb. Confirm purchase order by supplier (creates purchase order acknowledgment)\n\tc. Get and check inbound delivery request (BO *InboundDeliveryRequest*)\n\td. Create inbound delivery notification (BO *InboundDelivery*)\n\te. Post goods receipt and check the confirmed inbound delivery (BO *ConfirmedInboundDelivery*)\n\tf. Check purchase order status\n2. Create production proposal (SOAP Web Service API)\n3. Check and release production proposal\n4. Query production order (SOAP Web Service API)\n5. Check and release production order\n6. Query production lot (SOAP Web Service API)\n7. Assign production task responsible (SOAP Web Service API)\n8. Confirm and finish production task (SOAP Web Service API)\n\n\n&nbsp;\n\nScenario 8: Pay Due Items using Bank Statements\n-----------------------------------------------\n\nRequired user authorizations (ByD Work Center Views):\n- *Receivables - Customer Accounts*\n- *Liquidity Management - My Banks*\n- *Liquidity Management - Inbound Files*\n- *Liquidity Management - Bank Statements*\n\nSetup: \nThe bank statements created by this scenario are automatically allocated if you apply the following business configuration in your ByD system:\n1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  \nAdd row using the values: Company ID: 1000 | Bank ID: 1000002 | Bank Statement Format: 02 - BAI2 US\n2. Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  \nAdd row using the values: Seq.: 1 | Company: * | Bank Country: * | Bank ID: * | Currency: * | Bank Account ID: * | Manual Post Necessary: False\n3. Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  \nAdd 4 rows using the following values:\n\t- Rule 1: Description: Customer | Rule Type: 4 | Rule Definition Mode: Expert | Regular Expression: (ORIG CO NAME\\=).*\n\t- Rule 2: Description: AR External Reference (w seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\\R\\-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2}\\d{2})\n\t- Rule 3: Description: AR External Reference 1INV | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (1INV-\\d{1,}\\-\\d{1,})\n\t- Rule 4: Description: AR External Reference (w/o seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\\R\\-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2})\n\nScenario:\n1. Read previous bank statement to get last closing balance (BO *HouseBankStatement*)\n2. Get open items to be cleared and create BAI2 bank statement file (Report *Accounts Receivable - Open Items*)\n\t- The request creates a BAI2 bank statement file for the number of due items as specified in environment variable \"TotalNumberOfDueItemsToBeCleared\"\n\t- By environment variable \"MaxNumberOfDueItemsToBeClearedPartially\" you specify the max. number of due items that are cleared partially. Which due items are cleared partially is a random choice; clearing amount = due amount - 3% discount.\n3. Get company house bank account (BO *HouseBankAccount*)\n4. Get company payment file register (BO *CompanyPaymentFileRegister*)\n5. Create incoming file using the file of step 2 (BO *CompanyPaymentFileRegister*)\n6. Trigger file upload (Alternatively start the file via ByD work center view *Liquidity Management - Inbound Files*) \n7. ByD UI: Allocate unmatched payments via work center view *Liquidity Management - Bank Statements*",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -2655,10 +2655,9 @@
 									"// Validations",
 									"var jsonResponse = pm.response.json();",
 									"pm.test(\"Service order \" + jsonResponse.d.results.ID + \" released\", function () {pm.response.to.have.status(200) });",
-									"pm.test(\"Service order consistency status: \" + jsonResponse.d.results.ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
-									"pm.test(\"Service order release status: \" + jsonResponse.d.results.ReleaseStatusCodeText, function () { pm.expect(jsonResponse.d.results.ReleaseStatusCode).to.eql(\"3\") });",
-									"",
-									""
+									"pm.test(\"Consistency status: \" + jsonResponse.d.results.ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Release status: \" + jsonResponse.d.results.ReleaseStatusCodeText, function () { pm.expect(jsonResponse.d.results.ReleaseStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Lifecycle status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"2\") });"
 								],
 								"type": "text/javascript"
 							}
@@ -4129,7 +4128,7 @@
 								"id": "a0bfe897-ba8f-4957-98a0-c63800e15b73",
 								"exec": [
 									"// Delay and let the system complete the async. process integrations",
-									"setTimeout(function() {}, 3000); // wait 3 sec"
+									"setTimeout(function() {}, 6000); // wait 6 sec"
 								],
 								"type": "text/javascript"
 							}
@@ -4912,65 +4911,6 @@
 								{
 									"key": "$expand",
 									"value": "SupplierInvoiceExceptionReference/SupplierInvoiceException"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Accept supplier invoice exception",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
-								"exec": [
-									"var jsonResponse = pm.response.json();",
-									"",
-									"// Validations",
-									"//pm.test(\"Supplier invoice exception accepted\", function () { pm.response.to.have.status(200) });",
-									"pm.test(\"Supplier invoice exception accepted\", function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"3\") });"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-csrf-token",
-								"value": "{{x-csrf-token}}"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsupplierinvoice/Accept?ObjectID='{{SupplierInvoiceExceptionObjectID}}'",
-							"protocol": "https",
-							"host": [
-								"{{TenantHostname}}"
-							],
-							"path": [
-								"sap",
-								"byd",
-								"odata",
-								"cust",
-								"v1",
-								"khsupplierinvoice",
-								"Accept"
-							],
-							"query": [
-								{
-									"key": "ObjectID",
-									"value": "'{{SupplierInvoiceExceptionObjectID}}'"
 								}
 							]
 						}
@@ -7342,20 +7282,21 @@
 					"response": []
 				},
 				{
-					"name": "Create third-party delivery notification (SOAP 1.1)",
+					"name": "Create third-party delivery notification",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "691edeb4-7bfd-4e5f-8c75-c140cf9f04a2",
+								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
-									"let jsonResponse = xml2Json(responseBody);",
-									"",
-									"let IDNID = jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:ThirdPartyOrderDeliveryNotificationMaintainBundleConfirmation_sync'].ThirdPartyOrderDeliveryNotificationMaintainBundleConfirmation.DeliveryNotificationID;",
-									"pm.environment.set(\"InboundDeliveryNotificationID\", IDNID);",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"InboundDeliveryNotificationObjectID\", jsonResponse.d.results.ObjectID);",
 									"",
 									"// Validations",
-									"pm.test(\"Third-party delivery notification \" + IDNID + \" created\", function () { pm.response.to.have.status(200) });"
+									"pm.test(\"Third-party delivery notification \" + jsonResponse.d.results.ID + \" created\", function () { pm.response.to.have.status(201) });",
+									"pm.test(\"Consistency status: \" + jsonResponse.d.results.ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Release status: \" + jsonResponse.d.results.ReleaseStatusCodeText, function () { pm.expect(jsonResponse.d.results.ReleaseStatusCode).to.eql(\"1\") });",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -7363,19 +7304,14 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "3e65b165-9326-4ac2-9a90-37c0ed7a5612",
+								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
-									"// Set inbound delivery notification ID of pattern R-3PDN-<PurchaseOrderID-ItemID>-DateTime",
+									"// Set third-party delivery notification ID of pattern R-TPOP-<PurchaseOrderID-ItemID>",
 									"let todayDateTime = (new Date()).toISOString().substr(0,19);",
 									"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");",
-									"let generatedIDNID = pm.environment.get(\"ExternalReferencePrefix\") + \"3PDN-\" + pm.environment.get(\"PurchaseOrderID\") + \"-\" + pm.environment.get(\"PurchaseOrderItemID\") + \"-\" + todayDateTime;",
-									"//let generatedIDNID = pm.environment.get(\"ExternalReferencePrefix\") + \"IDN-\" + pm.environment.get(\"PurchaseOrderID\") + \"-\" + pm.environment.get(\"PurchaseOrderItemID\") + \"-\" + (new Date()).toISOString().substr(0,19);",
-									"pm.environment.set(\"InboundDeliveryNotificationID\", generatedIDNID);",
-									"",
-									"// Set production proposal material availability date with format 2019-02-05T12:00:00.0000000Z",
-									"//let moment = require('moment');",
-									"//let deliveryDate = moment().add(1,'day').toISOString().substr(0,16) + \":00.0000000Z\";",
-									"//pm.environment.set(\"DeliveryDateTime\", deliveryDate);",
+									"var generatedTPDNID = pm.environment.get(\"ExternalReferencePrefix\") + \"TPDN-\" + pm.environment.get(\"PurchaseOrderID\") + \"-\" + pm.environment.get(\"PurchaseOrderItemID\") + \"-\" + todayDateTime;",
+									"//var generatedTPDNID = pm.environment.get(\"ExternalReferencePrefix\") + \"TPDN-\" + pm.environment.get(\"PurchaseOrderID\") + \"-\" + pm.environment.get(\"PurchaseOrderItemID\") + \"-\" + (new Date()).toISOString().substr(0,19);",
+									"pm.environment.set(\"InboundDeliveryNotificationID\", generatedTPDNID);",
 									""
 								],
 								"type": "text/javascript"
@@ -7383,112 +7319,103 @@
 						}
 					],
 					"request": {
-						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "{{CommunicationUserPW}}",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "{{CommunicationUser}}",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/xml"
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:glob=\"http://sap.com/xi/SAPGlobal20/Global\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <glob:ThirdPartyOrderDeliveryNotificationMaintainBundleRequest_sync>\r\n         <BasicMessageHeader>\r\n         </BasicMessageHeader>\r\n         <ThirdPartyOrderDeliveryNotification actionCode=\"01\" cancellationDocumentIndicator=\"false\" releaseDocumentIndicator=\"false\" undoCancellationDocumentIndicator=\"false\">\r\n            <SenderTechnicalID>1</SenderTechnicalID>\r\n            <DeliveryNotificationID>{{InboundDeliveryNotificationID}}</DeliveryNotificationID>\r\n            <ProcessingTypeCode>TPDI</ProcessingTypeCode>\r\n            <DeliveryDate>\r\n   \t\t\t\t<!--<StartDateTime timeZoneCode=\"UTC\">2019-02-15T12:00:00.1234567Z</StartDateTime>-->\r\n   \t\t\t\t<!--<EndDateTime timeZoneCode=\"UTC\">2019-02-15T12:00:00.1234567Z</EndDateTime>-->\r\n            </DeliveryDate>\r\n            <ProductRecipientID>{{CustomerID2}}</ProductRecipientID>\r\n            <VendorID>{{SupplierID2}}</VendorID>\r\n            <Item actionCode=\"01\" cancellationItemIndicator=\"false\">\r\n               <SenderTechnicalID>1-1</SenderTechnicalID>\r\n               <LineItemID>10</LineItemID>\r\n               <TypeCode>14</TypeCode>\r\n               <ProcessingTypeCode>ITPD</ProcessingTypeCode>\r\n               <DeliveryQuantity unitCode=\"EA\">{{DropShipmentItemQuantity1}}</DeliveryQuantity>\r\n               <SellerPartyID>{{SupplierID2}}</SellerPartyID>\r\n               <BuyerPartyID>{{CompanyID}}</BuyerPartyID>\r\n               <EndBuyerPartyID>{{CustomerID2}}</EndBuyerPartyID>\r\n\t\t\t<FreightForwarderID>{{FreightForwarderID}}</FreightForwarderID>               \r\n               <ItemProduct actionCode=\"01\">\r\n                  <ProductID>{{MaterialID2}}</ProductID>\r\n               </ItemProduct>\r\n               <ItemBusinessTransactionDocumentReference actionCode=\"01\">\r\n                  <PurchaseOrder>\r\n                     <ID>{{PurchaseOrderID}}</ID>\r\n                     <TypeCode>001</TypeCode>\r\n                     <ItemID>{{PurchaseOrderItemID}}</ItemID>\r\n                  </PurchaseOrder>\r\n               </ItemBusinessTransactionDocumentReference>\r\n            </Item>\r\n         </ThirdPartyOrderDeliveryNotification>\r\n      </glob:ThirdPartyOrderDeliveryNotificationMaintainBundleRequest_sync>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>"
+							"raw": "{\t\n\t\"ID\": \"{{InboundDeliveryNotificationID}}\",\n\t\"ProcessingTypeCode\": \"TPDI\",\n\t\n\t\"SenderParty\": \n\t\t{\n\t\t\t\"PartyID\": \"{{SupplierID2}}\"\n\t\t},\n\t\"ShipToParty\": \n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID2}}\"\n\t\t},\n\t\"FreightForwarderParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{FreightForwarderID}}\"\n\t\t},\n\t\"Item\": \n\t\t[\n\t\t\t{\n\t\t\t\t\"TypeCode\": \"14\",\n\t\t\t\t\"ProductID\": \"{{MaterialID2}}\",\n\t\t\t\t\"ItemDeliveryQuantity\": \n\t\t\t\t\t{\n\t\t\t\t\t\t\"Quantity\": \"{{DropShipmentItemQuantity1}}\",\n\t\t\t\t\t\t\"UnitCode\": \"EA\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemPurchaseOrderReference\": \n\t\t\t\t\t{\n\t\t\t\t\t\t\"ID\": \"{{PurchaseOrderID}}\",\n\t\t\t\t\t\t\"ItemID\": \"{{PurchaseOrderItemID}}\",\n\t\t\t\t\t\t\"ItemTypeCode\": \"18\",\n\t\t\t\t\t\t\"ItemUUID\": \"{{PurchaseOrderItemUUID}}\",\n\t\t\t\t\t\t\"TypeCode\": \"001\",\n\t\t\t\t\t\t\"UUID\": \"{{PurchaseOrderUUID}}\",\n\t\t\t\t\t\t\"RelationshipRoleCode\": \"1\"\n\t\t\t\t\t}\n\t\t\t}\n\t\t]\n}    \t"
 						},
 						"url": {
-							"raw": "https://{{TenantHostname}}/sap/bc/srt/scs/sap/managethirdpartyorderdeliveryn",
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khinbounddelivery/InboundDeliveryCollection",
 							"protocol": "https",
 							"host": [
 								"{{TenantHostname}}"
 							],
 							"path": [
 								"sap",
-								"bc",
-								"srt",
-								"scs",
-								"sap",
-								"managethirdpartyorderdeliveryn"
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khinbounddelivery",
+								"InboundDeliveryCollection"
 							]
 						}
 					},
-					"response": [
+					"response": []
+				},
+				{
+					"name": "Release third-party delivery notification",
+					"event": [
 						{
-							"name": "Create production proposal (Soap 1.1)",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "text/xml"
-									}
+							"listen": "test",
+							"script": {
+								"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Thirt-party delivery notification \" + jsonResponse.d.results.ID + \" released\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Release status: \" + jsonResponse.d.results.ReleaseStatusCodeText, function () { pm.expect(jsonResponse.d.results.ReleaseStatusCode).to.eql(\"3\") });",
+									""
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:glob=\"http://sap.com/xi/SAPGlobal20/Global\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <glob:CreateProductionProposal>\r\n         <CreateProductionPlanningOrder>\r\n            <SequenceNumber>1</SequenceNumber>\r\n            <SupplyPlanningAreaID>P1100</SupplyPlanningAreaID>\r\n            <MaterialID>P100101</MaterialID>\r\n            <!-- <ProductRequirementSpecificationID>?</ProductRequirementSpecificationID> -->\r\n            <MaterialAvailabilityDateTime timeZoneCode=\"CET\">2019-02-05T12:00:00.0000000Z</MaterialAvailabilityDateTime>\r\n            <Quantity unitCode=\"EA\">1</Quantity>\r\n            <QuantityTypeCode>EA</QuantityTypeCode>\r\n         </CreateProductionPlanningOrder>\r\n      </glob:CreateProductionProposal>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>"
-								},
-								"url": {
-									"raw": "https://{{TenantHostname}}/sap/bc/srt/scs/sap/manageproductionproposalin",
-									"protocol": "https",
-									"host": [
-										"{{TenantHostname}}"
-									],
-									"path": [
-										"sap",
-										"bc",
-										"srt",
-										"scs",
-										"sap",
-										"manageproductionproposalin"
-									]
-								}
-							},
-							"status": "Unauthorized",
-							"code": 401,
-							"_postman_previewlanguage": "html",
-							"header": [
-								{
-									"key": "content-type",
-									"value": "text/html; charset=utf-8"
-								},
-								{
-									"key": "content-encoding",
-									"value": "gzip"
-								},
-								{
-									"key": "content-length",
-									"value": "505"
-								},
-								{
-									"key": "sap-system",
-									"value": "KHL"
-								},
-								{
-									"key": "www-authenticate",
-									"value": "Basic realm=\"SAP NetWeaver Application Server [KHL/171][alias]\""
-								},
-								{
-									"key": "strict-transport-security",
-									"value": "max-age=31536000; includeSubDomains"
-								}
-							],
-							"cookie": [],
-							"body": "<html>\n    <head>\n        <title>Logon Error Message</title>\n        <META http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n        <style type=\"text/css\">body { font-family:tahoma,helvetica,sans-serif;color:#333333;background-color:#FFFFFF; }td { font-family:tahoma,helvetica,sans-serif;font-size:70%;color:#333333; }h1 { font-family:tahoma,helvetica,sans-serif;font-size:160%;font-weight:bold;margin-top:15px;margin-bottom:3px;color:#003366; }h2 { font-family:verdana,helvetica,sans-serif;font-size:120%;font-style:italic;font-weight:bold;margin-top:6px;margin-bottom:6px;color:#999900; }p { font-family:tahoma,helvetica,sans-serif;color:#333333;margin-top:4px;margin-bottom:4px; }ul { font-family:tahoma,helvetica,sans-serif;color:#333333;list-style-type:square;margin-top:8px;margin-bottom:8px; }li { font-family:tahoma,helvetica,sans-serif;color:#33333;margin-top:4px; }.emphasize { color:#333333;background-color:#C8E3FF;padding:5px;}.note { color:#CC6600; }a { font-family:tahoma,helvetica,sans-serif;text-decoration:underline;color:#336699; }a:visited { color:#001166; }a:hover { text-decoration:none; }</style>\n    </head>\n    <body>\n        <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n            <tr>\n                <td>\n                    <h1>Logon failed</h1>\n                </td>\n            </tr>\n        </table>\n    </body>\n</html>"
+								"type": "text/javascript"
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khinbounddelivery/Release?ObjectID='{{InboundDeliveryNotificationObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khinbounddelivery",
+								"Release"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{InboundDeliveryNotificationObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
 				},
 				{
 					"name": "Get third-party delivery notification",
@@ -7508,7 +7435,7 @@
 									"// Validations",
 									"pm.test(\"Thirt-party delivery notification \" + jsonResponse.d.results[0].ID + \" retrieved\", function () { pm.response.to.have.status(200) });",
 									"pm.test(\"Consistency status: \" + jsonResponse.d.results[0].ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ConsistencyStatusCode).to.eql(\"3\") });",
-									"pm.test(\"Release status: \" + jsonResponse.d.results[0].ReleaseStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ReleaseStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Release status: \" + jsonResponse.d.results[0].ReleaseStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ReleaseStatusCode).to.eql(\"3\") });",
 									""
 								],
 								"type": "text/javascript"
@@ -7554,123 +7481,6 @@
 								{
 									"key": "$filter",
 									"value": "ID eq '{{InboundDeliveryNotificationID}}'"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add item external reference",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
-								"exec": [
-									"var jsonResponse = pm.response.json();",
-									"",
-									"// Validations",
-									"pm.test(\"External reference '\" + jsonResponse.d.results.ID + \"' added\", function () { pm.expect(pm.response.code).to.be.oneOf([201]) });"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "x-csrf-token",
-								"value": "{{x-csrf-token}}"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"ParentObjectID\": \"{{InboundDeliveryNotificationItemObjectID}}\",\n\t\"ID\": \"{{SalesOrderExternalReference}}\",\n\t\"TypeCode\": \"001\",\n\t\"RelationshipRoleCode\": \"16\"\n}"
-						},
-						"url": {
-							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khinbounddelivery/ItemExternalReferenceCollection",
-							"protocol": "https",
-							"host": [
-								"{{TenantHostname}}"
-							],
-							"path": [
-								"sap",
-								"byd",
-								"odata",
-								"cust",
-								"v1",
-								"khinbounddelivery",
-								"ItemExternalReferenceCollection"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Release third-party delivery notification",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
-								"exec": [
-									"var jsonResponse = pm.response.json();",
-									"",
-									"// Validations",
-									"pm.test(\"Thirt-party delivery notification \" + jsonResponse.d.results.ID + \" retrieved\", function () { pm.response.to.have.status(200) });",
-									"pm.test(\"Consistency status: \" + jsonResponse.d.results.ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
-									"pm.test(\"Release status: \" + jsonResponse.d.results.ReleaseStatusCodeText, function () { pm.expect(jsonResponse.d.results.ReleaseStatusCode).to.eql(\"3\") });",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-csrf-token",
-								"value": "{{x-csrf-token}}"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khinbounddelivery/Release?ObjectID='{{InboundDeliveryNotificationObjectID}}'",
-							"protocol": "https",
-							"host": [
-								"{{TenantHostname}}"
-							],
-							"path": [
-								"sap",
-								"byd",
-								"odata",
-								"cust",
-								"v1",
-								"khinbounddelivery",
-								"Release"
-							],
-							"query": [
-								{
-									"key": "ObjectID",
-									"value": "'{{InboundDeliveryNotificationObjectID}}'"
 								}
 							]
 						}
