@@ -136,10 +136,10 @@ Required business user authorizations (ByD Work Center Views):
 Assign your user (employee or service agent) to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.
 
 Configure the determination methode for external references:
-Business configuration fine tuning activity *External Reference Number Determination for Customer Invoice*: Set the determination method to *Copied from Predecessor Reference ID*.
+ByD work center *Business Configuration*: Open the fine tuning activity *External Reference Number Determination for Customer Invoice* and set the determination method to *Copied from Predecessor Reference ID*.
 
 Deactivate approval for service confirmations:
-Open the ByD work center *Business Configuration* and deactivate the scoping question *Service* > *Service and Repair* > *Service Confirmation* > *Do you want to use an approval process for service confirmations?*.
+ByD work center *Business Configuration*: Open your project scope and deactivate the scoping question: *Service* > *Service and Repair* > *Service Confirmation* > *Do you want to use an approval process for service confirmations?*
 
 Configure bank statement processing: 
 The bank statements created by this scenario are automatically allocated if you apply the following business configuration in your ByD system:
@@ -171,9 +171,9 @@ Configure additional Web Service APIs used in the Postman collection:
 	- *Manage Production Lots*
 3. Work center view *Application and User Management - Communication Arrangements*: Create a communication arrangement using the communication scenario and communication system and enter the credentials
 
-You can use the Postman collection folder *Procure to Stock* to fill up your stock before running the process *Sell from Stock* to avoid any failure of availability-to-promise checks.
-
-The Postman collection folder *Pay Due Items using Bank Statements* clears due items originating from customer invoices created by all other folders in this collection.
+Remarks:
+- You can use the Postman collection folder *Procure to Stock* to fill up your stock before running the process *Sell from Stock* to avoid any failure of availability-to-promise checks.
+- The Postman collection folder *Pay Due Items using Bank Statements* clears due items originating from customer invoices created by all other folders in this collection.
 
 #### Product and Service Portfolio
 
