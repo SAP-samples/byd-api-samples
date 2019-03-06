@@ -26,6 +26,10 @@ The following API sample packages are available:
 - **Product and Service Portfolio**: Create, change and read price lists and discount lists
 - **Product Data**: Create, change and read materials and service products
 - **Projects**: Create, change and read cost collecting projects and customer projects 
+	- Cost collection project with task hierarchy
+	- Cost collecting project with project team and work
+	- Customer project with planning data
+	- Sell project-based services (sales order > project > project time recordings)
 - **Sales Orders**: Create, change and sales orders; contains examples to use business object attachments as well
 
 Please check the description of the respective Postman collection for more information.
