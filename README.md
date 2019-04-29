@@ -150,7 +150,7 @@ The bank statements created by this scenario are automatically allocated if you 
 1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  
 Add row using the values: Company ID: 1000 | Bank ID: 1000002 | Bank Statement Format: 02 - BAI2 US
 2. Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  
-Add row using the values: *Seq.: 1* | *Company: 1000* | *Bank Country: '*'* | *Bank ID: '*'* | *Currency: '*'* | *Bank Account ID: '*'* | *Manual Post Necessary: False*
+Add row using the values: *Seq.: 1* | *Company: 1000* | *Bank Country: *'* | *Bank ID: *'* | *Currency: *'* | *Bank Account ID: *'* | *Manual Post Necessary: False*
 3. Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  
 Add 4 rows using the following values:
 	- Rule 1: Description: Customer | Rule Type: 4 | Rule Definition Mode: Expert | Regular Expression: (ORIG CO NAME\=).*
