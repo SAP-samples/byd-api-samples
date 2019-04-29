@@ -148,19 +148,19 @@ ByD work center *Business Configuration*: Open your project scope and deactivate
 Configure bank statement processing:  
 The bank statements created by this scenario are automatically allocated if you apply the following business configuration in your ByD system:
 1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  
-Add row using the values: Company ID: 1000 | Bank ID: 1000002 | Bank Statement Format: 02 - BAI2 US
+Add row using the values: *Company ID: 1000* | *Bank ID: 1000002* | *Bank Statement Format: 02 - BAI2 US*
 2. Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  
 Add row using the values: *Seq.: 1* | *Company: 1000* | *Bank Country: \** | *Bank ID: \** | *Currency: \** | *Bank Account ID: \** | *Manual Post Necessary: False*
 3. Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  
 Add 4 rows using the following values:
-	- Rule 1: Description: Customer | Rule Type: 4 | Rule Definition Mode: Expert | Regular Expression: (ORIG CO NAME\=).*
-	- Rule 2: Description: AR External Reference (w seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2}\d{2})
-	- Rule 3: Description: AR External Reference 1INV | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (1INV-\d{1,}\-\d{1,})
-	- Rule 4: Description: AR External Reference (w/o seconds) | Rule Type: 13 | Rule Definition Mode: Expert | Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2})
+	- Rule 1: *Description: Customer* | *Rule Type: 4* | *Rule Definition Mode: Expert* | *Regular Expression: (ORIG CO NAME\=).\**
+	- Rule 2: *Description: AR External Reference (w seconds)* | *Rule Type: 13* | *Rule Definition Mode: Expert | Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2}\d{2})*
+	- Rule 3: *Description: AR External Reference 1INV* | *Rule Type: 13* | *Rule Definition Mode: Expert* | *Regular Expression: (1INV-\d{1,}\-\d{1,})*
+	- Rule 4: *Description: AR External Reference (w/o seconds)* | *Rule Type: 13* | *Rule Definition Mode: Expert* | *Regular Expression: (\R\-\d{4}\d{1,2}\d{1,2}\d{2}\d{2})*
 
 Create company payment file register:  
 Open work center view *Liquidity Management - Inbound Files*, click on *New* > *Inbound File* and enter the following values:  
-	Type: Bank Statement | Company: 1000 | Bank ID: 1000002 | Import Format: BAI2 US.  
+	*Type: Bank Statement* | *Company: 1000* | *Bank ID: 1000002* | *Import Format: BAI2 US*.  
 Save without adding an attachment.  
 The system created a company payment file register for company 1000 that can now be used for file uploads via OData.
 
