@@ -45,7 +45,7 @@ Users must have an SAP Business ByDesign license.  *This is a paid product, no t
 ## Download and Installation
 
 1. Install [Postman API Development Environment](https://www.getpostman.com/)
-2. Download the example ByD Custom OData Services, Postman collections and Postman environments from GitHub as [zip-file](archive/master.zip)
+2. Download the example ByD Custom OData Services, Postman collections and Postman environments from GitHub as [zip-file](/archive/master.zip)
 
 ## Configuration
 
