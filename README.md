@@ -22,7 +22,7 @@ The following API sample packages are available:
 	- Sell from Stock
 	- Drop Shipment
 	- Make to Stock
-	- Pay Due Items using Bank Statements
+	- Clear Due Items using Bank Statements
 - **Product and Service Portfolio**: Create, change and read price lists and discount lists
 - **Product Data**: Create, change and read materials and service products
 - **Projects**: Create, change and read cost collecting projects and customer projects 
