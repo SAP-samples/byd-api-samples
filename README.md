@@ -66,19 +66,19 @@ Users must have an SAP Business ByDesign license.  *This is a paid product, no t
 
 ## Configuration
 
-All sample Postman collections are tailored to run on SAP Business ByDesign Partner Demo Tenants (reference systems) with preconfigured and loaded sample data provided by SAP.  
+All sample Postman collections are tailored to run on **SAP Business ByDesign Partner Demo Tenants** (reference systems) with preconfigured and loaded sample data provided by SAP.  
 Nevertheless you can use the Postman collections and sample Custom OData Services in other ByD systems as well, if you adopt Postman environment variables and Postman requests according the business configuration and master data of your ByD system.
 
 Steps to setup and run the API sample requests:
-1. SAP Business ByDesign: Open ByD work center view "*Application and User Management - OData Services*" and upload the Custom OData Services in folder "*Sample OData Services*".
-2. Postman: Open the desktop app *Postman* and import the Postman collections and Postman environments in folder "*Postman*". As result you should have a number of collections and environments uploaded to Postman. The environments contain test data and system access information. The collections contain multiple folders and sub-folders, each with a sequence of web service requests and scripts that run before and after the web service request. Each environment belongs to a collection (you can easily identify the collections and environments that belong together by their names).
-3. SAP Business ByDesign: Check the ByD business configuration and configure ByD web services. Check the descriptions of the Postman collections and follow the instructions of the respective Postman collection.
-4. Postman: Open the Postman environment and maintain the variables 
+1. **SAP Business ByDesign:** Open ByD work center view "*Application and User Management - OData Services*" and upload the Custom OData Services in folder "*Sample OData Services*".
+2. **Postman:** Open the desktop app *Postman* and import the Postman collections and Postman environments in folder "*Postman*". As result you should have a number of collections and environments uploaded to Postman. The environments contain test data and system access information. The collections contain multiple folders and sub-folders, each with a sequence of web service requests and scripts that run before and after the web service request. Each environment belongs to a collection (you can easily identify the collections and environments that belong together by their names).
+3. **SAP Business ByDesign:** Check the ByD business configuration and configure ByD web services. Check the descriptions of the Postman collections and follow the instructions of the respective Postman collection.
+4. **Postman:** Open the Postman environment and maintain the variables 
 	- *TenantHostname* (for example *my123456.sapbydesign.com*) 
 	- *User* and *Password* (enter a business user with access to all work center views listed in the description of the Postman collection)
 	- *CommunicationUser* and *CommunicationUserPW* (enter the communication user used for the communication arrangements created as described in the description of the Postman collection)
-5. Postman: Open the Postman Runner. The runner is used to automatically run a sequence of OData requests. 
-6. Postman Runner: 
+5. **Postman:** Open the Postman Runner. The runner is used to automatically run a sequence of OData requests. 
+6. **Postman Runner:** 
 	a. Select the collection and the folder
 	b. Select the environment 
 	c. Select the check boxes “Keep variable values” and “Run collection without using stored cookies”
@@ -86,7 +86,7 @@ Steps to setup and run the API sample requests:
 		i. Make sure you always choose collections and environments that belong together – otherwise it does not work!
 		ii.	You may have to start a scenario twice in case a service needed to be compiled and returns with error code 500
 		iii.	In the protocol you find IDs and valuations that you can use to find the corresponding objects in the ByD UI
-7. Postman: Alternatively you run the OData requests manually as well: 
+7. **Postman:** Alternatively you run the OData requests manually as well: 
 	a. Open the Postman collection folder
 	b. Select the Postman environment (Make sure you always choose collections and environments that belong together)
 	c. Select the request and click “Send”
