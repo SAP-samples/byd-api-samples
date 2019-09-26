@@ -1,0 +1,3650 @@
+{
+	"info": {
+		"_postman_id": "3e1bedc6-1d2b-4db6-b29e-28200e5bc8dc",
+		"name": "Projects",
+		"description": "Project Management - OData Examples\n===================================\n\nThis Postman collection contains examples to create and change projects and related business objects and processes using SAP Business ByDesign Custom OData Services.\n\nAll sample data is aligned to and ready to run on *SAP Business ByDesign Partner Demo Tenants (Full scope US)* with preconfigured and loaded sample data provided by SAP.  \n&nbsp; \n\n\n**Web services and User:**\n\nThe OData services used in this collection require an SAP ByDesign business user for authorization.  \n&nbsp; \n\nSAP ByDesign business objects provide defaulting capabilities based on the organizational assignment of the user logged in. In many sample OData requests I use this defaulting to keep the OData requests simple.  \nTherefore, assign the employee or service agent that is associated to your business user to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.  \n&nbsp; \n\nThe OData requests in this collection use the following SAP Bydesign *Custom OData Services* assigned to the work center views in column *User authorization*. Assign the listed SAP ByDesign Work Center Views to your business user:\n\n| Custom OData Service | User authorization (ByD Work Center View) |  \n|----------------------|-------------------------------------------|  \n| *khsalesorder* | *Sales Orders - Sales Orders* |  \n| *khproject* | *Project Management - Projects* |  \n| *khtimeagreement* | *Time Administration - Employees* |  \n| *khemployeetime* | *Time Administration - Time Sheet* |\n\n&nbsp; \n\n**Additional Information:**  \n\nProject types:\n- 10 - Cost collecting project\n- 25 - Customer project with sales integration\n\n&nbsp; \n\n\nScenario 1: Cost Collecting Project with Task Hierarchy\n-------------------------------------------------------\n\nScenario steps:\n1. Create cost collecting project with tasks\n2. Get project data and expand the task hierarchy (flat at this point in time)\n3. Move tasks to setup the child-parent relationship\n4. Move tasks to setup the task neighbour relationship\n5. Start and release the project\n6. Update a task durations\n7. Add task scheduling relationships\n7. Reschedule the project\n2. Get project data and expand the task hierarchy (2 hierarchy levels)\n8. Finish and close the project\n\n&nbsp;\n\n\nScenario 2: Cost Collecting Project with Team and Work\n------------------------------------------------------\n\nScenario steps:\n1. Create cost collecting project with tasks\n2. Get project data and expand the project details\n3. Update the project team (using batch)\n4. Create task services and assign team members\n\n&nbsp;\n\n\nScenario 3: Customer Project with Planning Data\n-----------------------------------------------\n\nScenario steps:\n1. Create customer project with tasks, buyer party and materials\n2. Get project data and expand the project details\n3. Create task expenses\n4. Create task revenue\n5. Create task materials (stock and non-stock)\n6. Create task service (internal resources, intercompany resources and external resources)\n\n&nbsp;\n\n\nScenario 4: Sell Project-based Services\n---------------------------------------\n\nScenario steps:\n1. Create sales order with project-related item types\n2. Create project from sales order\n3. Release sales order\n4. Get project\n5. Update project staffing and task relationships\n6. Start and release the project\n7. Get employee time agreement\n8. Create and release project time recording (on behalf)\n9. Find and get time recordings",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Cost Collecting Project with Task Hierarchy",
+			"item": [
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "da2c3596-b4d6-4170-89c1-8daa28afac3c",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create project with tasks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e53c5667-b455-4c85-938c-5e1feecad9d0",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results.ProjectID + \" created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1f786fa9-e253-4ace-b0c4-3d73a9d534b6",
+								"exec": [
+									"// Set Project ID with pattern KH-<datetime>",
+									"let todayDateTime = (new Date()).toISOString().substr(0,19);",
+									"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");",
+									"var generatedID = \"COC-\" + todayDateTime;",
+									"pm.environment.set(\"ProjectID\", generatedID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ProjectID\": \"{{ProjectID}}\",\n\t\"EstimatedCompletionPercent\": 10,\n\t\"ResponsibleCostCentreID\": \"{{Project ResponsibleCostCentreID}}\",\n\t\"ProjectTypeCode\": \"10\",\n\t\"ProjectLanguageCode\": \"EN\",\n\t\"ProjectSummaryTask\": \n\t\t{\n            \"ProjectName\": \"KH OData Project\",\n\t\t\t\"ResponsibleEmployeeID\": \"{{EmployeeID_1}}\"\n\t\t},\n\t\"Task\": \n\t\t[\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T1\",\n\t\t\t\t\"TaskName\": \"First Level Task 1\"\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T3\",\n\t\t\t\t\"TaskName\": \"First Level Task 3\"\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T2\",\n\t\t\t\t\"TaskName\": \"First Level Task 2\"\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T1-1\",\n\t\t\t\t\"TaskName\": \"Second Level Task 1-1\"\n\t\t\t}\n\t\t]\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get project and expand task hierarchy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f7580848-a542-4c8a-8aa9-6d70f4dd443a",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"ProjectObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"ProjectSummaryTaskObjectID\", jsonResponse.d.results[0].ProjectSummaryTask.ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_1\", jsonResponse.d.results[0].Task[1].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_2\", jsonResponse.d.results[0].Task[2].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_3\", jsonResponse.d.results[0].Task[3].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_4\", jsonResponse.d.results[0].Task[4].ObjectID);",
+									"pm.environment.set(\"ProjectTaskUUID_1\", jsonResponse.d.results[0].Task[1].TaskUUID);",
+									"pm.environment.set(\"ProjectTaskUUID_2\", jsonResponse.d.results[0].Task[2].TaskUUID);",
+									"pm.environment.set(\"ProjectTaskID_1\", jsonResponse.d.results[0].Task[1].TaskID);",
+									"pm.environment.set(\"ProjectTaskID_2\", jsonResponse.d.results[0].Task[2].TaskID);",
+									"pm.environment.set(\"ProjectTaskID_3\", jsonResponse.d.results[0].Task[3].TaskID);",
+									"pm.environment.set(\"ProjectTaskID_4\", jsonResponse.d.results[0].Task[4].TaskID);",
+									"//pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].SalesOrderPricingTerms.ObjectID);",
+									"//pm.environment.set(\"ItemProductObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemProduct.ObjectID);",
+									"//pm.environment.set(\"ItemScheduleLineObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemScheduleLine[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results[0].ProjectID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results[0].ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ProjectLifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results[0].SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									"",
+									"",
+									"",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection?$format=json&$expand=ProjectSummaryTask,Task&$filter=ProjectID eq '{{ProjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "ProjectSummaryTask,Task"
+								},
+								{
+									"key": "$filter",
+									"value": "ProjectID eq '{{ProjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Move task (parent)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "68855432-bdcc-457b-bf86-7ee9940caa9f",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task '\" + jsonResponse.d.results.TaskName + \"' moved to new parent\", function () { pm.response.to.have.status(200) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/Move?ObjectID='{{ProjectTaskObjectID_4}}'&TargetParentTaskUUID=guid'{{ProjectTaskUUID_1}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"Move"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{ProjectTaskObjectID_4}}'"
+								},
+								{
+									"key": "TargetParentTaskUUID",
+									"value": "guid'{{ProjectTaskUUID_1}}'"
+								},
+								{
+									"key": "TargetRightNeighbourTaskUUID",
+									"value": "guid'00163E5F-5A2A-1EE8-ABF0-A86CD3A3D59C'",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Move task (neighbour)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f4de44be-6c73-4e24-ac39-a77dd44fb580",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task '\" + jsonResponse.d.results.TaskName + \"' moved to new neighbour\", function () { pm.response.to.have.status(200) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/Move?ObjectID='{{ProjectTaskObjectID_3}}'&TargetRightNeighbourTaskUUID=guid'{{ProjectTaskUUID_2}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"Move"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{ProjectTaskObjectID_3}}'"
+								},
+								{
+									"key": "TargetParentTaskUUID",
+									"value": "guid'00163E2A-132B-1ED8-9290-70FB9E25BAE6'",
+									"disabled": true
+								},
+								{
+									"key": "TargetRightNeighbourTaskUUID",
+									"value": "guid'{{ProjectTaskUUID_2}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start and release",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cbf8135e-aada-4504-acec-4e132c66fee1",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Project started and released\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results.ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.ProjectLifeCycleStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results.SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results.SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/StartAndRelease?ObjectID='{{ProjectObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"StartAndRelease"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{ProjectObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update task duration T1-1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task duration updated\", function () { pm.response.to.have.status(204) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-http-method",
+								"value": "MERGE"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ObjectID\":\"{{ProjectTaskObjectID_4}}\",\n\t\"ParentObjectID\": \"{{ProjectObjectID}}\",\n\t\"PlannedDuration\": \"P4D\",\n\t\"WorkingDayCalendarCode\": \"\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskCollection('{{ProjectTaskObjectID_4}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskCollection('{{ProjectTaskObjectID_4}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update task duration T2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task duration updated\", function () { pm.response.to.have.status(204) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-http-method",
+								"value": "MERGE"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ObjectID\":\"{{ProjectTaskObjectID_3}}\",\n\t\"ParentObjectID\": \"{{ProjectObjectID}}\",\n\t\"PlannedDuration\": \"P3D\",\n\t\"WorkingDayCalendarCode\": \"\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskCollection('{{ProjectTaskObjectID_3}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskCollection('{{ProjectTaskObjectID_3}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update task duration T3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task duration updated\", function () { pm.response.to.have.status(204) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-http-method",
+								"value": "MERGE"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ObjectID\":\"{{ProjectTaskObjectID_2}}\",\n\t\"ParentObjectID\": \"{{ProjectObjectID}}\",\n\t\"PlannedDuration\": \"P7D\",\n\t\"WorkingDayCalendarCode\": \"\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskCollection('{{ProjectTaskObjectID_2}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskCollection('{{ProjectTaskObjectID_2}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add task relationship T1-T2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task relationships '\" + jsonResponse.d.results.DependencyTypeCodeText + \"' added\", function () { pm.expect(pm.response.code).to.be.oneOf([201]) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_1}}\",\n\t\"DependencyTypeCode\": \"2\",\n\t\"SuccessorTaskID\": \"{{ProjectTaskID_3}}\",\n\t\"LagDuration\": \"P0D\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskRelationshipCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskRelationshipCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add task relationship T1-T3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task relationships '\" + jsonResponse.d.results.DependencyTypeCodeText + \"' added\", function () { pm.expect(pm.response.code).to.be.oneOf([201]) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_1}}\",\n\t\"DependencyTypeCode\": \"1\",\n\t\"SuccessorTaskID\": \"{{ProjectTaskID_2}}\",\n\t\"LagDuration\": \"P2D\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskRelationshipCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskRelationshipCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8e57c8f0-909b-4619-8a43-e5646063408c",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Project scheduled\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results.ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.ProjectLifeCycleStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results.SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results.SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/Schedule?ObjectID='{{ProjectObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"Schedule"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{ProjectObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get project and expand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "279c5887-c574-4ab9-9199-cb2156cb7c72",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"ProjectObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"ProjectSummaryTaskObjectID\", jsonResponse.d.results[0].ProjectSummaryTask.ObjectID);",
+									"//pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].SalesOrderPricingTerms.ObjectID);",
+									"//pm.environment.set(\"ItemProductObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemProduct.ObjectID);",
+									"//pm.environment.set(\"ItemScheduleLineObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemScheduleLine[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results[0].ProjectID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results[0].ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ProjectLifeCycleStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results[0].SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection?$format=json&$expand=ProjectBuyerParty,Team,ProjectSummaryTask,Task/TaskRelationship&$filter=ProjectID eq '{{ProjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "ProjectBuyerParty,Team,ProjectSummaryTask,Task/TaskRelationship"
+								},
+								{
+									"key": "$filter",
+									"value": "ProjectID eq '{{ProjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Finish project summary task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "699e0948-ec32-4788-bf3e-267f6eaf056e",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Project summary task finished\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"6\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/Finish?ObjectID='{{ProjectObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"Finish"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{ProjectObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Close project summary task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "169d781f-f60b-4c1a-a648-6b38b8214de7",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Project summary task closed\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"4\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/Close?ObjectID='{{ProjectObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"Close"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{ProjectObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0ada4856-b5ca-486e-89a2-28571e4fb7f1",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "df2a882c-9b3c-4346-b1e4-4d5cabaa7713",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Cost Collecting Project with Team and Work",
+			"item": [
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "da2c3596-b4d6-4170-89c1-8daa28afac3c",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create project with tasks and team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e53c5667-b455-4c85-938c-5e1feecad9d0",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results.ProjectID + \" created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "bc3e7673-5f78-4f1e-aea6-fe9024155de1",
+								"exec": [
+									"// Set Project ID with pattern KH-<datetime>",
+									"let todayDateTime = (new Date()).toISOString().substr(0,19);",
+									"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");",
+									"var generatedID = \"COC-\" + todayDateTime;",
+									"pm.environment.set(\"ProjectID\", generatedID);",
+									"",
+									"// Set Dates as DateTime",
+									"var moment = require(\"moment\");",
+									"var generatedDate_1 = moment().add(1, 'day').toISOString().substr(0,10) + \"T12:00:00.0000000Z\";",
+									"pm.environment.set(\"Date_1\", generatedDate_1);",
+									"var generatedDate_2 = moment().add(11, 'day').toISOString().substr(0,10) + \"T12:00:00.0000000Z\";",
+									"pm.environment.set(\"Date_2\", generatedDate_2);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ProjectID\": \"{{ProjectID}}\",\n\t\"EstimatedCompletionPercent\": 10,\n\t\"ResponsibleCostCentreID\": \"{{Project ResponsibleCostCentreID}}\",\n\t\"ProjectTypeCode\": \"10\",\n\t\"ProjectLanguageCode\": \"EN\",\n\t\"ProjectSummaryTask\": \n\t\t{\n            \"ProjectName\": \"KH OData Project Staffing\",\n\t\t\t\"ResponsibleEmployeeID\": \"{{EmployeeID_1}}\"\n\t\t},\n\t\"Task\": \n\t\t[\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T1\",\n\t\t\t\t\"TaskName\": \"Task 1\",\n\t\t\t\t\"PlannedDuration\": \"P10D\",\n\t\t\t\t\"ResponsibleEmployeeID\": \"{{EmployeeID_1}}\"\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T2\",\n\t\t\t\t\"TaskName\": \"Task 2\",\n\t\t\t\t\"PlannedDuration\": \"P5D\",\n\t\t\t\t\"ResponsibleEmployeeID\": \"{{EmployeeID_2}}\"\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T3\",\n\t\t\t\t\"TaskName\": \"Task 3\",\n\t\t\t\t\"PlannedDuration\": \"P5D\",\n\t\t\t\t\"ResponsibleEmployeeID\": \"{{EmployeeID_2}}\"\n\t\t\t}\n\t\t],\n\t\"Team\": \n\t\t[\t\n\t\t\t{\n\t\t\t\t\"EmployeeID\": \"{{EmployeeID_3}}\",\n\t\t\t\t\"PlannedStartDateTime\": \"{{Date_1}}\",\n\t\t\t\t\"PlannedEndDateTime\": \"{{Date_2}}\",\n\t\t\t\t\"CommittedWorkQuantity\": \"40\"\n\t\t\t}\n\t\t]\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get project and expand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "04051516-282c-498b-a960-d4ff431b60af",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"ProjectObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"ProjectSummaryTaskObjectID\", jsonResponse.d.results[0].ProjectSummaryTask.ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_1\", jsonResponse.d.results[0].Task[1].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_2\", jsonResponse.d.results[0].Task[2].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_3\", jsonResponse.d.results[0].Task[3].ObjectID);",
+									"pm.environment.set(\"ProjectTeamObjectID_0\", jsonResponse.d.results[0].Team[0].ObjectID);",
+									"pm.environment.set(\"ProjectTeamObjectID_1\", jsonResponse.d.results[0].Team[1].ObjectID);",
+									"//pm.environment.set(\"ProjectTaskUUID_1\", jsonResponse.d.results[0].Task[1].TaskUUID);",
+									"//pm.environment.set(\"ProjectTaskUUID_2\", jsonResponse.d.results[0].Task[2].TaskUUID);",
+									"//pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].SalesOrderPricingTerms.ObjectID);",
+									"//pm.environment.set(\"ItemProductObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemProduct.ObjectID);",
+									"//pm.environment.set(\"ItemScheduleLineObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemScheduleLine[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results[0].ProjectID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results[0].ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ProjectLifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results[0].SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection?$format=json&$expand=ProjectBuyerParty,Team,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation&$filter=ProjectID eq '{{ProjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "ProjectBuyerParty,Team,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation"
+								},
+								{
+									"key": "$filter",
+									"value": "ProjectID eq '{{ProjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update team (batch)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "314c810c-5797-49a3-9b29-53dcbe1df5de",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Project team availability updated\", function () { pm.response.to.have.status(202) });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "eac22dea-a355-4c7d-b7d3-1a3efdd6400b",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/mixed; boundary=batch_1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n--batch_1\nContent-Type: multipart/mixed; boundary=changeset_2\n\n--changeset_2\nContent-Type: application/http \nContent-Transfer-Encoding: binary\n\nPOST TeamCollection('{{ProjectTeamObjectID_0}}') HTTP/1.1\nContent-Type: application/json\nContent-ID: 1\nContent-Length: 10000\nAccept: application/json\nx-http-method: MERGE\n\n{\t\n\t\"ObjectID\":\"{{ProjectTeamObjectID_0}}\",\n\t\"ParentObjectID\": \"{{ProjectObjectID}}\",\n\t\"PlannedStartDateTime\": \"{{Date_1}}\",\n\t\"PlannedEndDateTime\": \"{{Date_2}}\",\n\t\"CommittedWorkQuantity\": \"24\"\n}    \t\n\n--changeset_2\nContent-Type: application/http \nContent-Transfer-Encoding: binary\n\nPOST TeamCollection('{{ProjectTeamObjectID_1}}') HTTP/1.1\nContent-Type: application/json\nContent-ID: 1\nContent-Length: 10000\nAccept: application/json\nx-http-method: MERGE\n\n{\t\n\t\"ObjectID\":\"{{ProjectTeamObjectID_1}}\",\n\t\"ParentObjectID\": \"{{ProjectObjectID}}\",\n\t\"PlannedStartDateTime\": \"{{Date_1}}\",\n\t\"PlannedEndDateTime\": \"{{Date_2}}\",\n\t\"CommittedWorkQuantity\": \"30\"\n}    \t\n\n--changeset_2--\n\n--batch_1--"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/$batch",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"$batch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create task services (batch)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "314c810c-5797-49a3-9b29-53dcbe1df5de",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task services created and assigned\", function () { pm.response.to.have.status(202) });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "eac22dea-a355-4c7d-b7d3-1a3efdd6400b",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/mixed; boundary=batch_1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n--batch_1\nContent-Type: multipart/mixed; boundary=changeset_2\n\n--changeset_2\nContent-Type: application/http \nContent-Transfer-Encoding: binary\n\nPOST TaskServiceCollection HTTP/1.1\nContent-Type: application/json\nContent-ID: 1\nContent-Length: 10000\nAccept: application/json\n\n{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_1}}\",\n\t\"ProductID\": \"{{ServiceProduct_1}}\",\n\t\"PlannedWorkQuantity\": \"20\",\n\t\"AssignedEmployeeID\": \"{{EmployeeID_1}}\"\n}    \t\n\n--changeset_2\nContent-Type: application/http \nContent-Transfer-Encoding: binary\n\nPOST TaskServiceCollection HTTP/1.1\nContent-Type: application/json\nContent-ID: 1\nContent-Length: 10000\nAccept: application/json\n\n{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_2}}\",\n\t\"ProductID\": \"{{ServiceProduct_2}}\",\n\t\"PlannedWorkQuantity\": \"30\",\n\t\"AssignedEmployeeID\": \"{{EmployeeID_2}}\"\n}    \t\n\n--changeset_2\nContent-Type: application/http \nContent-Transfer-Encoding: binary\n\nPOST TaskServiceCollection HTTP/1.1\nContent-Type: application/json\nContent-ID: 1\nContent-Length: 10000\nAccept: application/json\n\n{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_3}}\",\n\t\"ProductID\": \"{{ServiceProduct_3}}\",\n\t\"PlannedWorkQuantity\": \"40\",\n\t\"AssignedEmployeeID\": \"{{EmployeeID_3}}\"\n}    \t\n\n--changeset_2--\n\n--batch_1--"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/$batch",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"$batch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get project and expand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "04051516-282c-498b-a960-d4ff431b60af",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"ProjectObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"ProjectSummaryTaskObjectID\", jsonResponse.d.results[0].ProjectSummaryTask.ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_1\", jsonResponse.d.results[0].Task[1].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_2\", jsonResponse.d.results[0].Task[2].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_3\", jsonResponse.d.results[0].Task[3].ObjectID);",
+									"pm.environment.set(\"ProjectTeamObjectID_0\", jsonResponse.d.results[0].Team[0].ObjectID);",
+									"pm.environment.set(\"ProjectTeamObjectID_1\", jsonResponse.d.results[0].Team[1].ObjectID);",
+									"//pm.environment.set(\"ProjectTaskUUID_1\", jsonResponse.d.results[0].Task[1].TaskUUID);",
+									"//pm.environment.set(\"ProjectTaskUUID_2\", jsonResponse.d.results[0].Task[2].TaskUUID);",
+									"//pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].SalesOrderPricingTerms.ObjectID);",
+									"//pm.environment.set(\"ItemProductObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemProduct.ObjectID);",
+									"//pm.environment.set(\"ItemScheduleLineObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemScheduleLine[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results[0].ProjectID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results[0].ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ProjectLifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results[0].SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection?$format=json&$expand=ProjectBuyerParty,Team,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation&$filter=ProjectID eq '{{ProjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "ProjectBuyerParty,Team,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation"
+								},
+								{
+									"key": "$filter",
+									"value": "ProjectID eq '{{ProjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9c4bca47-38a2-439f-9399-9577cb339f4f",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "367b4ea8-df2e-4efa-b21c-7943017689cf",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Customer Project with Planning Data",
+			"item": [
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "da2c3596-b4d6-4170-89c1-8daa28afac3c",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create customer project with tasks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e53c5667-b455-4c85-938c-5e1feecad9d0",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Customer project \" + jsonResponse.d.results.ProjectID + \" created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "bc3e7673-5f78-4f1e-aea6-fe9024155de1",
+								"exec": [
+									"// Set Project ID with pattern KH-<datetime>",
+									"let todayDateTime = (new Date()).toISOString().substr(0,19);",
+									"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");",
+									"var generatedID = \"CPSO-\" + todayDateTime;",
+									"pm.environment.set(\"ProjectID\", generatedID);",
+									"",
+									"// Set Dates as DateTime",
+									"var moment = require(\"moment\");",
+									"var generatedDate_1 = moment().add(1, 'day').toISOString().substr(0,10) + \"T12:00:00.0000000Z\";",
+									"pm.environment.set(\"Date_1\", generatedDate_1);",
+									"var generatedDate_2 = moment().add(11, 'day').toISOString().substr(0,10) + \"T12:00:00.0000000Z\";",
+									"pm.environment.set(\"Date_2\", generatedDate_2);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ProjectID\": \"{{ProjectID}}\",\n\t\"EstimatedCompletionPercent\": 10,\n\t\"ResponsibleCostCentreID\": \"{{Project ResponsibleCostCentreID}}\",\n\t\"ProjectTypeCode\": \"25\",\n\t\"ProjectLanguageCode\": \"EN\",\n\t\"ProjectBuyerParty\": \n\t\t{\n\t\t\t\"PartyID\": \"{{Project BuyerPartyID}}\"\n\t\t},\n\t\"ProjectSummaryTask\": \n\t\t{\n            \"ProjectName\": \"KH Customer Project\",\n\t\t\t\"ResponsibleEmployeeID\": \"{{EmployeeID_1}}\"\n\t\t},\n\t\"Task\": \n\t\t[\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T1\",\n\t\t\t\t\"TaskName\": \"Task 1\",\n\t\t\t\t\"PlannedDuration\": \"P10D\",\n\t\t\t\t\"ResponsibleEmployeeID\": \"{{EmployeeID_1}}\",\n\t\t\t\t\"TaskRelationship\": \n\t\t\t\t\t[\n                \t\t{\n                    \t\t\"DependencyTypeCode\": \"2\",\n                        \t\"SuccessorTaskID\": \"{{ProjectID}}-T2\",\n\t\t\t\t\t\t\t\"LagDuration\": \"P0D\"\n\t\t\t\t\t\t},\n                \t\t{\n                    \t\t\"DependencyTypeCode\": \"1\",\n                        \t\"SuccessorTaskID\": \"{{ProjectID}}-T3\",\n\t\t\t\t\t\t\t\"LagDuration\": \"P2D\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T2\",\n\t\t\t\t\"TaskName\": \"Task 2\",\n\t\t\t\t\"PlannedDuration\": \"P5D\",\n\t\t\t\t\"ResponsibleEmployeeID\": \"{{EmployeeID_2}}\"\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"TaskID\": \"{{ProjectID}}-T3\",\n\t\t\t\t\"TaskName\": \"Task 3\",\n\t\t\t\t\"PlannedDuration\": \"P11D\"\n\t\t\t}\n\t\t]\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get project and expand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8445f261-997b-4a6a-8ee7-c533cec8197f",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"ProjectID\", jsonResponse.d.results[0].ProjectID);",
+									"pm.environment.set(\"ProjectObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"//pm.environment.set(\"ProjectBuyerPartyObjectID\", jsonResponse.d.results[0].ProjectBuyerParty.ObjectID);",
+									"pm.environment.set(\"ProjectSummaryTaskObjectID\", jsonResponse.d.results[0].ProjectSummaryTask.ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_1\", jsonResponse.d.results[0].Task[1].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_2\", jsonResponse.d.results[0].Task[2].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results[0].ProjectID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results[0].ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ProjectLifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results[0].SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection?$format=json&$expand=ProjectBuyerParty,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation,Task/TaskMaterial,Task/TaskExpense,Task/TaskRevenue,Task/TaskRelationship&$filter=ProjectID eq '{{ProjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "ProjectBuyerParty,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation,Task/TaskMaterial,Task/TaskExpense,Task/TaskRevenue,Task/TaskRelationship"
+								},
+								{
+									"key": "$filter",
+									"value": "ProjectID eq '{{ProjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create task expense",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task expense '\" + jsonResponse.d.results.ExpenseGroupCodeText + \"' added\", function () { pm.expect(pm.response.code).to.be.oneOf([201]) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{ProjectSummaryTaskObjectID}}\",\n\t\"ExpenseGroupCode\": \"A-7100\",\n\t\"Description\": \"Travel to team meetings\",\n\t\"PlannedCostsAmount\": \"2000\",\n\t\"PlannedCostsAmountCurrencyCode\": \"USD\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskExpenseCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskExpenseCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create task revenue",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task revenue for '\" + jsonResponse.d.results.IncomeGroupCodeText + \"' added\", function () { pm.expect(pm.response.code).to.be.oneOf([201]) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{ProjectSummaryTaskObjectID}}\",\n\t\"IncomeGroupCode\": \"A-1520\",\n\t\"Description\": \"Sales price as agreed with customer\",\n\t\"PlannedRevenueAmount\": \"10000\",\n\t\"PlannedRevenueAmountCurrencyCode\": \"USD\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskRevenueCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskRevenueCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create task material (stock)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task material \" + jsonResponse.d.results.ProductID + \" (stock) added\", function () { pm.expect(pm.response.code).to.be.oneOf([201]) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_1}}\",\n\t\"ProductID\": \"{{MaterialID_stock}}\",\n\t\"StockIndicator\": true,\n\t\"BillableIndicator\": true,\n\t\"PlannedQuantity\": \"1\",\n\t\"PlannedQuantityUnitCode\": \"EA\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskMaterialCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskMaterialCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create task material (non-stock)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task material \" + jsonResponse.d.results.ProductID + \" (non-stock) added\", function () { pm.expect(pm.response.code).to.be.oneOf([201]) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_1}}\",\n\t\"ProductID\": \"{{MaterialID_non-stock}}\",\n\t\"StockIndicator\": false,\n\t\"BillableIndicator\": true,\n\t\"PlannedQuantity\": \"10\",\n\t\"PlannedQuantityUnitCode\": \"EA\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskMaterialCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskMaterialCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create task service (internal resource)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task service '\" + jsonResponse.d.results.ProductDescription + \"' added and assigned to internal resource: \" +jsonResponse.d.results.AssignedEmployeeFormattedName, function () { pm.expect(pm.response.code).to.be.oneOf([201]) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_2}}\",\n\t\"ProductID\": \"{{ServiceProduct_2}}\",\n\t\"PlannedWorkQuantity\": \"30\",\n\t\"AssignedEmployeeID\": \"{{EmployeeID_2}}\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskServiceCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskServiceCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create task service (intercompany resource)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task service '\" + jsonResponse.d.results.ProductDescription + \"' added and assigned to intercompany resource: \" +jsonResponse.d.results.AssignedEmployeeFormattedName, function () { pm.expect(pm.response.code).to.be.oneOf([201]) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_2}}\",\n\t\"ProductID\": \"{{ServiceProduct_1}}\",\n\t\"PlannedWorkQuantity\": \"25\",\n\t\"AssignedEmployeeID\": \"{{EmployeeID_4}}\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskServiceCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskServiceCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create task service (external resource)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task service '\" + jsonResponse.d.results.ProductDescription + \"' added and assigned to external resource: \" +jsonResponse.d.results.AssignedEmployeeFormattedName, function () { pm.expect(pm.response.code).to.be.oneOf([201]) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_2}}\",\n\t\"ProductID\": \"{{ServiceProduct_3}}\",\n\t\"PlannedWorkQuantity\": \"40\",\n\t\"AssignedEmployeeID\": \"{{EmployeeID_3}}\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskServiceCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskServiceCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get project and expand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8b6d5cbd-d02c-41da-ad1e-03be26274892",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"ProjectID\", jsonResponse.d.results[0].ProjectID);",
+									"pm.environment.set(\"ProjectObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"ProjectBuyerPartyObjectID\", jsonResponse.d.results[0].ProjectBuyerParty.ObjectID);",
+									"pm.environment.set(\"ProjectSummaryTaskObjectID\", jsonResponse.d.results[0].ProjectSummaryTask.ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_1\", jsonResponse.d.results[0].Task[1].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_2\", jsonResponse.d.results[0].Task[2].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results[0].ProjectID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results[0].ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ProjectLifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results[0].SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection?$format=json&$expand=ProjectBuyerParty,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation,Task/TaskMaterial,Task/TaskExpense,Task/TaskRevenue,Task/TaskRelationship&$filter=ProjectID eq '{{ProjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "ProjectBuyerParty,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation,Task/TaskMaterial,Task/TaskExpense,Task/TaskRevenue,Task/TaskRelationship"
+								},
+								{
+									"key": "$filter",
+									"value": "ProjectID eq '{{ProjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Read and change planning data for Work (service), Expenses, Materials and Revenue",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "fa2517db-e351-4282-b7bb-3dca4714be3a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e925b285-323e-46c9-a99e-a7f3613bc43a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Sell Project-based Services",
+			"item": [
+				{
+					"name": "Get entity sets and CSRF-token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "4b5f4d9c-55db-4cb2-a6b6-ffc9e31c7d2b",
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create sales order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
+								"exec": [
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results.ObjectID);",
+									"pm.environment.set(\"SalesOrderID\", jsonResponse.d.results.ID);",
+									"",
+									"// Validations",
+									"pm.test(\"Sales order \" + jsonResponse.d.results.ID + \" created\", function () { pm.response.to.have.status(201) });",
+									"pm.test(\"Sales Order consistent\", function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Sales Order status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
+								"exec": [
+									"// Set External Reference of pattern KH-<UTC datetime>",
+									"let todayDateTime = (new Date()).toISOString().substr(0,19);",
+									"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");",
+									"var generatedBuyerID = pm.environment.get(\"ExternalReferencePrefix\") + todayDateTime;",
+									"//var generatedBuyerID = pm.environment.get(\"ExternalReferencePrefix\") + (new Date()).toISOString().substr(0,19);",
+									"pm.environment.set(\"SalesOrderExternalReference\", generatedBuyerID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}\",\n\t\"Name\": \"Selling customer projects\",\n\t\"DataOriginTypeCode\": \"1\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"GrossAmountIndicator\": false\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TPTM\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{ServiceProduct_1}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"4\",\n\t\t\t\t\t\t\t\"unitCode\": \"HUR\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"ID\": \"20\",\n\t\t\t\t\"ProcessingTypeCode\": \"TPTM\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{ServiceProduct_2}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"40\",\n\t\t\t\t\t\t\t\"unitCode\": \"HUR\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"ID\": \"30\",\n\t\t\t\t\"ProcessingTypeCode\": \"TPFP\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{ServiceProduct_3}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"8\",\n\t\t\t\t\t\t\t\"unitCode\": \"HUR\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create project from sales order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Project for sales order \" + jsonResponse.d.results.ID + \" created\", function () { pm.response.to.have.status(200) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/CreateProject?ObjectID='{{SalesOrderObjectID}}'&ProjectCreationMethodCode='2'&PlannedDuration='P15D'&ProjectResponsibleEmployeeID='{{EmployeeID_1}}'&ProjectResponsibleCostCentreID='{{Project ResponsibleCostCentreID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"CreateProject"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{SalesOrderObjectID}}'"
+								},
+								{
+									"key": "ProjectCopyRevenueIndicator",
+									"value": "true",
+									"disabled": true
+								},
+								{
+									"key": "ProjectIntercompanySettlementIndicator",
+									"value": "false",
+									"disabled": true
+								},
+								{
+									"key": "ProjectCreationMethodCode",
+									"value": "'2'",
+									"description": "1- One Task for Fixed Price Items, One Task for Time and Material Items, \n2 - One Task for Each Item, \n3 - Only Project Header"
+								},
+								{
+									"key": "PlannedDuration",
+									"value": "'P15D'"
+								},
+								{
+									"key": "ProjectGeneralLedgerAccountAliasCode",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "ProjectResponsibleEmployeeID",
+									"value": "'{{EmployeeID_1}}'"
+								},
+								{
+									"key": "ProjectResponsibleCostCentreID",
+									"value": "'{{Project ResponsibleCostCentreID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Release sales order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Project for sales order \" + jsonResponse.d.results.ID + \" created\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Sales order release status: \" + jsonResponse.d.results.ReleaseStatusCodeText, function () { pm.expect(jsonResponse.d.results.ReleaseStatusCode).to.eql(\"3\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d3b65797-8969-4902-ad58-282bd6e10277",
+								"exec": [
+									"// Delay let the system complete the async. integrations",
+									"setTimeout(function() {}, 5000); // wait 5 sec"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderRelease3?ObjectID='{{SalesOrderObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderRelease3"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{SalesOrderObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"SalesOrderID\", jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderItemObjectID\", jsonResponse.d.results[0].Item[0].ObjectID);",
+									"pm.environment.set(\"SalesOrderItemObjectID2\", jsonResponse.d.results[0].Item[1].ObjectID);",
+									"pm.environment.set(\"SalesOrderItemObjectID3\", jsonResponse.d.results[0].Item[2].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Sales order \" + jsonResponse.d.results[0].ID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Sales Order consistent\", function () { pm.expect(jsonResponse.d.results[0].ConsistencyStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Sales order release status: \" + jsonResponse.d.results[0].ReleaseStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ReleaseStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Sales Order status: \" + jsonResponse.d.results[0].LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Item 10 ... ok\", function () { pm.expect(jsonResponse.d.results[0].Item[0].ID).to.eql(\"10\") });",
+									"pm.test(\"Item 20 ... ok\", function () { pm.expect(jsonResponse.d.results[0].Item[1].ID).to.eql(\"20\") });",
+									"pm.test(\"Item 30 ... ok\", function () { pm.expect(jsonResponse.d.results[0].Item[2].ID).to.eql(\"30\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine,DocumentReference,Item/ItemDocumentReference&$filter=ID eq '{{SalesOrderID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine,DocumentReference,Item/ItemDocumentReference"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{SalesOrderID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get project summary task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8b6d5cbd-d02c-41da-ad1e-03be26274892",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"ProjectSummaryTaskObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"ProjectObjectID\", jsonResponse.d.results[0].ParentObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project summary task \" + jsonResponse.d.results[0].ID + \" - \" + jsonResponse.d.results[0].ProjectName + \" returned\", function () ",
+									"    { ",
+									"        pm.response.to.have.status(200);",
+									"        pm.expect(jsonResponse.d.results[0].ProjectName).to.eql( pm.environment.get(\"SalesOrderID\") );",
+									"    });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectSummaryTaskCollection?$format=json&$filter=ProjectName eq '{{SalesOrderID}}' and ResponsibleEmployeeID eq '{{EmployeeID_1}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectSummaryTaskCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "ProjectBuyerParty,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation,Task/TaskMaterial,Task/TaskExpense,Task/TaskRevenue,Task/TaskRelationship",
+									"disabled": true
+								},
+								{
+									"key": "$filter",
+									"value": "ProjectName eq '{{SalesOrderID}}' and ResponsibleEmployeeID eq '{{EmployeeID_1}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get project (key access)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8b6d5cbd-d02c-41da-ad1e-03be26274892",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"ProjectID\", jsonResponse.d.results.ProjectID);",
+									"pm.environment.set(\"ProjectObjectID\", jsonResponse.d.results.ObjectID);",
+									"pm.environment.set(\"ProjectSummaryTaskObjectID\", jsonResponse.d.results.ProjectSummaryTask.ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_1\", jsonResponse.d.results.Task[1].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_2\", jsonResponse.d.results.Task[2].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_3\", jsonResponse.d.results.Task[3].ObjectID);",
+									"pm.environment.set(\"ProjectTaskServiceObjectID_1\", jsonResponse.d.results.Task[1].TaskService[0].ObjectID);",
+									"pm.environment.set(\"ProjectTaskServiceObjectID_2\", jsonResponse.d.results.Task[2].TaskService[0].ObjectID);",
+									"pm.environment.set(\"ProjectTaskServiceObjectID_3\", jsonResponse.d.results.Task[3].TaskService[0].ObjectID);",
+									"pm.environment.set(\"ProjectTaskID_1\", jsonResponse.d.results.Task[1].TaskID);",
+									"pm.environment.set(\"ProjectTaskID_2\", jsonResponse.d.results.Task[2].TaskID);",
+									"pm.environment.set(\"ProjectTaskID_3\", jsonResponse.d.results.Task[3].TaskID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results.ProjectID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results.ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.ProjectLifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results.SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results.SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection('{{ProjectObjectID}}')?$format=json&$expand=ProjectBuyerParty,ProjectSummaryTask,Task/TaskService,Task/TaskService/TaskServiceConfirmation,Task/TaskMaterial,Task/TaskExpense,Task/TaskRevenue,Task/TaskRelationship,Team",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection('{{ProjectObjectID}}')"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "ProjectBuyerParty,ProjectSummaryTask,Task/TaskService,Task/TaskService/TaskServiceConfirmation,Task/TaskMaterial,Task/TaskExpense,Task/TaskRevenue,Task/TaskRelationship,Team"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add task relationship T1-T2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task relationships '\" + jsonResponse.d.results.DependencyTypeCodeText + \"' added\", function () { pm.expect(pm.response.code).to.be.oneOf([201]) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_1}}\",\n\t\"DependencyTypeCode\": \"1\",\n\t\"SuccessorTaskID\": \"{{ProjectTaskID_2}}\",\n\t\"LagDuration\": \"P2D\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskRelationshipCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskRelationshipCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add task relationship T2-T3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aab993da-97ca-40e2-9ffc-aefda522898d",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Task relationships '\" + jsonResponse.d.results.DependencyTypeCodeText + \"' added\", function () { pm.expect(pm.response.code).to.be.oneOf([201]) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_2}}\",\n\t\"DependencyTypeCode\": \"2\",\n\t\"SuccessorTaskID\": \"{{ProjectTaskID_3}}\",\n\t\"LagDuration\": \"P1D\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskRelationshipCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskRelationshipCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update person responsible of task 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task 1: responsible person added\", function () { pm.response.to.have.status(204) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ObjectID\":\"{{ProjectTaskObjectID_1}}\",\n\t\"ParentObjectID\": \"{{ProjectObjectID}}\",\n\t\"ResponsibleEmployeeID\": \"{{EmployeeID_1}}\",\n\t\"PlannedDuration\": \"P15D\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskCollection('{{ProjectTaskObjectID_1}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskCollection('{{ProjectTaskObjectID_1}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update person responsible of task 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task 2: responsible person added\", function () { pm.response.to.have.status(204) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ObjectID\":\"{{ProjectTaskObjectID_2}}\",\n\t\"ParentObjectID\": \"{{ProjectObjectID}}\",\n\t\"ResponsibleEmployeeID\": \"{{EmployeeID_2}}\",\n\t\"PlannedDuration\": \"P10D\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskCollection('{{ProjectTaskObjectID_2}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskCollection('{{ProjectTaskObjectID_2}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update person responsible of task 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task 3: responsible person added\", function () { pm.response.to.have.status(204) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ObjectID\":\"{{ProjectTaskObjectID_3}}\",\n\t\"ParentObjectID\": \"{{ProjectObjectID}}\",\n\t\"ResponsibleEmployeeID\": \"{{EmployeeID_4}}\",\n\t\"PlannedDuration\": \"P2D\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskCollection('{{ProjectTaskObjectID_3}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskCollection('{{ProjectTaskObjectID_3}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update task service 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task 1: Employee assigned to task service\", function () { pm.response.to.have.status(204) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ObjectID\":\"{{ProjectTaskServiceObjectID_1}}\",\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_1}}\",\n\t\"AssignedEmployeeID\": \"{{EmployeeID_1}}\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskServiceCollection('{{ProjectTaskServiceObjectID_1}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskServiceCollection('{{ProjectTaskServiceObjectID_1}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update task service 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task 2: Employee assigned to task service\", function () { pm.response.to.have.status(204) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ObjectID\":\"{{ProjectTaskServiceObjectID_2}}\",\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_2}}\",\n\t\"AssignedEmployeeID\": \"{{EmployeeID_2}}\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskServiceCollection('{{ProjectTaskServiceObjectID_2}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskServiceCollection('{{ProjectTaskServiceObjectID_2}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update task service 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Task 3: Employee assigned to task service\", function () { pm.response.to.have.status(204) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ObjectID\":\"{{ProjectTaskServiceObjectID_3}}\",\n\t\"ParentObjectID\": \"{{ProjectTaskObjectID_3}}\",\n\t\"AssignedEmployeeID\": \"{{EmployeeID_4}}\"\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/TaskServiceCollection('{{ProjectTaskServiceObjectID_3}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"TaskServiceCollection('{{ProjectTaskServiceObjectID_3}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start and release project",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cbf8135e-aada-4504-acec-4e132c66fee1",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Project started and released\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results.ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.ProjectLifeCycleStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results.SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results.SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/StartAndRelease?ObjectID='{{ProjectObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"StartAndRelease"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{ProjectObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get project",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "279c5887-c574-4ab9-9199-cb2156cb7c72",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"ProjectID\", jsonResponse.d.results[0].ProjectID);",
+									"pm.environment.set(\"ProjectObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"ProjectSummaryTaskObjectID\", jsonResponse.d.results[0].ProjectSummaryTask.ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_1\", jsonResponse.d.results[0].Task[1].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_2\", jsonResponse.d.results[0].Task[2].ObjectID);",
+									"pm.environment.set(\"ProjectTaskObjectID_3\", jsonResponse.d.results[0].Task[3].ObjectID);",
+									"pm.environment.set(\"ProjectTaskServiceObjectID_1\", jsonResponse.d.results[0].Task[1].TaskService[0].ObjectID);",
+									"pm.environment.set(\"ProjectTaskServiceObjectID_2\", jsonResponse.d.results[0].Task[2].TaskService[0].ObjectID);",
+									"pm.environment.set(\"ProjectTaskServiceObjectID_3\", jsonResponse.d.results[0].Task[3].TaskService[0].ObjectID);",
+									"pm.environment.set(\"ProjectTaskID_1\", jsonResponse.d.results[0].Task[1].TaskID);",
+									"pm.environment.set(\"ProjectTaskID_2\", jsonResponse.d.results[0].Task[2].TaskID);",
+									"pm.environment.set(\"ProjectTaskID_3\", jsonResponse.d.results[0].Task[3].TaskID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project \" + jsonResponse.d.results[0].ProjectID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Project status: \" + jsonResponse.d.results[0].ProjectLifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ProjectLifeCycleStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Project scheduling status: \" + jsonResponse.d.results[0].SchedulingUpToDatenessStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].SchedulingUpToDatenessStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectCollection?$format=json&$expand=ProjectBuyerParty,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation,Task/TaskMaterial,Task/TaskExpense,Task/TaskRevenue,Task/TaskRelationship,Team&$filter=ProjectID eq '{{ProjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "ProjectBuyerParty,ProjectSummaryTask,Task,Task/TaskService,Task/TaskService/TaskServiceConfirmation,Task/TaskMaterial,Task/TaskExpense,Task/TaskRevenue,Task/TaskRelationship,Team"
+								},
+								{
+									"key": "$filter",
+									"value": "ProjectID eq '{{ProjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get employee time agreement",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1ddd0e57-0d41-4254-ba4a-0591c0c584fd",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"pm.environment.set(\"EmployeeTimeAgreementItemUUID\", jsonResponse.d.results[0].UUID);",
+									"",
+									"// Validations",
+									"pm.test(\"Employee time agreement item for employee \" + jsonResponse.d.results[0].EmployeeID + \" - \" + jsonResponse.d.results[0].EmployeeFormattedName + \" found\", function () { pm.response.to.have.status(200) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "fdb2bd86-7cc5-4eeb-86d6-1ecfe131c0bc",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khtimeagreement/ItemCollection?$format=json&$filter=EmployeeID eq '{{EmployeeID_1}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khtimeagreement",
+								"ItemCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$filter",
+									"value": "EmployeeID eq '{{EmployeeID_1}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create project time recording on behalf",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ea796a4f-489a-4937-b774-bf93760165e1",
+								"exec": [
+									"// Set Dates as DateTime",
+									"var moment = require(\"moment\");",
+									"var startDate = moment().add(0, 'day').toISOString().substr(0,10) + \"T00:00:00.0000000\";",
+									"pm.environment.set(\"Date_1\", startDate);",
+									"var endDate = moment().add(0, 'day').toISOString().substr(0,10) + \"T00:00:00.0000000\";",
+									"pm.environment.set(\"Date_2\", endDate);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e6f3b22b-c806-4ef4-96d1-63c818ea666c",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"EmployeeTimeObjectID\", jsonResponse.d.results.ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project time recording created\", function () { pm.response.to.have.status(201) });",
+									"pm.test(\"Lifecycle status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Approval status: \" + jsonResponse.d.results.ApprovalStatusCodeText, function () { pm.expect(jsonResponse.d.results.ApprovalStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"type": "text",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"EmployeeTimeAgreementItemUUID\": \"{{EmployeeTimeAgreementItemUUID}}\",\n    \"EmployeeTimeItem\": [\n        {\n            \"TypeCode\": \"US0001\",\n            \"StartDate\": \"{{Date_1}}\",\n            \"EndDate\": \"{{Date_2}}\",\n            \"Duration\": \"PT3H15M\",\n            \"ProjectElementID\": \"{{ProjectTaskID_1}}\",\n            \"ServiceProductID\": \"{{ServiceProduct_1}}\"\n        }\n    ],\n    \"EmployeeTimeText\" : [\n        {\n        \t\"TypeCode\": \"10071\",\n        \t\"Text\": \"Project plan done and ready for execution\"\n\t\t}\n    ]        \n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khemployeetime/EmployeeTimeCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khemployeetime",
+								"EmployeeTimeCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit time recording",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f4b5c07-3ae2-4b2b-b5bf-d156fa46e2d0",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Time recording released\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Lifecycle status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"2\") });",
+									"pm.test(\"Approval status: \" + jsonResponse.d.results.ApprovalStatusCodeText, function () { pm.expect(jsonResponse.d.results.ApprovalStatusCode).to.eql(\"2\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khemployeetime/SubmitForApproval?ObjectID='{{EmployeeTimeObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khemployeetime",
+								"SubmitForApproval"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{EmployeeTimeObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find time records by employee ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e99944ca-596c-4eda-b92e-4dea3cbe89a8",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"pm.environment.set(\"EmployeeTimeObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Time recordings found\", function () { pm.response.to.have.status(200) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{xcsrftoken}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khemployeetime/EmployeeTimeQueryActualTimeAndAbsenceTimeByElements?ProjectID='{{ProjectID}}'&LifeCycleStatusCode='2'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khemployeetime",
+								"EmployeeTimeQueryActualTimeAndAbsenceTimeByElements"
+							],
+							"query": [
+								{
+									"key": "ProjectID",
+									"value": "'{{ProjectID}}'"
+								},
+								{
+									"key": "EmployeeID",
+									"value": "'{{EmployeeID_1}}'",
+									"disabled": true
+								},
+								{
+									"key": "ProjectElementID",
+									"value": "'{{ProjectTaskID_1}}'",
+									"disabled": true
+								},
+								{
+									"key": "InternalEmployeeIndicator",
+									"value": "'X'",
+									"disabled": true
+								},
+								{
+									"key": "LifeCycleStatusCode",
+									"value": "'2'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get time records (key access)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "78ad6116-ca79-410c-a56a-1ec10476e003",
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"pm.environment.set(\"EmployeeTimeObjectID\", jsonResponse.d.results.ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Project time recording for employee \" + jsonResponse.d.results.EmployeeID + \" - \" + jsonResponse.d.results.EmployeeFormattedName + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Lifecycle status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"2\") });",
+									"pm.test(\"Approval status: \" + jsonResponse.d.results.ApprovalStatusCodeText, function () { pm.expect(jsonResponse.d.results.ApprovalStatusCode).to.eql(\"2\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khemployeetime/EmployeeTimeCollection('{{EmployeeTimeObjectID}}')?$expand=EmployeeTimeItem,EmployeeTimeText,EmployeeType",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khemployeetime",
+								"EmployeeTimeCollection('{{EmployeeTimeObjectID}}')"
+							],
+							"query": [
+								{
+									"key": "$expand",
+									"value": "EmployeeTimeItem,EmployeeTimeText,EmployeeType"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Codelists",
+			"item": [
+				{
+					"name": "Get project type codes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khproject/ProjectProjectTypeCodeCollection?$format=json",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khproject",
+								"ProjectProjectTypeCodeCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{Password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{User}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "5684cae6-dbbe-4974-ab56-cc52ec1d32e0",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "cd107e72-b20c-4578-9fb9-e5222acc03fd",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
