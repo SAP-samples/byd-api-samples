@@ -79,19 +79,19 @@ Steps to setup and run the API sample requests:
 	- *CommunicationUser* and *CommunicationUserPW* (enter the communication user used for the communication arrangements created as described in the description of the Postman collection)
 5. **Postman:** Open the Postman Runner. The runner is used to automatically run a sequence of OData requests. 
 6. **Postman Runner:** 
-	a. Select the collection and the folder
-	b. Select the environment 
-	c. Select the check boxes “Keep variable values” and “Run collection without using stored cookies”
-	d. Click on “Run …” 
-		i. Make sure you always choose collections and environments that belong together – otherwise it does not work!
-		ii.	You may have to start a scenario twice in case a service needed to be compiled and returns with error code 500
-		iii.	In the protocol you find IDs and valuations that you can use to find the corresponding objects in the ByD UI
+	1. Select the collection and the folder
+	2. Select the environment 
+	3. Select the check boxes “Keep variable values” and “Run collection without using stored cookies”
+	4. Click on “Run …” 
+		- Make sure you always choose collections and environments that belong together – otherwise it does not work!
+		- You may have to start a scenario twice in case a service needed to be compiled and returns with error code 500
+		- In the protocol you find IDs and valuations that you can use to find the corresponding objects in the ByD UI
 7. **Postman:** Alternatively you run the OData requests manually as well: 
-	a. Open the Postman collection folder
-	b. Select the Postman environment (Make sure you always choose collections and environments that belong together)
-	c. Select the request and click “Send”
-	e. Select the next request and click “Send” 
-	f. … (always keep the order of the OData requests and do not skip any OData request)
+	1. Open the Postman collection folder
+	2. Select the Postman environment (Make sure you always choose collections and environments that belong together)
+	3. Select the request and click “Send”
+	4. Select the next request and click “Send” 
+	5. … (always keep the order of the OData requests and do not skip any OData request)
 
 ## How to obtain support
 
