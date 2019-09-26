@@ -84,9 +84,8 @@ Steps to setup and run the API sample requests:
 	3. Select the check boxes “Keep variable values” and “Run collection without using stored cookies”
 	4. Click on “Run …” 
 		- Make sure you always choose collections and environments that belong together – otherwise it does not work!
-		- You may have to start a scenario twice in case a service needed to be compiled and returns with error code 500
 		- In the protocol you find IDs and valuations that you can use to find the corresponding objects in the ByD UI
-7. **Postman:** Alternatively you run the OData requests manually as well: 
+7. **Postman:** Alternatively you can run the OData requests manually as well: 
 	1. Open the Postman collection folder
 	2. Select the Postman environment (Make sure you always choose collections and environments that belong together)
 	3. Select the request and click “Send”
