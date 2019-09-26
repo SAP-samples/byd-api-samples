@@ -2,7 +2,7 @@
 
 ## Description
 
-This repository provides example Postman collections consuming SAP Business ByDesign APIs and can be used to get insights how to integrate and extend SAP Business ByDesign.
+This repository provides Postman collections with example SAP Business ByDesign web service requests and can be used to get insights how to integrate and extend SAP Business ByDesign.
 
 [SAP Business ByDesign](https://www.sap.com/products/business-bydesign.html) is a cloud ERP solution for small and mid-market companies. 
 SAP Business ByDesign (ByD) is designed as open business process platform and provides a comprehensive portfolio of APIs and integration capabilities. You find an overview of all ByD API in the SAP Community blog post [SAP Business ByDesign - API Overview](https://community.sap.com/topics/business-bydesign). 
