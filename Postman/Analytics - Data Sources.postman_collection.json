@@ -1,0 +1,510 @@
+{
+	"info": {
+		"_postman_id": "770370eb-af7d-4fa4-9e4e-c2fea1cb19f0",
+		"name": "Analytics - Data Sources",
+		"description": "SAP Business ByDesign Analytics - OData Examples to extract Data Sources\n========================================================================\n\nThe SAP Business ByDesign OData API for Data Sources is designed to extract analytical raw data. Remote systems can extract ByD analytical raw data in flat tables, free of redundancies from ByD. The analytical raw data is then processed, combined and formatted in the remote system. Typically such remote systems are central business analytics application such as SAP Analytics Cloud.\n\nThis collection provides sample OData requests for the SAP Business ByDesign analytical data sources listed below.\n\nData sources: \n- *Sales Order Header* (Crmslohb)\n- *Sales Order Item* (Crmsloib)\n- *Material General data* (Mat_General)\n- *Stock Overview* (Scminvv02)\n- *G/L Account Items* (Finglau02)\n- *Company Master Data* (/MOM/COMPANY)\n\nConfiguration: \n1. Enable the OData API for Data Sources in your ByD Business Configuration: *Built-in Services and Support* >> *System Management* >> *Analytics* >> *Do you want to enable analytical OData services for data sources?*\n2. Create a user to access the OData service: Create a Communication Arrangement for Communication Scenario *Analytics Data Sources ODATA* and maintain the technical user\n3. Expose your data sources in work center view *Business Analytics - Data Sources*\n \nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get exposed data sources",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get metadata",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/$metadata",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Finglau02.svc",
+						"$metadata"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sales order header",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Crmslohb.svc/Crmslohb?$top=10&$format=json",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Crmslohb.svc",
+						"Crmslohb"
+					],
+					"query": [
+						{
+							"key": "$top",
+							"value": "10"
+						},
+						{
+							"key": "$format",
+							"value": "json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sales order item",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Crmsloib.svc/Crmsloib?$top=10&$format=json",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Crmsloib.svc",
+						"Crmsloib"
+					],
+					"query": [
+						{
+							"key": "$top",
+							"value": "10"
+						},
+						{
+							"key": "$format",
+							"value": "json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Materials general data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/MatGeneral.svc/MatGeneral?$top=10&$format=json",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"MatGeneral.svc",
+						"MatGeneral"
+					],
+					"query": [
+						{
+							"key": "$top",
+							"value": "10"
+						},
+						{
+							"key": "$format",
+							"value": "json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Account details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpcsdb.svc/Bpcsdb?$select=C_BankAccountId,Count",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Bpcsdb.svc",
+						"Bpcsdb"
+					],
+					"query": [
+						{
+							"key": "$select",
+							"value": "C_BankAccountId,Count"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Supplier Details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Bpsppb?$format=json&$filter=C_TaxCountry eq 'SE' and C_TaxIdNr eq 'SE999999999901'&$expand=to_BpUuid",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Bpsppb.svc",
+						"Bpsppb"
+					],
+					"query": [
+						{
+							"key": "$select",
+							"value": "C_BpUuid,C_TaxCountry,C_TaxType,C_TaxIdNr,Count",
+							"disabled": true
+						},
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$filter",
+							"value": "C_TaxCountry eq 'SE' and C_TaxIdNr eq 'SE999999999901'"
+						},
+						{
+							"key": "$expand",
+							"value": "to_BpUuid"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Supplier Details Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Bpsppb('.63~SE.64~SE999999999901')/to_BpUuid?$format=json",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Bpsppb.svc",
+						"Bpsppb('.63~SE.64~SE999999999901')",
+						"to_BpUuid"
+					],
+					"query": [
+						{
+							"key": "$expand",
+							"value": "to_BpUuid",
+							"disabled": true
+						},
+						{
+							"key": "$format",
+							"value": "json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Supplier Master Data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Supplier?$select=C_BpUuid,C_BpIntId,T_BpFrmtdName,Count&$format=json&$filter=C_BpUuid eq guid'00000000-0001-1DEF-BA9F-CD59144F3576'",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Bpsppb.svc",
+						"Supplier"
+					],
+					"query": [
+						{
+							"key": "$select",
+							"value": "C_BpUuid,C_BpIntId,T_BpFrmtdName,Count"
+						},
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$filter",
+							"value": "C_BpUuid eq guid'00000000-0001-1DEF-BA9F-CD59144F3576'"
+						},
+						{
+							"key": "$expand",
+							"value": "to_BpUuid",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Stock overview",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/scminvv02.svc/Scminvv02?$format=json&$select=C_CoUuid,C_ImlUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"scminvv02.svc",
+						"Scminvv02"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$select",
+							"value": "C_CoUuid,C_ImlUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "G/L Account Items",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/Finglau02?$format=json&$inlinecount=allpages&$top=1000&$select=C_CompanyUuid,C_Setofbks,C_Fiscyearvar,C_Chofaccts,C_PostingDate,C_Fiscalyearperio,C_Glacct,Count&$filter=C_CompanyUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_Setofbks eq '7000' and C_Fiscyearvar eq '10' and C_Chofaccts eq 'ZIAS' and C_Fiscalyearperio eq '2018010' and ( C_PostingDate ge datetime'2018-10-01T00:00:00' and C_PostingDate le datetime'2018-12-31T00:00:00' )",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Finglau02.svc",
+						"Finglau02"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
+						},
+						{
+							"key": "$top",
+							"value": "1000"
+						},
+						{
+							"key": "$select",
+							"value": "C_CompanyUuid,C_Setofbks,C_Fiscyearvar,C_Chofaccts,C_PostingDate,C_Fiscalyearperio,C_Glacct,Count"
+						},
+						{
+							"key": "$filter",
+							"value": "C_CompanyUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_Setofbks eq '7000' and C_Fiscyearvar eq '10' and C_Chofaccts eq 'ZIAS' and C_Fiscalyearperio eq '2018010' and ( C_PostingDate ge datetime'2018-10-01T00:00:00' and C_PostingDate le datetime'2018-12-31T00:00:00' )",
+							"description": "C_CompanyUuid eq guid'00300571-C7CC-02DB-B898-AB1DC7E899CA' and C_Setofbks eq 'AXUS' and C_Fiscyearvar eq '10' and C_Chofaccts eq 'CAUS' and C_Fiscalyearperio eq '2018011' and ( C_PostingDate ge datetime'2018-11-01T00:00:00' and C_PostingDate le datetime'2018-11-30T00:00:00' )"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "G/L Account Items / Company",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/xMOMxCompany?$format=json&$top=100&$filter=T_Name eq 'Almika Inc.'",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Finglau02.svc",
+						"xMOMxCompany"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$top",
+							"value": "100"
+						},
+						{
+							"key": "$filter",
+							"value": "T_Name eq 'Almika Inc.'"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "G/L Account Items / Segment",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/xMOMxSegment?$format=json&$top=100&$select=C_SgmtUuid,C_SgmtId,T_Name",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Finglau02.svc",
+						"xMOMxSegment"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$top",
+							"value": "100"
+						},
+						{
+							"key": "$filter",
+							"value": "T_Name eq 'Almika Inc.'",
+							"disabled": true
+						},
+						{
+							"key": "$select",
+							"value": "C_SgmtUuid,C_SgmtId,T_Name"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{CommunicationUserPW}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{CommunicationUser}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "2cb400a3-a7c8-4b0b-b62a-39798b47e26e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "1a209054-a05d-4f51-a69b-de4943de691e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
