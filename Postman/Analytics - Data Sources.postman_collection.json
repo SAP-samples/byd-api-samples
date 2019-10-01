@@ -191,7 +191,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Bpsppb?$format=json&$filter=C_TaxCountry eq 'SE' and C_TaxIdNr eq 'SE999999999901'&$expand=to_BpUuid",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Bpsppb?$format=json&$filter=C_TaxCountry eq 'SE' and C_TaxIdNr eq 'SE999999999901'",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -218,46 +218,6 @@
 						{
 							"key": "$filter",
 							"value": "C_TaxCountry eq 'SE' and C_TaxIdNr eq 'SE999999999901'"
-						},
-						{
-							"key": "$expand",
-							"value": "to_BpUuid"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Supplier Details Copy",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Bpsppb('.63~SE.64~SE999999999901')/to_BpUuid?$format=json",
-					"protocol": "https",
-					"host": [
-						"{{TenantHostname}}"
-					],
-					"path": [
-						"sap",
-						"byd",
-						"odata",
-						"analytics",
-						"ds",
-						"Bpsppb.svc",
-						"Bpsppb('.63~SE.64~SE999999999901')",
-						"to_BpUuid"
-					],
-					"query": [
-						{
-							"key": "$expand",
-							"value": "to_BpUuid",
-							"disabled": true
-						},
-						{
-							"key": "$format",
-							"value": "json"
 						}
 					]
 				}
@@ -296,11 +256,6 @@
 						{
 							"key": "$filter",
 							"value": "C_BpUuid eq guid'00000000-0001-1DEF-BA9F-CD59144F3576'"
-						},
-						{
-							"key": "$expand",
-							"value": "to_BpUuid",
-							"disabled": true
 						}
 					]
 				}
@@ -420,6 +375,11 @@
 						{
 							"key": "$filter",
 							"value": "T_Name eq 'Almika Inc.'"
+						},
+						{
+							"key": "sap-language",
+							"value": "en",
+							"disabled": true
 						}
 					]
 				}

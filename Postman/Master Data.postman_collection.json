@@ -10047,6 +10047,66 @@
 			"name": "Business Partner (write)",
 			"item": [
 				{
+					"name": "Get xsrf-token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"Cross-site request forgery token received\", function () { pm.response.to.have.header(\"x-csrf-token\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b2e8f837-8860-4a09-9931-7d6db97f5cdf",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khbusinesspartner/",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khbusinesspartner",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create business partner (organisation)",
 					"event": [
 						{
@@ -12835,7 +12895,7 @@
 									"//pm.environment.set(\"PrivateAccountInternalID\", jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:CustomerByElementsResponse_sync'].Customer.InternalID);",
 									"",
 									"// Validations",
-									"pm.test(\"Private Account: \" + jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:CustomerByElementsResponse_sync'].Customer.InternalID + \" Queried Successfully \", function () { pm.response.to.have.status(200) });"
+									"pm.test(\"Private Account: \" + jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:CustomerByElementsResponse_sync'].Customer.InternalID + \" found and retrieved\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -13046,7 +13106,7 @@
 									"//pm.environment.set(\"PrivateAccountInternalID\", jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:CustomerByElementsResponse_sync'].Customer.InternalID);",
 									"",
 									"// Validations",
-									"pm.test(\"Coporate Account: \" + jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:CustomerByElementsResponse_sync'].Customer.InternalID + \" found\", function () { pm.response.to.have.status(200) });"
+									"pm.test(\"Coporate Account: \" + jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:CustomerByElementsResponse_sync'].Customer.InternalID + \" found and retrieved\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}

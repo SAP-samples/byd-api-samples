@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "7068e2b8-13d5-41ce-99f7-ae6283cd9465",
+		"_postman_id": "1cd53f7f-0f30-4945-935c-50265818db59",
 		"name": "Sales and Commerce Scenarios",
-		"description": "SAP Business ByDesign API Samples - Sales and Commerce Scenarios\n================================================================\n\nThis Postman collection contains examples to create, change and read business objects and to run end-to-end business processes using *SAP Business ByDesign Custom OData Services*.\nEach collection folder corresponds to a business scenario; execute the web service requests in the listed order within each folder.\n\nAll sample data is aligned to and ready to run on *SAP Business ByDesign Partner Demo Tenants (Full scope US)* with preconfigured and loaded sample data provided by SAP.  \n&nbsp; \n\n\n**Web services and User:**\n\nThe OData services used in this collection require a SAP ByDesign business user for authorization.  \n&nbsp; \n\nSAP ByDesign business objects provide defaulting capabilities based on the organizational assignment of the user logged in. In many sample OData requests I use this defaulting to keep the OData requests simple.  \nTherefore, assign the employee or service agent that is associated to your business user to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.  \n&nbsp; \n\nThe OData requests in this collection use the following SAP Bydesign *Custom OData Services* assigned to the work center views in column *User authorization*. Assign the listed SAP ByDesign Work Center Views to your business user:\n\n| Custom OData Service | User authorization (ByD Work Center View) |  \n|----------------------|-------------------------------------------|  \n| *khsalesorder* | *Sales Orders - Sales Orders* |  \n| *khcustomerinvoicerequest* | *Customer Invoicing - Invoice Requests* |  \n| *khcustomerinvoice* | *Customer Invoicing - Invoice Documents* |  \n| *khcustomerreturn* | *Sales Orders - Returns* |\n| *khoutbounddeliveryrequest* | *Outbound Logistics - Delivery Proposals* |  \n| *khoutbounddelivery* | *Outbound Logistics - Outbound Deliveries* |  \n| *khinbounddelivery* | *Inbound Logistics - Inbound Delivery Notifications* |\n| *khconfirmedinbounddelivery* | *Inbound Logistics - Inbound Deliveries* |\n| *khhousebankaccount* | *Liquidity Management - My Banks* |\n| *khcompanypaymentfileregister* | *Liquidity Management - Inbound Files* |\n| *khhousebankstatement* | *Liquidity Management - Bank Statements* |\n| *khpayment* | *Payment Management - Payment Monitor* |\n| *khpaymentorderprocessingstatement* | *Payment Management - Clearing House Statements* |\n\n&nbsp; \n\nAdditionally this collection uses the SOAP Web Service APIs:  \n- *Manage Sales Orders* (required because external payment information cannot be created using OData)\n- *Manage Customer Invoice Requests* (required because external payment information cannot be created using OData)  \n\nSteps to configure SOAP the Web Service APIs:\n1. Work center view *Application and User Management - Communication Systems*: Create a communication system\n2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with web service APIs listed above\n3. Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials  \n&nbsp; \n\n\n**Business Configuration:**  \n\nThe following fine tuning settings are required additionally to the preconfigured and loaded sample data provided by the SAP Business ByDesign Partner Demo Tenant.  \n&nbsp; \n\nConfigure the determination methode for external references:  \nByD work center *Business Configuration*: Open the fine tuning activity *External Reference Number Determination for Customer Invoice* and set the determination method to *Copied from Predecessor Reference ID*.  \n&nbsp; \n\nCreate company payment file register:  \nOpen work center view *Liquidity Management - Inbound Files*, click on *New* > *Inbound File* and enter the following values:  \n\t*Type: Bank Statement* | *Company: 1000* | *Bank ID: 1000002* | *Import Format: BAI2 US*.  \nSave without adding an attachment.  \nThe system created a company payment file register for company 1000 that can now be used for file uploads via OData.  \n&nbsp; \n\nThe bank statements created in this collection are automatically allocated if you apply the following fine tuning settings:  \n1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  \nAdd row using the values: *Company ID: 1000* | *Bank ID: 1000002* | *Bank Statement Format: 02 - BAI2 US*\n2. Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  \nAdd row using the values: Seq.: 1 | Company: 1000 | Bank Country: * | Bank ID: * | Currency: * | Bank Account ID: * | Manual Post Necessary: False\n3. Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  \nAdd a rules: \n\t- Rule 1: *Description: Customer Return External Reference* | *Rule Type: 13* | *Rule Definition Mode: Expert* | *Regular Expression: (E-CRN-\\d{4}-\\d{2}-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2}\\d{2})*\n\t- Rule 2: *Description: Sales Order External Payment* | *Rule Type: 14* | *Rule Definition Mode: Expert* | *Regular Expression: (E-PAYTAREF-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2}\\d{2})*\n4. Fine-Tuning activity *Automatically Generated Bank Statements* > *Edit import formats for automatic generated bank statements*:\nAdd two rows to Import Format \"02 - BAI2 US\":\n\t- Transaction code assignment 1: *External Transaction Code: 399* | *Description: Miscellaneous Credit* | *Debit/Credit: Increase* | *Payment Method: Payment Processing - Of Incoming External Payment*\n\t- Transaction code assignment 2: *External Transaction Code: 699* | *Description: Miscellaneous Debit* | *Debit/Credit: Decrease* | *Payment Method: Payment Processing - Of Outgoing Direct Debit*  \n\n\tRemark: Basically you can use any external transaction codes, you just have to make sure that the transaction codes match the codes used to create the bank statement file. The setting of transaction code assignment 2 is required to trigger the automated allocation of the bank statement line item to the credit memo open item related to customer returns (customer returns do not yet result in payments in transfer, but remain open items).  \n&nbsp; \n\n**New Payment Register/Payment Monitor:**  \n\nOData access to the SAP ByDesign *Payment Monitor* (business object *PaymentRegister*) requires to activate the new high-performance payment register/payment monitor.  \n\nYou can check if the new payment monitor is already active in your system by sending the following request:  \nPostman collection *Sales and Commerce Scenarios* > folder *Miscellaneous Samples* > request *Get payments (new payment monitor)*.  \nThe OData service request retrieves all payment register entries of the last 30 days; if the OData service response is empty and you see some entries in the payment monitor in ByD work center view *Payment Management - Payment Monitor*, then the new payment register is not active in your system.  \n\nYou can request to activate the new payment register by creating an SAP ByDesign incident.  \n&nbsp; \n\n\n**Additional Information:**  \nThe sales order origin type (*DataOriginTypeCode*) can be used integrate webshops with ByD. Relevant code values for the examples in collection are *1 - Manual data entry* and *4 - Internet order (webshop integration)*.  \nCompare blog post [Create ByD Sales Orders using Web Services](https://blogs.sap.com/2017/08/10/create-byd-sales-orders-using-web-services/) for more details.  \n&nbsp; \n\n\nScenario 1a: eCommerce - Sell from stock with external payment\n--------------------------------------------------------------\n\nScenario steps:\n1. Create and release sales order with external payment information (SOAP Web Service API)\n2. Get and check delivery proposal (Business object *OutboundDeliveryRequest*)\n3. Post goods issue\n4. Get, check and release outbound delivery (Business object *OutboundDelivery*)\n5. Get, check and release the customer invoice request\n6. Get, check and release customer invoice\n7. Check sales order status\n\nIf the availability check fails, you can fill up your stock using Postman collection **End-to-End Scenarios** and scenario **Procure to Stock**.  \n\nPayments in transfer created by this scenario can be confirmed using scenario **eCommerce - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 1b: eCommerce - Customer return to stock\n-------------------------------------------------\n\nScenario steps:\n1. Get and check the sales order and outbound delivery from scenario *eCommerce - Sell from stock with external payment*\n2. Create customer return notification (Business object *InboundDelivery*)\n3. Post goods receipt and check the confirmed inbound delivery (Business object *ConfirmedInboundDelivery*)\n4. Get and release the customer return\n5. Get the customer invoice request (credit memo) and update the payment reference (needed to allocate the bank statement line item)\n6. Get and release the customer credit memo\n7. Check the status of the customer return\n\nOpen items created by this scenario can be cleared using scenario **eCommerce - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 1c: eCommerce - Confirm payments using bank statements\n---------------------------------------------------------------\n\nScenario steps:\n1. Read previous bank statement to get the last closing balance (Business object *HouseBankStatement*)\n2. Get open items to be cleared and create BAI2 bank statement file\n\t- Get the customer invoice from scenario *eCommerce - Sell from stock with external payment* and the credit memo of scenario *eCommerce - Customer return to stock* and create a suitable bank statement file\n\t- Use the closing balance of step 1 as opening balance of the bank statement file\n3. Get company house bank account (Business object *HouseBankAccount*)\n4. Get company payment file register (Business object *CompanyPaymentFileRegister*)\n5. Create incoming file using the file of step 2 (Business object *CompanyPaymentFileRegister*)\n6. Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*) \n\n&nbsp; \n\n\nScenario 2a: Invoice External Billing Documents - Customer invoice with external payment\n----------------------------------------------------------------------------------------\n\nScenario steps:\n1. Create and release external customer invoice with external payment information (SOAP Web Service API)\n2. Get and check the customer invoice request\n3. Get and check the customer invoice\n\nPayments in transfer created by this scenario can be pre-confirmed using scenario **Invoice External Billing Documents - Pre-confirm payments using clearing house statements** and finally confirmed using scenario **Invoice External Billing Documents - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 2b: Invoice External Billing Documents - Pre-confirm payments using clearing house statements\n------------------------------------------------------------------------------------------------------\n\nScenario steps:\n1. Get customer invoice (payments in transfer) and create clearing house statement file (Get the customer invoice from scenario *Invoice External Billing Documents - Customer invoice with external payment* and create a suitable clearing house statement file)\n2. Get company payment file register (Business object *CompanyPaymentFileRegister*)\n3. Create incoming file using the file of step 1 (Business object *CompanyPaymentFileRegister*)\n4. Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*) \n5. Check file upload status\n\nPayments pre-confirmed by this scenario can be confirmed using scenario **Invoice External Billing Documents - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 2c: Invoice External Billing Documents - Confirm payments using bank statements\n----------------------------------------------------------------------------------------\n\nScenario steps:\n1. Read previous bank statement to get the last closing balance (Business object *HouseBankStatement*)\n2. Get open items to be cleared and create BAI2 bank statement file\n\t- Get the clearing house statement from scenario *Invoice External Billing Documents - Pre-confirm payments using clearing house statements* and create a suitable bank statement file\n\t- Use the closing balance of step 1 as opening balance of the bank statement file\n3. Get company house bank account (Business object *HouseBankAccount*)\n4. Get company payment file register (Business object *CompanyPaymentFileRegister*)\n5. Create incoming file using the file of step 2 (Business object *CompanyPaymentFileRegister*)\n6. Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*) \n7. ByD UI: Open work center view *Liquidity Management - Bank Statements*, select the bank statement created in step 6, click on *Required* in column *Postprocessing*, select *Actions* > *Import clearing house statement* and select the clearing house statement selected in step 2. Check and post the allocation.\n\n&nbsp; \n\n\nScenario 3: Create Sales Order (nested create)\n----------------------------------------------\n\nScenario steps:  \n1. Create an internet sales order (sales order) with service item\n2. Get and check the sales order\n3. Release the customer request (submit the internet order)\n4. Release the sales order\n5. Get and check the sales order\n\n&nbsp; \n\n\nScenario 4: Create Sales Order using batch\n------------------------------------------\n\nScenario steps:  \n1. Create 2 sales orders and get the sales order data in one batch request\n\n&nbsp; \n\n\nScenario 5: Create Sales Order node by node\n-------------------------------------------\n\nScenario steps:  \n1. Create sales order\n2. Add sales unit\n3. Add account (buyer party)\n4. Update pricing terms\n5. Create an sales order item\n6. Update the item product\n7. Update item quantity (item schedule line)\n8. Release the customer request (submit the internet order)\n9. Get and check the sales order\n\n&nbsp; \n\n\nScenario 6: Create Sales Order with Attachments\n-----------------------------------------------\n\nScenario steps:  \n1. Create a sales order with attachments on header and item level\n2. Get the sales order\n3. Get the item attachment\n4. Delete the item attachment\n5. Add a new item attachment\n\nRemark:  \nThe attachment binaries are Base64-encodes files (here: base64-encoded images of a document icon, icecream and shoes).\n\n&nbsp; \n\n\nScenario 7: Create Sales Order with price components (net)\n----------------------------------------------------------\n\nScenario steps:  \n1. Create sales order with net pricing\n2. Get sales order with item price components\n3. Update item tax code\n4. Create custom list price for item 10\n5. Create further item price components: product discount, surcharge, surcharge (%)\n6. Get sales order with header price components\n7. Create header price components: overall discount, freight surcharge, surcharge\n\n&nbsp; \n\n\nScenario 8: Create Sales Order with price components (gross)\n------------------------------------------------------------\n\nScenario steps:  \n1. Create sales order with gross pricing\n2. Get sales order with item price components\n3. Update item tax code\n4. Create custom gross list price for item 10\n5. Create further item gross price components: product discount, surcharge, surcharge (%)\n6. Get sales order with header price components\n7. Create header gross price components: overall discount, freight surcharge, surcharge\n\n&nbsp; \n\n\nScenario 9: Miscellaneous Samples\n---------------------------------\n\nScenario steps:  \n1. Get metadata\n2. Get codelist for currency codes\n3. Get code list for item processing type codes\n2. Get sales orders using filter parameters\n2. Get sales orders using search parameters\n3. Get sales orders using a sales order query function import\n4. Get payments (new payment monitor)",
+		"description": "SAP Business ByDesign API Samples - Sales and Commerce Scenarios\n================================================================\n\nThis Postman collection contains examples to create, change and read business objects and to run end-to-end business processes using *SAP Business ByDesign Custom OData Services*.\nEach collection folder corresponds to a business scenario; execute the web service requests in the listed order within each folder.\n\nAll sample data is aligned to and ready to run on *SAP Business ByDesign Partner Demo Tenants (Full scope US)* with preconfigured and loaded sample data provided by SAP.  \n&nbsp; \n\n\n**Web services and User:**\n\nThe OData services used in this collection require a SAP ByDesign business user for authorization.  \n&nbsp; \n\nSAP ByDesign business objects provide defaulting capabilities based on the organizational assignment of the user logged in. In many sample OData requests I use this defaulting to keep the OData requests simple.  \nTherefore, assign the employee or service agent that is associated to your business user to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.  \n&nbsp; \n\nThe OData requests in this collection use the following SAP Bydesign *Custom OData Services* assigned to the work center views in column *User authorization*. Assign the listed SAP ByDesign Work Center Views to your business user:\n\n| Custom OData Service | User authorization (ByD Work Center View) |  \n|----------------------|-------------------------------------------|  \n| *khsalesorder* | *Sales Orders - Sales Orders* |  \n| *khcustomerinvoicerequest* | *Customer Invoicing - Invoice Requests* |  \n| *khcustomerinvoice* | *Customer Invoicing - Invoice Documents* |  \n| *khcustomerreturn* | *Sales Orders - Returns* |\n| *khoutbounddeliveryrequest* | *Outbound Logistics - Delivery Proposals* |  \n| *khoutbounddelivery* | *Outbound Logistics - Outbound Deliveries* |  \n| *khinbounddelivery* | *Inbound Logistics - Inbound Delivery Notifications* |\n| *khconfirmedinbounddelivery* | *Inbound Logistics - Inbound Deliveries* |\n| *khhousebankaccount* | *Liquidity Management - My Banks* |\n| *khcompanypaymentfileregister* | *Liquidity Management - Inbound Files* |\n| *khhousebankstatement* | *Liquidity Management - Bank Statements* |\n| *khpayment* | *Payment Management - Payment Monitor* |\n| *khpaymentorderprocessingstatement* | *Payment Management - Clearing House Statements* |\n\n&nbsp; \n\nAdditionally this collection uses the SOAP Web Service APIs:  \n- *Manage Sales Orders* (required because external payment information cannot be created using OData)\n- *Manage Customer Invoice Requests* (required because external payment information cannot be created using OData)  \n\nSteps to configure SOAP the Web Service APIs:\n1. Work center view *Application and User Management - Communication Systems*: Create a communication system\n2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with web service APIs listed above\n3. Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials  \n&nbsp; \n\n\n**Business Configuration:**  \n\nThe following fine tuning settings are required additionally to the preconfigured and loaded sample data provided by the SAP Business ByDesign Partner Demo Tenant.  \n&nbsp; \n\nConfigure the determination methode for external references:  \nByD work center *Business Configuration*: Open the fine tuning activity *External Reference Number Determination for Customer Invoice* and set the determination method to *Copied from Predecessor Reference ID*.  \n&nbsp; \n\nCreate company payment file register:  \nOpen work center view *Liquidity Management - Inbound Files*, click on *New* > *Inbound File* and enter the following values:  \n\t*Type: Bank Statement* | *Company: 1000* | *Bank ID: 1000002* | *Import Format: BAI2 US*.  \nSave without adding an attachment.  \nThe system created a company payment file register for company 1000 that can now be used for file uploads via OData.  \n&nbsp; \n\nThe bank statements created in this collection are automatically allocated if you apply the following fine tuning settings:  \n1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  \nAdd row using the values: *Company ID: 1000* | *Bank ID: 1000002* | *Bank Statement Format: 02 - BAI2 US*\n2. Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  \nAdd row using the values: Seq.: 1 | Company: 1000 | Bank Country: * | Bank ID: * | Currency: * | Bank Account ID: * | Manual Post Necessary: False\n3. Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  \nAdd a rules: \n\t- Rule 1: *Description: Customer Return External Reference* | *Rule Type: 13* | *Rule Definition Mode: Expert* | *Regular Expression: (E-CRN-\\d{4}-\\d{2}-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2}\\d{2})*\n\t- Rule 2: *Description: Sales Order External Payment* | *Rule Type: 14* | *Rule Definition Mode: Expert* | *Regular Expression: (E-PAYTAREF-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2}\\d{2})*\n4. Fine-Tuning activity *Automatically Generated Bank Statements* > *Edit import formats for automatic generated bank statements*:\nAdd two rows to Import Format \"02 - BAI2 US\":\n\t- Transaction code assignment 1: *External Transaction Code: 399* | *Description: Miscellaneous Credit* | *Debit/Credit: Increase* | *Payment Method: Payment Processing - Of Incoming External Payment*\n\t- Transaction code assignment 2: *External Transaction Code: 699* | *Description: Miscellaneous Debit* | *Debit/Credit: Decrease* | *Payment Method: Payment Processing - Of Outgoing Direct Debit*  \n\n\tRemark: Basically you can use any external transaction codes, you just have to make sure that the transaction codes match the codes used to create the bank statement file. The setting of transaction code assignment 2 is required to trigger the automated allocation of the bank statement line item to the credit memo open item related to customer returns (customer returns do not yet result in payments in transfer, but remain open items).  \n&nbsp; \n\n**New Payment Register/Payment Monitor:**  \n\nOData access to the SAP ByDesign *Payment Monitor* (business object *PaymentRegister*) requires to activate the new high-performance payment register/payment monitor.  \n\nYou can check if the new payment monitor is already active in your system by sending the following request:  \nPostman collection *Sales and Commerce Scenarios* > folder *Miscellaneous Samples* > request *Get payments (new payment monitor)*.  \nThe OData service request retrieves all payment register entries of the last 30 days; if the OData service response is empty and you see some entries in the payment monitor in ByD work center view *Payment Management - Payment Monitor*, then the new payment register is not active in your system.  \n\nYou can request to activate the new payment register by creating an SAP ByDesign incident.  \n&nbsp; \n\n\n**Additional Information:**  \nThe sales order origin type (*DataOriginTypeCode*) can be used integrate webshops with ByD. Relevant code values for the examples in collection are *1 - Manual data entry* and *4 - Internet order (webshop integration)*.  \nCompare blog post [Create ByD Sales Orders using Web Services](https://blogs.sap.com/2017/08/10/create-byd-sales-orders-using-web-services/) for more details.  \n&nbsp; \n\n\nScenario 1a: eCommerce - Sell from stock with external payment\n--------------------------------------------------------------\n\nScenario steps:\n1. Create and release sales order with external payment information (SOAP Web Service API)\n2. Get and check delivery proposal (Business object *OutboundDeliveryRequest*)\n3. Post goods issue\n4. Get, check and release outbound delivery (Business object *OutboundDelivery*)\n5. Get, check and release the customer invoice request\n6. Get, check and release customer invoice\n7. Check sales order status\n\nIf the availability check fails, you can fill up your stock using Postman collection **End-to-End Scenarios** and scenario **Procure to Stock**.  \n\nPayments in transfer created by this scenario can be confirmed using scenario **eCommerce - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 1b: eCommerce - Customer return to stock\n-------------------------------------------------\n\nScenario steps:\n1. Get and check the sales order and outbound delivery from scenario *eCommerce - Sell from stock with external payment*\n2. Create customer return notification (Business object *InboundDelivery*)\n3. Post goods receipt and check the confirmed inbound delivery (Business object *ConfirmedInboundDelivery*)\n4. Get and release the customer return\n5. Get the customer invoice request (credit memo) and update the payment reference (needed to allocate the bank statement line item)\n6. Get and release the customer credit memo\n7. Check the status of the customer return\n\nOpen items created by this scenario can be cleared using scenario **eCommerce - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 1c: eCommerce - Confirm payments using bank statements\n---------------------------------------------------------------\n\nScenario steps:\n1. Read previous bank statement to get the last closing balance (Business object *HouseBankStatement*)\n2. Get open items to be cleared and create BAI2 bank statement file\n\t- Get the customer invoice from scenario *eCommerce - Sell from stock with external payment* and the credit memo of scenario *eCommerce - Customer return to stock* and create a suitable bank statement file\n\t- Use the closing balance of step 1 as opening balance of the bank statement file\n3. Get company house bank account (Business object *HouseBankAccount*)\n4. Get company payment file register (Business object *CompanyPaymentFileRegister*)\n5. Create incoming file using the file of step 2 (Business object *CompanyPaymentFileRegister*)\n6. Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*) \n\n&nbsp; \n\n\nScenario 2a: Invoice External Billing Documents - Customer invoice with external payment\n----------------------------------------------------------------------------------------\n\nScenario steps:\n1. Create and release external customer invoice with external payment information (SOAP Web Service API)\n2. Get and check the customer invoice request\n3. Get and check the customer invoice\n\nPayments in transfer created by this scenario can be pre-confirmed using scenario **Invoice External Billing Documents - Pre-confirm payments using clearing house statements** and finally confirmed using scenario **Invoice External Billing Documents - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 2b: Invoice External Billing Documents - Pre-confirm payments using clearing house statements\n------------------------------------------------------------------------------------------------------\n\nScenario steps:\n1. Get customer invoice (payments in transfer) and create clearing house statement file (Get the customer invoice from scenario *Invoice External Billing Documents - Customer invoice with external payment* and create a suitable clearing house statement file).  \nAlternative in scenario **Invoice External Billing Documents - Pre-confirm payments using clearing house statements**: Get payments in transfer from the payment monitor (Business object *Payment*) and create clearing house statement file.\n2. Get company payment file register (Business object *CompanyPaymentFileRegister*)\n3. Create incoming file using the file of step 1 (Business object *CompanyPaymentFileRegister*)\n4. Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*) \n5. Check file upload status\n\nPayments pre-confirmed by this scenario can be confirmed using scenario **Invoice External Billing Documents - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 2c: Invoice External Billing Documents - Confirm payments using bank statements\n----------------------------------------------------------------------------------------\n\nScenario steps:\n1. Read previous bank statement to get the last closing balance (Business object *HouseBankStatement*)\n2. Get open items to be cleared and create BAI2 bank statement file\n\t- Get the clearing house statement from scenario *Invoice External Billing Documents - Pre-confirm payments using clearing house statements* and create a suitable bank statement file\n\t- Use the closing balance of step 1 as opening balance of the bank statement file\n3. Get company house bank account (Business object *HouseBankAccount*)\n4. Get company payment file register (Business object *CompanyPaymentFileRegister*)\n5. Create incoming file using the file of step 2 (Business object *CompanyPaymentFileRegister*)\n6. Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*) \n7. ByD UI: Open work center view *Liquidity Management - Bank Statements*, select the bank statement created in step 6, click on *Required* in column *Postprocessing*, select *Actions* > *Import clearing house statement* and select the clearing house statement selected in step 2. Check and post the allocation.\n\n&nbsp; \n\n\nScenario 3: Create Sales Order (nested create)\n----------------------------------------------\n\nScenario steps:  \n1. Create an internet sales order (sales order) with service item\n2. Get and check the sales order\n3. Release the customer request (submit the internet order)\n4. Release the sales order\n5. Get and check the sales order\n\n&nbsp; \n\n\nScenario 4: Create Sales Order using batch\n------------------------------------------\n\nScenario steps:  \n1. Create 2 sales orders and get the sales order data in one batch request\n\n&nbsp; \n\n\nScenario 5: Create Sales Order node by node\n-------------------------------------------\n\nScenario steps:  \n1. Create sales order\n2. Add sales unit\n3. Add account (buyer party)\n4. Update pricing terms\n5. Create an sales order item\n6. Update the item product\n7. Update item quantity (item schedule line)\n8. Release the customer request (submit the internet order)\n9. Get and check the sales order\n\n&nbsp; \n\n\nScenario 6: Create Sales Order with Attachments\n-----------------------------------------------\n\nScenario steps:  \n1. Create a sales order with attachments on header and item level\n2. Get the sales order\n3. Get the item attachment\n4. Delete the item attachment\n5. Add a new item attachment\n\nRemark:  \nThe attachment binaries are Base64-encodes files (here: base64-encoded images of a document icon, icecream and shoes).\n\n&nbsp; \n\n\nScenario 7: Create Sales Order with price components (net)\n----------------------------------------------------------\n\nScenario steps:  \n1. Create sales order with net pricing\n2. Get sales order with item price components\n3. Update item tax code\n4. Create custom list price for item 10\n5. Create further item price components: product discount, surcharge, surcharge (%)\n6. Get sales order with header price components\n7. Create header price components: overall discount, freight surcharge, surcharge\n\n&nbsp; \n\n\nScenario 8: Create Sales Order with price components (gross)\n------------------------------------------------------------\n\nScenario steps:  \n1. Create sales order with gross pricing\n2. Get sales order with item price components\n3. Update item tax code\n4. Create custom gross list price for item 10\n5. Create further item gross price components: product discount, surcharge, surcharge (%)\n6. Get sales order with header price components\n7. Create header gross price components: overall discount, freight surcharge, surcharge\n\n&nbsp; \n\n\nScenario 9: Miscellaneous Samples\n---------------------------------\n\nScenario steps:  \n1. Get metadata\n2. Get codelist for currency codes\n3. Get code list for item processing type codes\n2. Get sales orders using filter parameters\n2. Get sales orders using search parameters\n3. Get sales orders using a sales order query function import\n4. Get payments (new payment monitor)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -1241,6 +1241,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -2595,6 +2596,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -3512,9 +3514,11 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Invoice External Billing Documents",
@@ -3898,6 +3902,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -4551,6 +4556,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -5468,9 +5474,11 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Invoice External Billing Documents with Payment Monitor",
@@ -5854,6 +5862,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -6509,6 +6518,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -7426,9 +7436,11 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Create Sales Order using nested create",
@@ -7943,7 +7955,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Create Sales Order using batch",
@@ -8151,7 +8164,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Create Sales Order node by node",
@@ -8988,7 +9002,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Create Sales Order with Attachments",
@@ -9425,7 +9440,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Create Sales Order with price components (net)",
@@ -9506,7 +9522,7 @@
 									"// Validations",
 									"pm.test(\"Sales order \" + jsonResponse.d.results.ID + \" created\", function () { pm.response.to.have.status(201) });",
 									"pm.test(\"Consistency status: \" + jsonResponse.d.results.ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
-									"pm.test(\"Lifecycle  status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Lifecycle  status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"4\") });",
 									""
 								],
 								"type": "text/javascript"
@@ -9544,7 +9560,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}\",\n\t\"Name\": \"Sample Sales Order with price components (net)\",\n\t\"DataOriginTypeCode\": \"2\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID2}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": false\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TAN\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t"
+							"raw": "{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}\",\n\t\"Name\": \"Sample Sales Order with price components (net)\",\n\t\"DataOriginTypeCode\": \"1\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID2}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": false\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TAN\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t"
 						},
 						"url": {
 							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection",
@@ -10352,7 +10368,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Create Sales Order with price components (gross)",
@@ -10432,8 +10449,9 @@
 									"",
 									"// Validations",
 									"pm.test(\"Sales order \" + jsonResponse.d.results.ID + \" created\", function () { pm.response.to.have.status(201) });",
+									"//Inconsistent if cross list price list missing",
 									"//pm.test(\"Consistency status: \" + jsonResponse.d.results.ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
-									"//pm.test(\"Lifecycle  status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Lifecycle  status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"4\") });",
 									""
 								],
 								"type": "text/javascript"
@@ -10471,7 +10489,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}\",\n\t\"Name\": \"Sample Sales Order with price components (gross)\",\n\t\"DataOriginTypeCode\": \"2\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID2}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": true\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TAN\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t"
+							"raw": "{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}\",\n\t\"Name\": \"Sample Sales Order with price components (gross)\",\n\t\"DataOriginTypeCode\": \"1\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID2}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": true\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TAN\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t"
 						},
 						"url": {
 							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection",
@@ -11279,7 +11297,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Miscellaneous Samples",
@@ -11780,7 +11799,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"auth": {
@@ -11819,5 +11839,6 @@
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
