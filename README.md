@@ -10,7 +10,7 @@ The Postman collections of this repository illustrate hands-on how to access mas
 
 The repository is structured in API sample packages. 
 Each package contains Postman collections, a Postman environment and ByD Custom OData Services required to run the OData requests of the Postman collections.
-You find the ByD Custom OData Services in folder "Sample OData Services" and the Postman collections and environments in folder "Postman". Postman collections and environments that belong together have the same name. The ByD Custom OData Services are used by multiple Postman collections; you find a list of required ByD Custom OData Services in the description of each Postman collection.
+You find the sample ByD Custom OData Services in folder "Custom OData Services" and the Postman collections and environments in folder "Postman". Postman collections and environments that belong together have the same name. The ByD Custom OData Services are used by multiple Postman collections; you find a list of required ByD Custom OData Services in the description of each Postman collection.
 
 This repository contains the following API sample packages:
 - **Analytics**: Access ByD built-in analytics incl. reports and data sources
