@@ -79,14 +79,14 @@ Steps to setup and run the API sample requests:
 	- *CommunicationUser* and *CommunicationUserPW* (enter the communication user used for the communication arrangements created as described in the description of the Postman collection)
 5. **Postman:** Open the Postman Runner. The runner is used to automatically run a sequence of OData requests. 
 6. **Postman Runner:** 
-	1. Select the collection and the folder
-	2. Select the environment 
+	1. Select the collection and the folder of your choice
+	2. Select the environment that belongs to the collection
 	3. Select the check boxes “Keep variable values” and “Run collection without using stored cookies”
 	4. Click on “Run …” 
 		- Make sure you always choose collections and environments that belong together – otherwise it does not work!
-		- In the protocol you find IDs and valuations that you can use to find the corresponding objects in the ByD UI
-7. **Postman:** Alternatively you can run the OData requests manually as well: 
-	1. Open the Postman collection folder
+		- The run protocol provides you with test results and document IDs that you can use to find the corresponding objects in the ByD UI
+7. **Postman:** Alternatively to the Postman Runner you can run the OData requests manually as well: 
+	1. Open the Postman collection folder of your choice
 	2. Select the Postman environment (Make sure you always choose collections and environments that belong together)
 	3. Select the request and click “Send”
 	4. Select the next request and click “Send” 
