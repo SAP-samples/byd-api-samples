@@ -7536,7 +7536,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"ParentObjectID\": \"{{CustomerInvoiceObjectID}}}}\",\n    \"Name\": \"test4.txt\",\n    \"MimeType\": \"text/plain\",\n    \"Binary\": \"dGVzdCBmaWxlIGF0dGFjaG1lbnQ=\",\n    \"OutputRelevanceIndicator\": true,\n    \"Title\": \"test4.txt\"\n}",
+							"raw": "{\n    \"ParentObjectID\": \"{{CustomerInvoiceObjectID}}\",\n    \"Name\": \"test4.txt\",\n    \"MimeType\": \"text/plain\",\n    \"Binary\": \"dGVzdCBmaWxlIGF0dGFjaG1lbnQ=\",\n    \"OutputRelevanceIndicator\": true,\n    \"Title\": \"test4.txt\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -7544,13 +7544,142 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{TenantHostname}}khcustomerinvoice/CustomerInvoiceAttachmentFolderCollection",
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerinvoice/CustomerInvoiceAttachmentFolderCollection",
 							"protocol": "https",
 							"host": [
-								"{{TenantHostname}}khcustomerinvoice"
+								"{{TenantHostname}}"
 							],
 							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerinvoice",
 								"CustomerInvoiceAttachmentFolderCollection"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Invoice Request Attachments",
+			"item": [
+				{
+					"name": "Get Invoice Request Attachments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerinvoicerequest/CustomerInvoiceRequestCollection('{{CustomerInvoiceRequestID}}')/CustomerInvoiceRequestAttachmentFolder?$format=json",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerinvoicerequest",
+								"CustomerInvoiceRequestCollection('{{CustomerInvoiceRequestID}}')",
+								"CustomerInvoiceRequestAttachmentFolder"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Invoice Request Attachment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerinvoicerequest/CustomerInvoiceRequestAttachmentFolderCollection('{{AttachmentObjectID}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerinvoicerequest",
+								"CustomerInvoiceRequestAttachmentFolderCollection('{{AttachmentObjectID}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Invoice Request Attachment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ParentObjectID\": \"{{CustomerInvoiceObjectID}}\",\n    \"Name\": \"test5.txt\",\n    \"MimeType\": \"text/plain\",\n    \"Binary\": \"dGVzdCBmaWxlIGF0dGFjaG1lbnQ=\",\n    \"OutputRelevanceIndicator\": true,\n    \"Title\": \"test5.txt\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerinvoicerequest/CustomerInvoiceRequestAttachmentFolderCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerinvoicerequest",
+								"CustomerInvoiceRequestAttachmentFolderCollection"
 							]
 						}
 					},
