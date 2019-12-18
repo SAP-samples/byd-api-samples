@@ -7513,7 +7513,7 @@
 					"response": []
 				},
 				{
-					"name": "Create Invoice Attachment2",
+					"name": "Create Invoice Attachment",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -7536,7 +7536,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"ParentObjectID\": \"{{CustomerInvoiceObjectID}}}}\",\n    \"Name\": \"test4.txt\",\n    \"MimeType\": \"text/plain\",\n    \"Binary\": \"dGVzdCBmaWxlIGF0dGFjaG1lbnQ=\",\n    \"Title\": \"test4.txt\"\n}",
+							"raw": "{\n    \"ParentObjectID\": \"{{CustomerInvoiceObjectID}}}}\",\n    \"Name\": \"test4.txt\",\n    \"MimeType\": \"text/plain\",\n    \"Binary\": \"dGVzdCBmaWxlIGF0dGFjaG1lbnQ=\",\n    \"OutputRelevanceIndicator\": true,\n    \"Title\": \"test4.txt\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
