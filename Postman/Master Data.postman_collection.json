@@ -152,10 +152,6 @@
 							"script": {
 								"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
-									"",
-									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
 									""
 								],
 								"type": "text/javascript"
@@ -257,11 +253,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -324,11 +319,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -391,11 +385,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -458,11 +451,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -525,11 +517,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -1497,7 +1488,7 @@
 								"exec": [
 									"// Validations",
 									"var jsonResponse = pm.response.json();",
-									"pm.test(\"Material quantity conversion \" + jsonResponse.d.results.CorrespondingQuantityUnitCodeText + \" to \" + jsonResponse.d.results.QuantityUnitCodeText + \"created\", function () { pm.response.to.have.status(201) });"
+									"pm.test(\"Material quantity conversion \" + jsonResponse.d.results.CorrespondingQuantityUnitCodeText + \" to \" + jsonResponse.d.results.QuantityUnitCodeText + \" created\", function () { pm.response.to.have.status(201) });"
 								],
 								"type": "text/javascript"
 							}
@@ -3721,7 +3712,7 @@
 								"exec": [
 									"// Validations",
 									"var jsonResponse = pm.response.json();",
-									"pm.test(\"Service product quantity conversion \" + jsonResponse.d.results.CorrespondingQuantityUnitCodeText + \" to \" + jsonResponse.d.results.QuantityUnitCodeText + \"created\", function () { pm.response.to.have.status(201) });"
+									"pm.test(\"Service product quantity conversion \" + jsonResponse.d.results.CorrespondingQuantityUnitCodeText + \" to \" + jsonResponse.d.results.QuantityUnitCodeText + \" created\", function () { pm.response.to.have.status(201) });"
 								],
 								"type": "text/javascript"
 							}
@@ -4559,7 +4550,7 @@
 									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Service product \" + jsonResponse.d.results.InternalID + \" retrieved\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Service product \" + jsonResponse.d.results[0].InternalID + \" retrieved\", function () { pm.response.to.have.status(200) });",
 									""
 								],
 								"type": "text/javascript"
@@ -9780,11 +9771,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -9847,11 +9837,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -9914,11 +9903,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -9981,11 +9969,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -13976,11 +13963,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -14044,11 +14030,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -14117,11 +14102,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -14187,16 +14171,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									"",
-									"// Set variables",
-									"var jsonResponse = pm.response.json();",
-									"//pm.environment.set(\"BP-BusinessPartnerObjectID\", jsonResponse.d.results[0].ObjectID);",
-									"//pm.environment.set(\"BP-BusinessPartnerUUID\", jsonResponse.d.results[0].UUID);",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}
@@ -14262,16 +14240,10 @@
 							"script": {
 								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
-									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"var jsonResponse = pm.response.json();",
 									"",
 									"// Validations",
-									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
-									"",
-									"// Set variables",
-									"var jsonResponse = pm.response.json();",
-									"//pm.environment.set(\"BP-BusinessPartnerObjectID\", jsonResponse.d.results[0].ObjectID);",
-									"//pm.environment.set(\"BP-BusinessPartnerUUID\", jsonResponse.d.results[0].UUID);",
-									""
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
 								],
 								"type": "text/javascript"
 							}

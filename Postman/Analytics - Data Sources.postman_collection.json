@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "770370eb-af7d-4fa4-9e4e-c2fea1cb19f0",
 		"name": "Analytics - Data Sources",
-		"description": "SAP Business ByDesign Analytics - OData Examples to extract Data Sources\n========================================================================\n\nThe SAP Business ByDesign OData API for Data Sources is designed to extract analytical raw data. Remote systems can extract ByD analytical raw data in flat tables, free of redundancies from ByD. The analytical raw data is then processed, combined and formatted in the remote system. Typically such remote systems are central business analytics application such as SAP Analytics Cloud.\n\nThis collection provides sample OData requests for the SAP Business ByDesign analytical data sources listed below.\n\nData sources: \n- *Sales Order Header* (Crmslohb)\n- *Sales Order Item* (Crmsloib)\n- *Material General data* (Mat_General)\n- *Stock Overview* (Scminvv02)\n- *G/L Account Items* (Finglau02)\n- *Company Master Data* (/MOM/COMPANY)\n\nConfiguration: \n1. Enable the OData API for Data Sources in your ByD Business Configuration: *Built-in Services and Support* >> *System Management* >> *Analytics* >> *Do you want to enable analytical OData services for data sources?*\n2. Create a user to access the OData service: Create a Communication Arrangement for Communication Scenario *Analytics Data Sources ODATA* and maintain the technical user\n3. Expose your data sources in work center view *Business Analytics - Data Sources*\n \nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
+		"description": "SAP Business ByDesign Analytics - OData Examples to extract Data Sources\n========================================================================\n\nThe SAP Business ByDesign OData API for Data Sources is designed to extract analytical raw data. Remote systems can extract ByD analytical raw data in flat tables, free of redundancies from ByD. The analytical raw data is then processed, combined and formatted in the remote system. Typically such remote systems are central business analytics application such as SAP Analytics Cloud.\n\nThis collection provides sample OData requests for the SAP Business ByDesign analytical data sources listed below.\n\nData sources: \n- *Sales Order Header* (CRMSLOHB)\n- *Sales Order Item* (CRMSLOIB)\n- *Material General data* (MAT_GENERAL)\n- *Account Details* (BPCSDB)\n- *Supplier Details* (BPSPPB)\n- *Supplier Master Data* (SUPPLIER)\n- *Stock Overview* (CRMSLOIB)\n- *G/L Account Items* (FINGLAU02)\n- *Company Master Data* (/MOM/COMPANY)\n- *Segment Master Data* (/MOM/SEGMENT)\n\nConfiguration: \n1. Enable the OData API for Data Sources in your ByD Business Configuration: *Built-in Services and Support* >> *System Management* >> *Analytics* >> *Do you want to enable analytical OData services for data sources?*\n2. Create a user to access the OData service: Create a Communication Arrangement for Communication Scenario *Analytics Data Sources OData* and maintain the technical user\n3. Expose your data sources in work center view *Business Analytics - Data Sources*\n \nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -55,11 +55,26 @@
 		},
 		{
 			"name": "Sales order header",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f4dddd6d-d112-4e7c-842d-e9089ef553e7",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Crmslohb.svc/Crmslohb?$top=10&$format=json",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Crmslohb.svc/Crmslohb?$top=100&$format=json&$inlinecount=allpages",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -76,11 +91,15 @@
 					"query": [
 						{
 							"key": "$top",
-							"value": "10"
+							"value": "100"
 						},
 						{
 							"key": "$format",
 							"value": "json"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
 						}
 					]
 				}
@@ -89,11 +108,26 @@
 		},
 		{
 			"name": "Sales order item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "659933bd-8678-458a-8c99-27546db12ea4",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Crmsloib.svc/Crmsloib?$top=10&$format=json",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Crmsloib.svc/Crmsloib?$top=100&$format=json&$inlinecount=allpages",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -110,11 +144,15 @@
 					"query": [
 						{
 							"key": "$top",
-							"value": "10"
+							"value": "100"
 						},
 						{
 							"key": "$format",
 							"value": "json"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
 						}
 					]
 				}
@@ -123,11 +161,26 @@
 		},
 		{
 			"name": "Materials general data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aeab6220-d4f9-453e-848b-da53ad76ea95",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/MatGeneral.svc/MatGeneral?$top=10&$format=json",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/MatGeneral.svc/MatGeneral?$top=100&$format=json&$inlinecount=allpages",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -144,11 +197,15 @@
 					"query": [
 						{
 							"key": "$top",
-							"value": "10"
+							"value": "100"
 						},
 						{
 							"key": "$format",
 							"value": "json"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
 						}
 					]
 				}
@@ -157,11 +214,26 @@
 		},
 		{
 			"name": "Account details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dff588ea-98a6-4074-a9e0-c6435cd3ade3",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpcsdb.svc/Bpcsdb?$select=C_BankAccountId,Count",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpcsdb.svc/Bpcsdb?$select=C_BankAccountId,Count&$inlinecount=allpages&$format=json",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -179,6 +251,14 @@
 						{
 							"key": "$select",
 							"value": "C_BankAccountId,Count"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
+						},
+						{
+							"key": "$format",
+							"value": "json"
 						}
 					]
 				}
@@ -187,11 +267,26 @@
 		},
 		{
 			"name": "Supplier Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0105622b-599b-4a51-86bd-4a1223b09427",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Bpsppb?$format=json&$filter=C_TaxCountry eq 'SE' and C_TaxIdNr eq 'SE999999999901'",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Bpsppb?$format=json&$filter=C_TaxCountry eq 'SE' and C_TaxIdNr eq 'SE999999999901'&$inlinecount=allpages",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -218,6 +313,10 @@
 						{
 							"key": "$filter",
 							"value": "C_TaxCountry eq 'SE' and C_TaxIdNr eq 'SE999999999901'"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
 						}
 					]
 				}
@@ -226,11 +325,26 @@
 		},
 		{
 			"name": "Supplier Master Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "21b0a3ef-1d94-466d-aacf-9adc66156008",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Supplier?$select=C_BpUuid,C_BpIntId,T_BpFrmtdName,Count&$format=json&$filter=C_BpUuid eq guid'00000000-0001-1DEF-BA9F-CD59144F3576'",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Bpsppb.svc/Supplier?$select=C_BpUuid,C_BpIntId,T_BpFrmtdName,Count&$format=json&$filter=C_BpUuid eq guid'00000000-0001-1DEF-BA9F-CD59144F3576'&$inlinecount=allpages",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -256,6 +370,10 @@
 						{
 							"key": "$filter",
 							"value": "C_BpUuid eq guid'00000000-0001-1DEF-BA9F-CD59144F3576'"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
 						}
 					]
 				}
@@ -264,11 +382,26 @@
 		},
 		{
 			"name": "Stock overview",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1d275a0c-e8eb-42fa-9204-93036981b678",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/scminvv02.svc/Scminvv02?$format=json&$select=C_CoUuid,C_ImlUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/scminvv02.svc/Scminvv02?$format=json&$select=C_CoUuid,C_ImlUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom&$inlinecount=allpages",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -290,6 +423,10 @@
 						{
 							"key": "$select",
 							"value": "C_CoUuid,C_ImlUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
 						}
 					]
 				}
@@ -298,6 +435,21 @@
 		},
 		{
 			"name": "G/L Account Items",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "709bd3c1-1428-4933-a676-cd00875dc21d",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -345,11 +497,26 @@
 		},
 		{
 			"name": "G/L Account Items / Company",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5f258521-20ab-430f-ae6a-e1275defd3e0",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/xMOMxCompany?$format=json&$top=100&$filter=T_Name eq 'Almika Inc.'",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/xMOMxCompany?$format=json&$top=100&$filter=T_Name eq 'Almika Inc.'&sap-language=en&$inlinecount=allpages",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -378,8 +545,11 @@
 						},
 						{
 							"key": "sap-language",
-							"value": "en",
-							"disabled": true
+							"value": "en"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
 						}
 					]
 				}
@@ -388,11 +558,26 @@
 		},
 		{
 			"name": "G/L Account Items / Segment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c673ea9e-c148-41ae-83a7-db391fe4c437",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/xMOMxSegment?$format=json&$top=100&$select=C_SgmtUuid,C_SgmtId,T_Name",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/xMOMxSegment?$format=json&$top=100&$select=C_SgmtUuid,C_SgmtId,T_Name&$inlinecount=allpages",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -417,12 +602,16 @@
 						},
 						{
 							"key": "$filter",
-							"value": "T_Name eq 'Almika Inc.'",
+							"value": "T_Name eq 'Almika Heating Cleveland'",
 							"disabled": true
 						},
 						{
 							"key": "$select",
 							"value": "C_SgmtUuid,C_SgmtId,T_Name"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
 						}
 					]
 				}

@@ -267,8 +267,7 @@
 											"pm.test(\"Sales order data returned\", function () { pm.response.to.have.status(200) });",
 											"pm.test(\"Item 10 created\", function () { pm.expect(jsonResponse.d.results[0].Item[0].ID).to.eql(\"10\") });",
 											"pm.test(\"Sales Order consistent\", function () { pm.expect(jsonResponse.d.results[0].ConsistencyStatusCode).to.eql(\"3\") });",
-											"pm.test(\"Sales Order status: \" + jsonResponse.d.results[0].LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.eql(\"1\") });",
-											""
+											"pm.test(\"Sales Order status: \" + jsonResponse.d.results[0].LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.be.oneOf([\"1\",\"2\"]) });"
 										],
 										"type": "text/javascript"
 									}
@@ -2614,12 +2613,12 @@
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 											"",
 											"// Validate response",
-											"pm.test(\"Bank statement found; Bank statement ID: \" + jsonResponse.d.results[0].ID, function () { pm.response.to.have.status(200) });",
+											"pm.test(\"Bank statement found with bank statement document ID: \" + jsonResponse.d.results[0].DocumentID, function () { pm.response.to.have.status(200) });",
 											"",
 											"// Persist data from last bank statement",
 											"for (let index = 0; index < 1; index++)",
 											"{ ",
-											"    pm.environment.set(\"LastBankStatementID\", jsonResponse.d.results[0].ID);",
+											"    pm.environment.set(\"LastBankStatementID\", jsonResponse.d.results[0].DocumentID);",
 											"    pm.environment.set(\"LastBankStatementClosingBalanceAmount\", jsonResponse.d.results[0].ClosingBalanceAmount);",
 											"    pm.environment.set(\"LastBankStatementClosingBalanceCurrency\", jsonResponse.d.results[0].CurrencyCode);",
 											"}",
@@ -2909,7 +2908,7 @@
 									}
 								],
 								"url": {
-									"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerinvoice/PaymentControlCollection?$format=json&$filter=PaymentReferenceID eq '{{SalesOrderPaymentReferenceID}}' or PaymentReferenceID eq '{{CustomerReturnPaymentReferenceID}}'&$expand=CustomerInvoice/BusinessTransactionDocumentReference,ExternalPayment,CustomerInvoice/BuyerParty/BuyerPartyName",
+									"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerinvoice/PaymentControlCollection?$format=json&$filter=PaymentReferenceID eq '{{SalesOrderPaymentReferenceID}}' or PaymentReferenceID eq '{{CustomerReturnPaymentReferenceID}}'&$expand=CustomerInvoice/BusinessTransactionDocumentReference,ExternalPayment,CustomerInvoice/BuyerParty/BuyerPartyName&$inlinecount=allpages",
 									"protocol": "https",
 									"host": [
 										"{{TenantHostname}}"
@@ -2940,6 +2939,10 @@
 											"key": "$select",
 											"value": "PaymentReferenceID,CustomerInvoice/ID,CustomerInvoice/ReferenceBusinessTransactionDocumentID,CustomerInvoice/ReleaseStatusCode,CustomerInvoice/ReleaseStatusCodeText,ExternalPayment/PaymentTransactionReferenceID ",
 											"disabled": true
+										},
+										{
+											"key": "$inlinecount",
+											"value": "allpages"
 										}
 									]
 								}
@@ -3438,8 +3441,8 @@
 											"// Validate response",
 											"pm.test(\"Bank statement \" + jsonResponse.d.results[0].ID + \" retrieved\", function () { pm.response.to.have.status(200) });",
 											"let bankStatementID = +pm.environment.get(\"LastBankStatementID\") + 1; // '+' converts string to integer",
-											"pm.test(\"Bank statement ID ... ok\", function () { pm.expect(jsonResponse.d.results[0].ID).to.eql(bankStatementID.toString()) });",
-											"pm.test(\"Opening balance amount ... ok\", function () { pm.expect(jsonResponse.d.results[0].OpeningBalanceAmount).to.eql(pm.environment.get(\"LastBankStatementClosingBalanceAmount\")) });",
+											"pm.test(\"Bank statement document ID: \" + jsonResponse.d.results[0].DocumentID, function () { pm.expect(jsonResponse.d.results[0].DocumentID).to.eql(bankStatementID.toString()) });",
+											"pm.test(\"Opening balance amount ok\", function () { pm.expect(jsonResponse.d.results[0].OpeningBalanceAmount).to.eql(pm.environment.get(\"LastBankStatementClosingBalanceAmount\")) });",
 											"",
 											"pm.test(\"Bank statement status: \" + jsonResponse.d.results[0].LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.be.oneOf([\"1\",\"2\"]) });",
 											"//pm.test(\"Bank statement status: In preparation\", function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.eql(\"1\") });",
@@ -4574,12 +4577,12 @@
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 											"",
 											"// Validate response",
-											"pm.test(\"Bank statement found; Bank statement ID: \" + jsonResponse.d.results[0].ID, function () { pm.response.to.have.status(200) });",
+											"pm.test(\"Bank statement found with bank statement document ID: \" + jsonResponse.d.results[0].DocumentID, function () { pm.response.to.have.status(200) });",
 											"",
 											"// Persist data from last bank statement",
 											"for (let index = 0; index < 1; index++)",
 											"{ ",
-											"    pm.environment.set(\"LastBankStatementID\", jsonResponse.d.results[0].ID);",
+											"    pm.environment.set(\"LastBankStatementID\", jsonResponse.d.results[0].DocumentID);",
 											"    pm.environment.set(\"LastBankStatementClosingBalanceAmount\", jsonResponse.d.results[0].ClosingBalanceAmount);",
 											"    pm.environment.set(\"LastBankStatementClosingBalanceCurrency\", jsonResponse.d.results[0].CurrencyCode);",
 											"}",
@@ -5398,14 +5401,14 @@
 											"// Validate response",
 											"pm.test(\"Bank statement \" + jsonResponse.d.results[0].ID + \" retrieved\", function () { pm.response.to.have.status(200) });",
 											"let bankStatementID = +pm.environment.get(\"LastBankStatementID\") + 1; // '+' converts string to integer",
-											"pm.test(\"Bank statement ID ... ok\", function () { pm.expect(jsonResponse.d.results[0].ID).to.eql(bankStatementID.toString()) });",
-											"pm.test(\"Opening balance amount ... ok\", function () { pm.expect(jsonResponse.d.results[0].OpeningBalanceAmount).to.eql(pm.environment.get(\"LastBankStatementClosingBalanceAmount\")) });",
+											"pm.test(\"Bank statement document ID: \" + jsonResponse.d.results[0].DocumentID, function () { pm.expect(jsonResponse.d.results[0].DocumentID).to.eql(bankStatementID.toString()) });",
+											"pm.test(\"Opening balance amount ok\", function () { pm.expect(jsonResponse.d.results[0].OpeningBalanceAmount).to.eql(pm.environment.get(\"LastBankStatementClosingBalanceAmount\")) });",
 											"",
 											"pm.test(\"Bank statement status: \" + jsonResponse.d.results[0].LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.be.oneOf([\"1\",\"2\"]) });",
 											"//pm.test(\"Bank statement status: In preparation\", function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.eql(\"1\") });",
 											"//pm.test(\"Bank statement status: Posted\", function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.eql(\"2\") });",
 											"",
-											"pm.test(\"Post processing: \" + jsonResponse.d.results[0].OverallPostprocessingCodeText, function () { pm.expect(jsonResponse.d.results[0].OverallPostprocessingCode).to.be.oneOf([\"1\",\"2\",\"4\"]) });",
+											"pm.test(\"Post processing: \" + jsonResponse.d.results[0].OverallPostprocessingCodeText, function () { pm.expect(jsonResponse.d.results[0].OverallPostprocessingCode).to.be.oneOf([\"1\",\"2\",\"3\",\"4\"]) });",
 											"//pm.test(\"Postprocessing: Not relevant\", function () { pm.expect(jsonResponse.d.results[0].OverallPostprocessingCode).to.eql(\"4\") });",
 											"//pm.test(\"Postprocessing: In Process\", function () { pm.expect(jsonResponse.d.results[0].OverallPostprocessingCode).to.eql(\"2\") });",
 											""
@@ -6536,12 +6539,12 @@
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 											"",
 											"// Validate response",
-											"pm.test(\"Bank statement found; Bank statement ID: \" + jsonResponse.d.results[0].ID, function () { pm.response.to.have.status(200) });",
+											"pm.test(\"Bank statement found with bank statement document ID: \" + jsonResponse.d.results[0].DocumentID, function () { pm.response.to.have.status(200) });",
 											"",
 											"// Persist data from last bank statement",
 											"for (let index = 0; index < 1; index++)",
 											"{ ",
-											"    pm.environment.set(\"LastBankStatementID\", jsonResponse.d.results[0].ID);",
+											"    pm.environment.set(\"LastBankStatementID\", jsonResponse.d.results[0].DocumentID);",
 											"    pm.environment.set(\"LastBankStatementClosingBalanceAmount\", jsonResponse.d.results[0].ClosingBalanceAmount);",
 											"    pm.environment.set(\"LastBankStatementClosingBalanceCurrency\", jsonResponse.d.results[0].CurrencyCode);",
 											"}",
@@ -7360,14 +7363,14 @@
 											"// Validate response",
 											"pm.test(\"Bank statement \" + jsonResponse.d.results[0].ID + \" retrieved\", function () { pm.response.to.have.status(200) });",
 											"let bankStatementID = +pm.environment.get(\"LastBankStatementID\") + 1; // '+' converts string to integer",
-											"pm.test(\"Bank statement ID ... ok\", function () { pm.expect(jsonResponse.d.results[0].ID).to.eql(bankStatementID.toString()) });",
-											"pm.test(\"Opening balance amount ... ok\", function () { pm.expect(jsonResponse.d.results[0].OpeningBalanceAmount).to.eql(pm.environment.get(\"LastBankStatementClosingBalanceAmount\")) });",
+											"pm.test(\"Bank statement document ID: \" + jsonResponse.d.results[0].DocumentID, function () { pm.expect(jsonResponse.d.results[0].DocumentID).to.eql(bankStatementID.toString()) });",
+											"pm.test(\"Opening balance amount ok\", function () { pm.expect(jsonResponse.d.results[0].OpeningBalanceAmount).to.eql(pm.environment.get(\"LastBankStatementClosingBalanceAmount\")) });",
 											"",
 											"pm.test(\"Bank statement status: \" + jsonResponse.d.results[0].LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.be.oneOf([\"1\",\"2\"]) });",
 											"//pm.test(\"Bank statement status: In preparation\", function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.eql(\"1\") });",
 											"//pm.test(\"Bank statement status: Posted\", function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.eql(\"2\") });",
 											"",
-											"pm.test(\"Post processing: \" + jsonResponse.d.results[0].OverallPostprocessingCodeText, function () { pm.expect(jsonResponse.d.results[0].OverallPostprocessingCode).to.be.oneOf([\"1\",\"2\",\"4\"]) });",
+											"pm.test(\"Post processing: \" + jsonResponse.d.results[0].OverallPostprocessingCodeText, function () { pm.expect(jsonResponse.d.results[0].OverallPostprocessingCode).to.be.oneOf([\"1\",\"2\",\"3\",\"4\"]) });",
 											"//pm.test(\"Postprocessing: Not relevant\", function () { pm.expect(jsonResponse.d.results[0].OverallPostprocessingCode).to.eql(\"4\") });",
 											"//pm.test(\"Postprocessing: In Process\", function () { pm.expect(jsonResponse.d.results[0].OverallPostprocessingCode).to.eql(\"2\") });",
 											""

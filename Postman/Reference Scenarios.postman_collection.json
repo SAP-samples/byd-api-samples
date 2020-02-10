@@ -6807,7 +6807,7 @@
 								"id": "f4250237-33ad-4ff1-98bb-4ffb6dd02d19",
 								"exec": [
 									"// Delay and let the system complete the async. integration between CRM and SCM",
-									"setTimeout(function() {}, 5000); // wait 5 sec"
+									"setTimeout(function() {}, 6000); // wait 6 sec"
 								],
 								"type": "text/javascript"
 							}
@@ -8135,7 +8135,7 @@
 								"id": "f4250237-33ad-4ff1-98bb-4ffb6dd02d19",
 								"exec": [
 									"// Delay and let the system complete the async. integration between CRM and SCM",
-									"setTimeout(function() {}, 5000); // wait 5 sec"
+									"setTimeout(function() {}, 6000); // wait 6 sec"
 								],
 								"type": "text/javascript"
 							}
@@ -11424,12 +11424,12 @@
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
 									"// Validate response",
-									"pm.test(\"Bank statement found; Bank statement ID: \" + jsonResponse.d.results[0].ID, function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Bank statement found with bank statement document ID: \" + jsonResponse.d.results[0].DocumentID, function () { pm.response.to.have.status(200) });",
 									"",
 									"// Persist data from last bank statement",
 									"for (let index = 0; index < 1; index++)",
 									"{ ",
-									"    pm.environment.set(\"LastBankStatementID\", jsonResponse.d.results[0].ID);",
+									"    pm.environment.set(\"LastBankStatementID\", jsonResponse.d.results[0].DocumentID);",
 									"    pm.environment.set(\"LastBankStatementClosingBalanceAmount\", jsonResponse.d.results[0].ClosingBalanceAmount);",
 									"    pm.environment.set(\"LastBankStatementClosingBalanceCurrency\", jsonResponse.d.results[0].CurrencyCode);",
 									"}",
@@ -12261,8 +12261,8 @@
 									"// Validate response",
 									"pm.test(\"Bank statement \" + jsonResponse.d.results[0].ID + \" retrieved\", function () { pm.response.to.have.status(200) });",
 									"let bankStatementID = +pm.environment.get(\"LastBankStatementID\") + 1; // '+' converts string to integer",
-									"pm.test(\"Bank statement ID ... ok\", function () { pm.expect(jsonResponse.d.results[0].ID).to.eql(bankStatementID.toString()) });",
-									"pm.test(\"Opening balance amount ... ok\", function () { pm.expect(jsonResponse.d.results[0].OpeningBalanceAmount).to.eql(pm.environment.get(\"LastBankStatementClosingBalanceAmount\")) });",
+									"pm.test(\"Bank statement document ID: \" + jsonResponse.d.results[0].DocumentID, function () { pm.expect(jsonResponse.d.results[0].DocumentID).to.eql(bankStatementID.toString()) });",
+									"pm.test(\"Opening balance amount ok\", function () { pm.expect(jsonResponse.d.results[0].OpeningBalanceAmount).to.eql(pm.environment.get(\"LastBankStatementClosingBalanceAmount\")) });",
 									"",
 									"pm.test(\"Bank statement status: \" + jsonResponse.d.results[0].LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.be.oneOf([\"1\",\"2\"]) });",
 									"//pm.test(\"Bank statement status: In preparation\", function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.eql(\"1\") });",
