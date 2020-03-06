@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "770370eb-af7d-4fa4-9e4e-c2fea1cb19f0",
 		"name": "Analytics - Data Sources",
-		"description": "SAP Business ByDesign Analytics - OData Examples to extract Data Sources\n========================================================================\n\nThe SAP Business ByDesign OData API for Data Sources is designed to extract analytical raw data. Remote systems can extract ByD analytical raw data in flat tables, free of redundancies from ByD. The analytical raw data is then processed, combined and formatted in the remote system. Typically such remote systems are central business analytics application such as SAP Analytics Cloud.\n\nThis collection provides sample OData requests for the SAP Business ByDesign analytical data sources listed below.\n\nData sources: \n- *Sales Order Header* (CRMSLOHB)\n- *Sales Order Item* (CRMSLOIB)\n- *Material General data* (MAT_GENERAL)\n- *Account Details* (BPCSDB)\n- *Supplier Details* (BPSPPB)\n- *Supplier Master Data* (SUPPLIER)\n- *Stock Overview* (CRMSLOIB)\n- *G/L Account Items* (FINGLAU02)\n- *Company Master Data* (/MOM/COMPANY)\n- *Segment Master Data* (/MOM/SEGMENT)\n\nConfiguration: \n1. Enable the OData API for Data Sources in your ByD Business Configuration: *Built-in Services and Support* >> *System Management* >> *Analytics* >> *Do you want to enable analytical OData services for data sources?*\n2. Create a user to access the OData service: Create a Communication Arrangement for Communication Scenario *Analytics Data Sources OData* and maintain the technical user\n3. Expose your data sources in work center view *Business Analytics - Data Sources*\n \nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
+		"description": "SAP Business ByDesign Analytics - OData Examples to extract Data Sources\n========================================================================\n\nThe SAP Business ByDesign OData API for Data Sources is designed to extract analytical raw data. Remote systems can extract ByD analytical raw data in flat tables, free of redundancies from ByD. The analytical raw data is then processed, combined and formatted in the remote system. Typically such remote systems are central business analytics application such as SAP Analytics Cloud.\n\nThis collection provides sample OData requests for the SAP Business ByDesign analytical data sources listed below.\n\nData sources: \n- *Sales Order Header* (CRMSLOHB)\n- *Sales Order Item* (CRMSLOIB)\n- *Material General data* (MAT_GENERAL)\n- *Account Details* (BPCSDB)\n- *Supplier Details* (BPSPPB)\n- *Supplier Master Data* (SUPPLIER)\n- *Stock Overview* (CRMSLOIB)\n- *G/L Account Items* (FINGLAU02)\n- *Company Master Data* (/MOM/COMPANY)\n- *Segment Master Data* (/MOM/SEGMENT)\n- *Forecasted Utilization* (HCMRPMU01)\n\nConfiguration: \n1. Enable the OData API for Data Sources in your ByD Business Configuration: *Built-in Services and Support* >> *System Management* >> *Analytics* >> *Do you want to enable analytical OData services for data sources?*\n2. Create a user to access the OData service: Create a Communication Arrangement for Communication Scenario *Analytics Data Sources OData* and maintain the technical user\n3. Expose your data sources in work center view *Business Analytics - Data Sources*\n \nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -35,7 +35,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/$metadata",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Hcmrpmu01.svc/$metadata",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -46,7 +46,7 @@
 						"odata",
 						"analytics",
 						"ds",
-						"Finglau02.svc",
+						"Hcmrpmu01.svc",
 						"$metadata"
 					]
 				}
@@ -427,6 +427,67 @@
 						{
 							"key": "$inlinecount",
 							"value": "allpages"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Forecasted Utilization",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1d275a0c-e8eb-42fa-9204-93036981b678",
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Hcmrpmu01.svc/Hcmrpmu01?$format=json&$select=C_Company,C_Employee,C_CalendarWeek,K_Vacation,K_GrossCapacity,K_ScheduleWork,Count&$inlinecount=allpages&$filter=C_CalendarDay ge datetime'2020-01-01T00:00:00' and C_CalendarDay le datetime'2020-01-31T00:00:00'&$top=1000",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Hcmrpmu01.svc",
+						"Hcmrpmu01"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$select",
+							"value": "C_Company,C_Employee,C_CalendarWeek,K_Vacation,K_GrossCapacity,K_ScheduleWork,Count"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
+						},
+						{
+							"key": "$filter",
+							"value": "C_CalendarDay ge datetime'2020-01-01T00:00:00' and C_CalendarDay le datetime'2020-01-31T00:00:00'"
+						},
+						{
+							"key": "$top",
+							"value": "1000"
 						}
 					]
 				}
