@@ -1,5 +1,7 @@
 # SAP Business ByDesign - API Samples
 
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/byd-api-samples)](https://api.reuse.software/info/github.com/SAP-samples/byd-api-samples)
+
 ## Description
 
 This repository provides Postman collections with example SAP Business ByDesign web service requests and can be used to get insights how to integrate and extend SAP Business ByDesign.
