@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "c0fa86b4-4c01-43ac-aa44-cffca93ba934",
 		"name": "Internal Logistics",
-		"description": "Internal Logistics - OData Examples\n===================================\n\nThis Postman collection contains examples to execute logistic processes using SAP Business ByDesign Custom OData Services.\n\nAll sample data is aligned to and ready to run on *SAP Business ByDesign Partner Demo Tenants (Full scope US)* with preconfigured and loaded sample data provided by SAP.  \n&nbsp;\n\n**Web services and User:**\n\nByD OData services require a SAP ByDesign business user for authorization. The OData requests in this collection use the following SAP Bydesign *Custom OData Services* assigned to the work center views in column *User authorization*. Assign the listed SAP ByDesign Work Center Views to your business user:\n\n| Custom OData Service or Report | User authorization (ByD Work Center View) |  \n|----------------------|-------------------------------------------|  \n| *khgoodsandactivityconfirmation* | *Internal Logistics - Goods Movement* |\n| *khlocation*  | *Supply Chain Design Master Data - Locations* |\n| *Inventory Report (SCMINVV02_Q0001)* | *Internal Logistics - By Warehouse Request* |\n| *vmumaterial* | *Product Data - Materials* |\n| *khbusinesspartner* | *Business Partner Data - Business Partners* |\n\n\n&nbsp;",
+		"description": "Internal Logistics - OData Examples\n===================================\n\nThis Postman collection contains examples to execute logistic processes using SAP Business ByDesign Custom OData Services.\n\nAll sample data is aligned to and ready to run on *SAP Business ByDesign Partner Demo Tenants (Full scope US)* with preconfigured and loaded sample data provided by SAP.  \n&nbsp;\n\n**Web services and User:**\n\nByD OData services require a SAP ByDesign business user for authorization. The OData requests in this collection use the following SAP Bydesign *Custom OData Services* assigned to the work center views in column *User authorization*. Assign the listed SAP ByDesign Work Center Views to your business user:\n\n| Custom OData Service or Report | User authorization (ByD Work Center View) |  \n|----------------------|-------------------------------------------|  \n| *khgoodsandactivityconfirmation* | *Internal Logistics - Goods Movement* |\n| *khlocation*  | *Supply Chain Design Master Data - Locations* |\n| *Inventory Report (SCMINVV02_Q0001)* | *Internal Logistics - By Warehouse Request* |\n| *vmumaterial* | *Product Data - Materials* |\n| *khbusinesspartner* | *Business Partner Data - Business Partners* |\n\n&nbsp;  \n\nAdditionally this collection uses the SOAP Web Service API:  \n- *Create Goods and Activity Confirmations for Goods Movements* \n\nSteps to configure SOAP the Web Service APIs:\n1. Work center view *Application and User Management - Communication Systems*: Create a communication system\n2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with web service APIs listed above\n3. Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials  \n\n&nbsp;",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -534,6 +534,79 @@
 									"key": "$top",
 									"value": "10"
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Goods Movement (SOAP)",
+			"item": [
+				{
+					"name": "Create goods movement (SOAP 1.1)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Set TransactionDateTime with format 2021-08-30T12:00:00.1234567Z\r",
+									"//let todayDateTime = (new Date()).toISOString().substr(0,27);\r",
+									"//var generatedDateTime = pm.environment.get(\"P-Prefix\") + todayDateTime;\r",
+									"pm.environment.set(\"TransactionDateTime\", (new Date()).toISOString() );\r",
+									"\r",
+									"// Set External ID of pattern <Prefix>-<UTC datetime>\r",
+									"let todayDateTime = (new Date()).toISOString().substr(0,19);\r",
+									"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");\r",
+									"var generatedID = \"E-\" + todayDateTime;\r",
+									"pm.environment.set(\"ExternalID\", generatedID);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{CommunicationUserPW}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{CommunicationUser}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:glob=\"http://sap.com/xi/SAPGlobal20/Global\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <glob:GoodsAndActivityConfirmationGoodsMovement>\r\n         <GoodsAndActivityConfirmation>\r\n            <ExternalID>{{ExternalID}}</ExternalID>\r\n            <SiteID>{{StorageLocationID}}</SiteID>\r\n            <TransactionDateTime>{{TransactionDateTime}}</TransactionDateTime>\r\n            <InventoryChangeItemGoodsMovement>\r\n               <ExternalItemID>E-10</ExternalItemID>\r\n               <MaterialInternalID>{{MaterialID}}</MaterialInternalID>\r\n               <OwnerPartyInternalID>{{OwnerPartyID}}</OwnerPartyInternalID>\r\n               <InventoryRestrictedUseIndicator>false</InventoryRestrictedUseIndicator>\r\n               <!-- <InventoryStockStatusCode>?</InventoryStockStatusCode> -->\r\n               <!-- <IdentifiedStockID>?</IdentifiedStockID> -->\r\n               <SourceLogisticsAreaID>{{SourceLogisticsAreaID}}</SourceLogisticsAreaID>\r\n               <TargetLogisticsAreaID>{{TargetLogisticsAreaID}}</TargetLogisticsAreaID>\r\n               <InventoryItemChangeQuantity>\r\n                  <Quantity unitCode=\"EA\">1</Quantity>\r\n               </InventoryItemChangeQuantity>\r\n               <!--\r\n               <LogisticUnitChangeQuantity>\r\n                  <LogisticUnitID>?</LogisticUnitID>\r\n                  <Quantity unitCode=\"?\">?</Quantity>\r\n               </LogisticUnitChangeQuantity>\r\n               -->\r\n               <!--\r\n               <InventoryItemChangeSerialNumber>\r\n                  <SerialID>?</SerialID>\r\n               </InventoryItemChangeSerialNumber>\r\n               -->\r\n            </InventoryChangeItemGoodsMovement>\r\n         </GoodsAndActivityConfirmation>\r\n      </glob:GoodsAndActivityConfirmationGoodsMovement>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/bc/srt/scs/sap/inventoryprocessinggoodsandac2",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"bc",
+								"srt",
+								"scs",
+								"sap",
+								"inventoryprocessinggoodsandac2"
 							]
 						}
 					},
