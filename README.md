@@ -50,6 +50,8 @@ This repository contains the following API sample packages:
 	- Create sales orders using a nested create, batch and node-by-node
 	- Create sales orders with attachments
 	- Create sales orders with externally provided prices, discounts and surcharges
+- **Internal Logistics**: Run internal logistical processes using APIs
+	- Goods movement
 
 Please check the description of the respective Postman collection for more information.
 
