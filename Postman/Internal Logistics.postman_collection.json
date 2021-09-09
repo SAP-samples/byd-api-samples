@@ -1,0 +1,580 @@
+{
+	"info": {
+		"_postman_id": "c0fa86b4-4c01-43ac-aa44-cffca93ba934",
+		"name": "Internal Logistics",
+		"description": "Internal Logistics - OData Examples\n===================================\n\nThis Postman collection contains examples to execute logistic processes using SAP Business ByDesign Custom OData Services.\n\nAll sample data is aligned to and ready to run on *SAP Business ByDesign Partner Demo Tenants (Full scope US)* with preconfigured and loaded sample data provided by SAP.  \n&nbsp;\n\n**Web services and User:**\n\nByD OData services require a SAP ByDesign business user for authorization. The OData requests in this collection use the following SAP Bydesign *Custom OData Services* assigned to the work center views in column *User authorization*. Assign the listed SAP ByDesign Work Center Views to your business user:\n\n| Custom OData Service or Report | User authorization (ByD Work Center View) |  \n|----------------------|-------------------------------------------|  \n| *khgoodsandactivityconfirmation* | *Internal Logistics - Goods Movement* |\n| *khlocation*  | *Supply Chain Design Master Data - Locations* |\n| *Inventory Report (SCMINVV02_Q0001)* | *Internal Logistics - By Warehouse Request* |\n| *vmumaterial* | *Product Data - Materials* |\n| *khbusinesspartner* | *Business Partner Data - Business Partners* |\n\n\n&nbsp;",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Goods Movement",
+			"item": [
+				{
+					"name": "Get metadata (report)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/ana_businessanalytics_analytics.svc/$metadata?entityset=RPSCMINVV02_Q0001QueryResults&sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"ana_businessanalytics_analytics.svc",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "entityset",
+									"value": "RPSCMINVV02_Q0001QueryResults"
+								},
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stock Overview (report)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/ana_businessanalytics_analytics.svc/RPSCMINVV02_Q0001QueryResults?$filter=CIML_UUID eq '{{StorageLocationID}}'&$inlinecount=allpages&$format=json&$select=CMATERIAL_UUID,TMATERIAL_UUID,CISTOCK_UUID,TISTOCK_UUID,CSITE_UUID,TSITE_UUID,CIML_UUID,TIML_UUID,CLOG_AREA_UUID,TLOG_AREA_UUID,CLU_UUID,TLU_UUID,CCONSIGNMENT_IND,CON_HAND_STOCK_UOM,TON_HAND_STOCK_UOM,FCON_HAND_STOCK,FCQUALITY_STOCK,FCRESTRICTED_STOCK,FCTIME_TO_EXPIRE",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"ana_businessanalytics_analytics.svc",
+								"RPSCMINVV02_Q0001QueryResults"
+							],
+							"query": [
+								{
+									"key": "$filter",
+									"value": "CIML_UUID eq '{{StorageLocationID}}'"
+								},
+								{
+									"key": "$inlinecount",
+									"value": "allpages"
+								},
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$select",
+									"value": "CMATERIAL_UUID,TMATERIAL_UUID,CISTOCK_UUID,TISTOCK_UUID,CSITE_UUID,TSITE_UUID,CIML_UUID,TIML_UUID,CLOG_AREA_UUID,TLOG_AREA_UUID,CLU_UUID,TLU_UUID,CCONSIGNMENT_IND,CON_HAND_STOCK_UOM,TON_HAND_STOCK_UOM,FCON_HAND_STOCK,FCQUALITY_STOCK,FCRESTRICTED_STOCK,FCTIME_TO_EXPIRE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get metadata (Goods and Activity Confirmation)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khgoodsandactivityconfirmation/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khgoodsandactivityconfirmation",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get material",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set environment variables for subsequent OData requests",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"MaterialUUID\", jsonResponse.d.results[0].UUID);",
+									"",
+									"// Validations",
+									"pm.test(\"Material \" + jsonResponse.d.results[0].InternalID + \" retrieved\", function () { pm.response.to.have.status(200) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/vmumaterial/MaterialCollection?$filter=InternalID eq '{{MaterialID}}'&$format=json&sap-language=EN&$select=ObjectID,UUID,InternalID,Description,DescriptionLanguageCode,DescriptionLanguageCodeText,BaseMeasureUnitCode,BaseMeasureUnitCodeText,IdentifiedStockTypeCode,IdentifiedStockTypeCodeText",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"vmumaterial",
+								"MaterialCollection"
+							],
+							"query": [
+								{
+									"key": "$filter",
+									"value": "InternalID eq '{{MaterialID}}'"
+								},
+								{
+									"key": "$expand",
+									"value": "QuantityConversion,ProductCategory,QuantityCharacteristic,Identification,GlobalTradeItemNumber,Text,AttachmentFolder",
+									"disabled": true
+								},
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "sap-language",
+									"value": "EN"
+								},
+								{
+									"key": "$select",
+									"value": "ObjectID,UUID,InternalID,Description,DescriptionLanguageCode,DescriptionLanguageCodeText,BaseMeasureUnitCode,BaseMeasureUnitCodeText,IdentifiedStockTypeCode,IdentifiedStockTypeCodeText"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get business partner (Owner party)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"OwnerPartyUUID\", jsonResponse.d.results[0].UUID);",
+									"",
+									"// Validations",
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khbusinesspartner/BusinessPartnerCollection?$format=json&$filter=InternalID eq '{{OwnerPartyID}}'&$inlinecount=allpages&$top=10&$select=ObjectID,UUID,InternalID,CategoryCode,CategoryCodeText,BusinessPartnerFormattedName",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khbusinesspartner",
+								"BusinessPartnerCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "Role,Identification,CurrentDefaultAddressInformation/FormattedAddress,CurrentDefaultAddressInformation/PostalAddress,CurrentDefaultAddressInformation/ConventionalPhone,CurrentDefaultAddressInformation/MobilePhone,CurrentDefaultAddressInformation/Facsimile,CurrentDefaultAddressInformation/EMail,CurrentDefaultAddressInformation/WebSite",
+									"disabled": true
+								},
+								{
+									"key": "$filter",
+									"value": "InternalID eq '{{OwnerPartyID}}'"
+								},
+								{
+									"key": "$inlinecount",
+									"value": "allpages"
+								},
+								{
+									"key": "$top",
+									"value": "10"
+								},
+								{
+									"key": "$select",
+									"value": "ObjectID,UUID,InternalID,CategoryCode,CategoryCodeText,BusinessPartnerFormattedName"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get location and logistics areas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"StorageLocationUUID\", jsonResponse.d.results[0].UUID);",
+									"",
+									"// Loop logistics areas and lookup the logistics area UUID",
+									"console.log(\"- Start loop -\");",
+									"var check1 = new Boolean(\"false\");",
+									"var check2 = new Boolean(\"false\");",
+									"check1 = false;",
+									"check2 = false;",
+									"for (let index = 0; index < 100; index++) {",
+									"    pm.test(\"Logistics Area ID: \" + jsonResponse.d.results[0].LogisticsArea[index].ID, function() { pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]) });",
+									"    console.log(\"Logistics Area ID: \" + jsonResponse.d.results[0].LogisticsArea[index].ID);",
+									"    if ( pm.environment.get(\"SourceLogisticsAreaID\") == jsonResponse.d.results[0].LogisticsArea[index].ID ) {",
+									"        pm.environment.set(\"SourceLogisticsAreaUUID\", jsonResponse.d.results[0].LogisticsArea[index].UUID);",
+									"        check1 = true;",
+									"    }",
+									"    if ( pm.environment.get(\"TargetLogisticsAreaID\") == jsonResponse.d.results[0].LogisticsArea[index].ID ) {",
+									"        pm.environment.set(\"TargetLogisticsAreaUUID\", jsonResponse.d.results[0].LogisticsArea[index].UUID);",
+									"        check2 = true;",
+									"    }",
+									"    if (check1 && check2) {",
+									"        break;",
+									"    }",
+									"}",
+									"console.log(\"- End loop -\");",
+									"",
+									"// Validations",
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khlocation/LocationCollection?$format=json&$expand=LogisticsArea&$filter=ID eq '{{StorageLocationID}}'&$inlinecount=allpages&$top=10&$select=ObjectID,ID,UUID,Name,LogisticsArea/ObjectID,LogisticsArea/ID,LogisticsArea/UUID,LogisticsArea/Description",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khlocation",
+								"LocationCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "LogisticsArea"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{StorageLocationID}}'"
+								},
+								{
+									"key": "$inlinecount",
+									"value": "allpages"
+								},
+								{
+									"key": "$top",
+									"value": "10"
+								},
+								{
+									"key": "$select",
+									"value": "ObjectID,ID,UUID,Name,LogisticsArea/ObjectID,LogisticsArea/ID,LogisticsArea/UUID,LogisticsArea/Description"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create goods movement (Goods and Activity Confirmation)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Set TransactionDateTime with format 2021-09-08T09:08:50.4640000Z\r",
+									"//let todayDateTime = (new Date()).toISOString().substr(0,27);\r",
+									"//var generatedDateTime = pm.environment.get(\"P-Prefix\") + todayDateTime;\r",
+									"pm.environment.set(\"TransactionDateTime\", (new Date()).toISOString() );\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set environment variables for subsequent OData requests",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"GoodsAndActivityConfirmationID\", jsonResponse.d.results.ID);",
+									"",
+									"// Validations",
+									"pm.test(\"Goods and activity confirmation (goods movement) \" + jsonResponse.d.results.ID + \" created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"TransactionDateTime\": \"{{TransactionDateTime}}\",\n    \"InventoryChangeItem\": [\n        {\n            \"InventoryChangeReasonCode\": \"7\",\n            \"InventoryMovementDirectionCode\": \"1\",\n            \"TransferGroupID\": \"20\",\n            \"MaterialUUID\": \"{{MaterialUUID}}\",\n            \"InventoryRestrictedUseIndicator\": false,\n            \"TypeCode\": \"11\",\n            \"LogisticsAreaUUID\": \"{{SourceLogisticsAreaUUID}}\",\n            \"OwnerPartyUUID\": \"{{OwnerPartyUUID}}\",\n            \"ItemChangeQuantity\": [\n                {\n                    \"Quantity\": \"1\",\n                    \"QuantityUnitCode\": \"EA\"\n                }\n            ]\n        },\n        {\n            \"InventoryChangeReasonCode\": \"7\",\n            \"InventoryMovementDirectionCode\": \"2\",\n            \"TransferGroupID\": \"20\",\n            \"MaterialUUID\": \"{{MaterialUUID}}\",\n            \"InventoryRestrictedUseIndicator\": false,\n            \"TypeCode\": \"11\",\n            \"LogisticsAreaUUID\": \"{{TargetLogisticsAreaUUID}}\",\n            \"OwnerPartyUUID\": \"{{OwnerPartyUUID}}\",\n            \"ItemChangeQuantity\": [\n                {\n                    \"Quantity\": \"1\",\n                    \"QuantityUnitCode\": \"EA\"\n                }\n            ]\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khgoodsandactivityconfirmation/GoodsAndActivityConfirmationCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khgoodsandactivityconfirmation",
+								"GoodsAndActivityConfirmationCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get goods and activity confirmations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khgoodsandactivityconfirmation/GoodsAndActivityConfirmationCollection?$format=json&$expand=InventoryChangeItem/ItemChangeQuantity,InventoryChangeItem/Location,InventoryChangeItem/LogisticsArea,InventoryChangeItem/SupplyPlanningArea,InventoryChangeItem/OwnerParty,InventoryChangeItem/ItemText,Text&$filter=ID eq '{{GoodsAndActivityConfirmationID}}'&$inlinecount=allpages&$top=10",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khgoodsandactivityconfirmation",
+								"GoodsAndActivityConfirmationCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "InventoryChangeItem/ItemChangeQuantity,InventoryChangeItem/Location,InventoryChangeItem/LogisticsArea,InventoryChangeItem/SupplyPlanningArea,InventoryChangeItem/OwnerParty,InventoryChangeItem/ItemText,Text"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{GoodsAndActivityConfirmationID}}'"
+								},
+								{
+									"key": "$inlinecount",
+									"value": "allpages"
+								},
+								{
+									"key": "$top",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{Password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{User}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
