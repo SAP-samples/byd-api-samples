@@ -1,0 +1,332 @@
+{
+	"info": {
+		"_postman_id": "f49234a8-1b78-417d-a99c-0f509a0ed261",
+		"name": "Analytics - KPIs",
+		"description": "SAP Business ByDesign Analytics - OData Examples to access KPIs\n===============================================================\n\nThe SAP Business ByDesign OData API for KPIs can be used to access SAP ByDesign KPIs at a given key date. The API is tailored for remote access to pre-processed and formatted analytical data. \n\nThis collection provides sample OData requests for the SAP Business ByDesign KPIs listed below.\n\nReports: \n- *Total Active Order Volume (CRMSLOIB_Q0001_SOVOLUME)*\n- *Net Invoice Value (CRMCIVI0001)*\n- *Overdue Receivables (FINDUE0001)*",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get metadata",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/kpi/Kpi.svc/$metadata?sap-label=true&sap-language=en",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"kpi",
+						"Kpi.svc",
+						"$metadata"
+					],
+					"query": [
+						{
+							"key": "sap-label",
+							"value": "true"
+						},
+						{
+							"key": "sap-language",
+							"value": "en"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get KPIs",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/kpi/Kpi.svc/Kpi?$format=json&sap-language=en",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"kpi",
+						"Kpi.svc",
+						"Kpi"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$filter",
+							"value": "Id eq 'CRMCIVI0001'",
+							"disabled": true
+						},
+						{
+							"key": "sap-language",
+							"value": "en"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get KPI value - Total Active Order Volume",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Set key date to filter account receivables open items",
+							"var keyDate = (new Date()).toISOString().substr(0,19);",
+							"pm.environment.set(\"KeyDate\", keyDate);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/kpi/Kpi.svc/KpiValue?$format=json&$filter=Id eq 'CRMSLOIB_Q0001_SOVOLUME'&sap-statistics=true",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"kpi",
+						"Kpi.svc",
+						"KpiValue"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$filter",
+							"value": "Id eq 'CRMSLOIB_Q0001_SOVOLUME'"
+						},
+						{
+							"key": "sap-statistics",
+							"value": "true"
+						},
+						{
+							"key": "sap-language",
+							"value": "en",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Report: Accounts Receivable - Open Items (FINGLAU08_Q0002)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get KPI value - Overdue Receivables",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Set key date to filter account receivables open items",
+							"var keyDate = (new Date()).toISOString().substr(0,19);",
+							"pm.environment.set(\"KeyDate\", keyDate);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/kpi/Kpi.svc/KpiValue?$format=json&$filter=Id eq 'FINDUE0001'&sap-statistics=true",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"kpi",
+						"Kpi.svc",
+						"KpiValue"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$filter",
+							"value": "Id eq 'FINDUE0001'"
+						},
+						{
+							"key": "sap-statistics",
+							"value": "true"
+						},
+						{
+							"key": "sap-language",
+							"value": "en",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Report: Accounts Receivable - Open Items (FINGLAU08_Q0002)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get KPI value - Net Invoice Value",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Set key date to filter account receivables open items",
+							"var keyDate = (new Date()).toISOString().substr(0,19);",
+							"pm.environment.set(\"KeyDate\", keyDate);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/kpi/Kpi.svc/KpiValue?$format=json&$filter=Id eq 'CRMCIVI0001'&sap-statistics=true",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"kpi",
+						"Kpi.svc",
+						"KpiValue"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$filter",
+							"value": "Id eq 'CRMCIVI0001'"
+						},
+						{
+							"key": "sap-statistics",
+							"value": "true"
+						},
+						{
+							"key": "sap-language",
+							"value": "en",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Report: Accounts Receivable - Open Items (FINGLAU08_Q0002)"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{Password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{User}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
