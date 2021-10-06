@@ -52,6 +52,8 @@ This repository contains the following API sample packages:
 	- Create sales orders with externally provided prices, discounts and surcharges
 - **Internal Logistics**: Run internal logistical processes using APIs
 	- Goods movement
+- **New Business**: Run processes to generate new business such as leads, opportunities and quotes
+	- Create Sales Quote with net price components
 
 Please check the description of the respective Postman collection for more information.
 
