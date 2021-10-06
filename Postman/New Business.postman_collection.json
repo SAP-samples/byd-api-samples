@@ -1,0 +1,977 @@
+{
+	"info": {
+		"_postman_id": "1c44c62b-4352-4594-a15e-fe06be326996",
+		"name": "New Business",
+		"description": "New Business - OData Examples\n=============================\n\nThis Postman collection contains examples to execute processes to generate new business such as leads, opportunities and quotes using SAP Business ByDesign Custom OData Services.\n\nAll sample data is aligned to and ready to run on *SAP Business ByDesign Partner Demo Tenants (Full scope US)* with preconfigured and loaded sample data provided by SAP.  \n&nbsp;\n\n**Web services and User:**\n\nByD OData services require a SAP ByDesign business user for authorization. The OData requests in this collection use the following SAP Bydesign *Custom OData Services* assigned to the work center views in column *User authorization*. Assign the listed SAP ByDesign Work Center Views to your business user:\n\n| Custom OData Service or Report | User authorization (ByD Work Center View) |  \n|----------------------|-------------------------------------------|  \n| *khcustomerquote* | *New Business - Sales Quotes* |\n\n&nbsp;  \n\n\n&nbsp;",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Sales Quote with net price components",
+			"item": [
+				{
+					"name": "Get xsrf-token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"Cross-site request forgery token received\", function () { pm.response.to.have.header(\"x-csrf-token\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"Cross site request forgery token: received\", function () { pm.response.to.have.status(200); pm.response.to.have.header(\"x-csrf-token\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create sales quote (prices are determined)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"SalesQuoteObjectID\", jsonResponse.d.results.ObjectID);",
+									"pm.environment.set(\"SalesQuoteID\", jsonResponse.d.results.ID);",
+									"",
+									"// Validations",
+									"pm.test(\"Sales quote \" + jsonResponse.d.results.ID + \" created\", function () { pm.response.to.have.status(201) });",
+									"pm.test(\"Consistency status: \" + jsonResponse.d.results.ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Lifecycle  status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"1\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set External Reference of pattern KH-<UTC datetime>",
+									"let todayDateTime = (new Date()).toISOString().substr(0,19);",
+									"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");",
+									"var generatedID = \"Q-\" + todayDateTime;",
+									"pm.environment.set(\"QuoteExternalReference\", generatedID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ExternalReference\": \"{{QuoteExternalReference}}\",\n\t\"Description\": \"Sample sales quote with net price components\",\n    \"CurrencyCode\": \"USD\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID}}\"\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n                \"ID\": \"10\",\n                \"ExternalItemID\": \"E-10\",\n\t\t\t\t\"ProcessingTypeCode\": \"AGN\",\n                \"ProductID\": \"{{MaterialID}}\",\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"XBX\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/CustomerQuoteCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"CustomerQuoteCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales quote with item price components",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"SalesQuoteID\", jsonResponse.d.results.ID);",
+									"pm.environment.set(\"SalesQuoteObjectID\", jsonResponse.d.results.ObjectID);",
+									"pm.environment.set(\"SalesQuoteItemObjectID\", jsonResponse.d.results.Item[0].ObjectID);",
+									"pm.environment.set(\"SalesQuoteItemPriceAndTaxObjectID\", jsonResponse.d.results.Item[0].ItemPriceAndTaxCalculation.ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Sales quote \" + jsonResponse.d.results.ID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Sales quote consistency status: \" + jsonResponse.d.results.ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Sales quote status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Sales quote net amount: \" + jsonResponse.d.results.NetAmount, function () { pm.expect(jsonResponse.d.results.NetAmount).to.eql(\"168.000000\") });",
+									"pm.test(\"Sales quote tax amount: \" + jsonResponse.d.results.TaxAmount, function () { pm.expect(jsonResponse.d.results.TaxAmount).to.eql(\"0.000000\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/CustomerQuoteCollection('{{SalesQuoteObjectID}}')?$format=json&$expand=Item/ItemPriceAndTaxCalculation/ItemPriceComponent,Item/ItemScheduleLine",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"CustomerQuoteCollection('{{SalesQuoteObjectID}}')"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "Item/ItemPriceAndTaxCalculation/ItemPriceComponent,Item/ItemScheduleLine",
+									"description": "All nodes except notes and attachments"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{SalesQuoteID}}'",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update item tax code",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validations",
+									"pm.test(\"Sales order item: Tax code updated\", function () { pm.response.to.have.status(204) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ObjectID\": \"{{SalesQuoteItemPriceAndTaxObjectID}}\",\n\t\"TaxationCharacteristicsCode\": \"501\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/ItemPriceAndTaxCalculationCollection('{{SalesQuoteItemPriceAndTaxObjectID}}')",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"ItemPriceAndTaxCalculationCollection('{{SalesQuoteItemPriceAndTaxObjectID}}')"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create item custom list price",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validations",
+									"pm.test(\"Sales quote item: Custom list price component created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Delay request\r",
+									"//setTimeout(function() {}, 2000); // wait 2 sec"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesQuoteItemPriceAndTaxObjectID}}\",\n    \"TypeCode\": \"7PR1\",\n    \"Description\": \"New List Price\",\n\t\"DecimalValue\": \"5.00\",\n\t\"CurrencyCode\": \"USD\",\n\t\"BaseDecimalValue\": \"1\",\n\t\"BaseMeasureUnitCode\": \"EA\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/ItemPriceComponentCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"ItemPriceComponentCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create item product discount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validations",
+									"//pm.test(\"Sales quote item: Product discount created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Delay request\r",
+									"setTimeout(function() {}, 2000); // wait 2 sec"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesQuoteItemPriceAndTaxObjectID}}\",\n    \"TypeCode\": \"7PR6\",\n    \"Description\": \"Special Discount of 8%\",\n    \"DecimalValue\": \"8\",\n    \"MeasureUnitCode\": \"P1\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/ItemPriceComponentCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"ItemPriceComponentCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create item surcharge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validations",
+									"pm.test(\"Sales quote item: Surcharge price component created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Delay request\r",
+									"//setTimeout(function() {}, 2000); // wait 2 sec"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesQuoteItemPriceAndTaxObjectID}}\",\n    \"TypeCode\": \"7PR3\",\n    \"Description\": \"Preferred delivery\",\n\t\"DecimalValue\": \"1.00\",\n\t\"CurrencyCode\": \"EUR\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/ItemPriceComponentCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"ItemPriceComponentCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create item surcharge (%)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validations",
+									"pm.test(\"Sales quote item: Surcharge (%) price component created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Delay request\r",
+									"//setTimeout(function() {}, 2000); // wait 2 sec"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesQuoteItemPriceAndTaxObjectID}}\",\n    \"TypeCode\": \"7PR2\",\n    \"Description\": \"Weekend processing surcharge (%)\",\n\t\"DecimalValue\": \"12.5\",\n\t\"MeasureUnitCode\": \"P1\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/ItemPriceComponentCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"ItemPriceComponentCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales quote with header price components",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"SalesQuoteID\", jsonResponse.d.results.ID);",
+									"pm.environment.set(\"SalesQuoteObjectID\", jsonResponse.d.results.ObjectID);",
+									"pm.environment.set(\"SalesQuotePriceAndTaxObjectID\", jsonResponse.d.results.PriceAndTaxCalculation.ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Sales quote \" + jsonResponse.d.results.ID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Sales quote consistency status: \" + jsonResponse.d.results.ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results.ConsistencyStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Sales quote status: \" + jsonResponse.d.results.LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results.LifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Sales quote net amount: \" + jsonResponse.d.results.NetAmount, function () { pm.expect(jsonResponse.d.results.NetAmount).to.eql(\"126.800000\") });",
+									"pm.test(\"Sales quote tax amount: \" + jsonResponse.d.results.TaxAmount, function () { pm.expect(jsonResponse.d.results.TaxAmount).to.eql(\"9.820000\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/CustomerQuoteCollection('{{SalesQuoteObjectID}}')?$format=json&$expand=PriceAndTaxCalculation/PriceComponent",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"CustomerQuoteCollection('{{SalesQuoteObjectID}}')"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "PriceAndTaxCalculation/PriceComponent",
+									"description": "All nodes except notes and attachments"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{SalesQuoteID}}'",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create overall discount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Sales quote price component (\" + jsonResponse.d.results.TypeCodeText + \") created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Delay request\r",
+									"//setTimeout(function() {}, 2000); // wait 2 sec"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesQuotePriceAndTaxObjectID}}\",\n    \"TypeCode\": \"0007\",\n\t\"DecimalValue\": \"10\",\n\t\"MeasureUnitCode\": \"P1\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/PriceComponentCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"PriceComponentCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create freight surcharge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Sales quote price component (\" + jsonResponse.d.results.TypeCodeText + \") created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Delay request\r",
+									"//setTimeout(function() {}, 2000); // wait 2 sec"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesQuotePriceAndTaxObjectID}}\",\n    \"TypeCode\": \"7PR8\",\n\t\"DecimalValue\": \"50\",\n\t\"CurrencyCode\": \"EUR\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/PriceComponentCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"PriceComponentCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create surcharge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(\"Sales quote price component (\" + jsonResponse.d.results.TypeCodeText + \") created\", function () { pm.response.to.have.status(201) });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Delay request\r",
+									"//setTimeout(function() {}, 2000); // wait 2 sec"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ParentObjectID\": \"{{SalesQuotePriceAndTaxObjectID}}\",\n    \"TypeCode\": \"0001\",\n\t\"DecimalValue\": \"30\",\n\t\"CurrencyCode\": \"EUR\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/PriceComponentCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"PriceComponentCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales quote by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"SalesQuoteID\", jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesQuoteObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"Sales quote \" + jsonResponse.d.results[0].ID + \" returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Sales quote consistency status: \" + jsonResponse.d.results[0].ConsistencyStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].ConsistencyStatusCode).to.eql(\"3\") });",
+									"pm.test(\"Sales quote status: \" + jsonResponse.d.results[0].LifeCycleStatusCodeText, function () { pm.expect(jsonResponse.d.results[0].LifeCycleStatusCode).to.eql(\"1\") });",
+									"pm.test(\"Sales quote net amount: \" + jsonResponse.d.results[0].NetAmount, function () { pm.expect(jsonResponse.d.results[0].NetAmount).to.eql(\"218.120000\") });",
+									"pm.test(\"Sales quote tax amount: \" + jsonResponse.d.results[0].TaxAmount, function () { pm.expect(jsonResponse.d.results[0].TaxAmount).to.eql(\"16.910000\") });",
+									"pm.test(\"Sales quote net w/o freight: \" + jsonResponse.d.results[0].NetWithoutFreightChargeAmount, function () { pm.expect(jsonResponse.d.results[0].NetWithoutFreightChargeAmount).to.eql(\"153.120000\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerquote/CustomerQuoteCollection?$format=json&$expand=DocumentReference,Item/ItemPriceAndTaxCalculation/ItemPriceComponent,BillToParty/BillToPartyName,BuyerParty/BuyerPartyName,EmployeeResponsible/EmployeeResponsibleName,OpportunityReference,SalesUnitParty/SalesUnitPartyName,ShipToParty/ShipToPartyName,ValidityPeriod,PeriodTerms,Item/ItemScheduleLine,PriceAndTaxCalculation/PriceComponent&$filter=ID eq '{{SalesQuoteID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khcustomerquote",
+								"CustomerQuoteCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "DocumentReference,Item/ItemPriceAndTaxCalculation/ItemPriceComponent,BillToParty/BillToPartyName,BuyerParty/BuyerPartyName,EmployeeResponsible/EmployeeResponsibleName,OpportunityReference,SalesUnitParty/SalesUnitPartyName,ShipToParty/ShipToPartyName,ValidityPeriod,PeriodTerms,Item/ItemScheduleLine,PriceAndTaxCalculation/PriceComponent",
+									"description": "All nodes except notes and attachments"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{SalesQuoteID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{Password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{User}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
