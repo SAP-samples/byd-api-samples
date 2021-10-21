@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "fd3d5935-3f29-4dc2-b301-3a9a70d9d070",
 		"name": "Analytics - Reports",
-		"description": "SAP Business ByDesign Analytics - OData Examples to access Reports\n==================================================================\n\nThe SAP Business ByDesign OData API for Reports can be used to access SAP ByDesign reports. The API is tailored for remote access to pre-processed and formatted analytical data. The remote system may extract a ByD analytical model as a cube incl. semantics like key figures and language-dependent texts, or analytics result sets incl. aggregations and key figures.\n\nThis collection provides sample OData requests for the SAP Business ByDesign reports listed below.\n\nReports: \n- *Invoice Volume*\n- *Complete Employee Overview: Key date*\n- *Inventory Report*\n- *Monitoring Purchase Orders*\n- *G/L Accounts - Line Items*\n- *Account Details*\n- *All Current Access Rights*\n- *Sales Order Volume Extended*\n- *Accounts Receivable - Open Items*\n\nConfiguration: \nThe SAP ByDesign business user requires access to the following SAP ByDesign work center views:\n- *Customer Invoicing - Invoice Documents*\n- *Personnel Administration - Employees*\n- *Inbound Logistics - By Warehouse Request*\n- *Purchase Requests and Orders - Purchase Orders*\n- *General Ledger - Journal Entries*\n- *Business Partner Data - Accounts*\n- *Application and User Management - Business Users*\n- *Sales Orders - Sales Orders*\n- *Receivables - Customer Accounts*\n\nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
+		"description": "SAP Business ByDesign Analytics - OData Examples to access Reports\n==================================================================\n\nThe SAP Business ByDesign OData API for Reports can be used to access SAP ByDesign reports. The API is tailored for remote access to pre-processed and formatted analytical data. The remote system may extract a ByD analytical model as a cube incl. semantics like key figures and language-dependent texts, or analytics result sets incl. aggregations and key figures.\n\nThis collection provides sample OData requests for the SAP Business ByDesign reports listed below.\n\nReports: \n- *Invoice Volume*\n- *Complete Employee Overview: Key date*\n- *Inventory Report*\n- *Monitoring Purchase Orders*\n- *G/L Accounts - Line Items*\n- *Account Details*\n- *All Current Access Rights*\n- *Sales Order Volume Extended*\n- *Accounts Receivable - Open Items*\n- *Employee Lifecycle Events*\n- *Planned Working Time and Absences*\n\nConfiguration: \nThe SAP ByDesign business user requires access to the following SAP ByDesign work center views:\n- *Customer Invoicing - Invoice Documents*\n- *Personnel Administration - Employees*\n- *Inbound Logistics - By Warehouse Request*\n- *Purchase Requests and Orders - Purchase Orders*\n- *General Ledger - Journal Entries*\n- *Business Partner Data - Accounts*\n- *Application and User Management - Business Users*\n- *Sales Orders - Sales Orders*\n- *Receivables - Customer Accounts*\n- *Time Administration - Employees*\n\nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -186,7 +186,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f9e598a6-e907-4084-9830-ca5b8e6667ce",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -201,7 +200,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://{{TenantHostname}}/sap/byd/odata/crm_customerinvoicing_analytics.svc/RP{{InvoiceVolume_ReportID}}QueryResults?$format=json&$inlinecount=allpages&$filter=PARA_CAL_DAY ge datetime'2019-01-01T00:00:00'",
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/crm_customerinvoicing_analytics.svc/RP{{InvoiceVolume_ReportID}}QueryResults?$format=json&$inlinecount=allpages&$filter=PARA_CAL_DAY ge datetime'2019-01-01T00:00:00'&sap-language=de",
 							"protocol": "https",
 							"host": [
 								"{{TenantHostname}}"
@@ -225,6 +224,10 @@
 								{
 									"key": "$filter",
 									"value": "PARA_CAL_DAY ge datetime'2019-01-01T00:00:00'"
+								},
+								{
+									"key": "sap-language",
+									"value": "de"
 								}
 							]
 						}
@@ -237,7 +240,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "be0f778f-438e-48a8-b17c-d9dd946bd03d",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -288,7 +290,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a2ccab72-4467-4963-9496-66920abc4a1b",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -343,7 +344,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8b2dd601-501c-44d1-af81-b1dc641bade6",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -398,7 +398,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bb237c37-e1a4-48d7-bbc8-962fdd311c58",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -453,7 +452,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "add67fc8-02c2-4735-8a36-09165de79f60",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -549,7 +547,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "203a6134-8a8e-4690-8b81-8c8a3ec24c4a",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -605,7 +602,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "b25121b5-24d7-4ff3-8fa1-9762eb78dbcf",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -615,7 +611,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5506d488-da25-4649-a505-6cd813fc30d8",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -669,7 +664,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f15d7401-367c-46f4-97c7-8c5baf3f692f",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -684,7 +678,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://{{TenantHostname}}/sap/byd/odata/ana_businessanalytics_analytics.svc/RP{{InventoryReport_ReportID}}QueryResults?$inlinecount=allpages&$format=json&$select=CIML_UUID,TIML_UUID,CINV_TYPE,TINV_TYPE,FCON_HAND_STOCK",
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/ana_businessanalytics_analytics.svc/RP{{InventoryReport_ReportID}}QueryResults?$filter=CIML_UUID eq 'P1100'&$inlinecount=allpages&$format=json&$select=CIML_UUID,TIML_UUID,CINV_TYPE,TINV_TYPE,FCON_HAND_STOCK",
 							"protocol": "https",
 							"host": [
 								"{{TenantHostname}}"
@@ -699,8 +693,7 @@
 							"query": [
 								{
 									"key": "$filter",
-									"value": "PAR_SEL_IML_UUID eq 'P1100'",
-									"disabled": true
+									"value": "CIML_UUID eq 'P1100'"
 								},
 								{
 									"key": "$inlinecount",
@@ -718,13 +711,66 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Stock Overview with details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/ana_businessanalytics_analytics.svc/RP{{InventoryReport_ReportID}}QueryResults?$filter=CIML_UUID eq 'P1100'&$inlinecount=allpages&$format=json&$select=CMATERIAL_UUID,TMATERIAL_UUID,CISTOCK_UUID,TISTOCK_UUID,CSITE_UUID,TSITE_UUID,CIML_UUID,TIML_UUID,CLOG_AREA_UUID,TLOG_AREA_UUID,CLU_UUID,TLU_UUID,CCONSIGNMENT_IND,CON_HAND_STOCK_UOM,TON_HAND_STOCK_UOM,FCON_HAND_STOCK,FCQUALITY_STOCK,FCRESTRICTED_STOCK,FCTIME_TO_EXPIRE",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"ana_businessanalytics_analytics.svc",
+								"RP{{InventoryReport_ReportID}}QueryResults"
+							],
+							"query": [
+								{
+									"key": "$filter",
+									"value": "CIML_UUID eq 'P1100'"
+								},
+								{
+									"key": "$inlinecount",
+									"value": "allpages"
+								},
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$select",
+									"value": "CMATERIAL_UUID,TMATERIAL_UUID,CISTOCK_UUID,TISTOCK_UUID,CSITE_UUID,TSITE_UUID,CIML_UUID,TIML_UUID,CLOG_AREA_UUID,TLOG_AREA_UUID,CLU_UUID,TLU_UUID,CCONSIGNMENT_IND,CON_HAND_STOCK_UOM,TON_HAND_STOCK_UOM,FCON_HAND_STOCK,FCQUALITY_STOCK,FCRESTRICTED_STOCK,FCTIME_TO_EXPIRE"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "bc8e19b4-31ac-40e5-a21a-ef9e6ed7eaa2",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -734,7 +780,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "19289e02-4b82-4feb-afbf-f62e02c28ac1",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -788,7 +833,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "63d13426-9ee1-49cd-8aa5-87a868bd2da7",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -885,7 +929,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1feee415-74c6-4c56-93b2-c51ad0b4296b",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -949,7 +992,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "155f558a-9f14-4557-8a53-1b21737d8931",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -1008,7 +1050,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "63d71906-f439-4337-b7bc-60022469a0b7",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -1067,7 +1108,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "07673f09-1444-437a-b00f-1cfe775b9e5c",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -1126,7 +1166,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "4ba70516-e9ed-444d-aeb6-bbb801c01a76",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -1226,7 +1265,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7668f4dd-2a97-47f2-a01f-4a2cebeee96c",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -1241,7 +1279,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://{{TenantHostname}}/sap/byd/odata/bpm_businesspartnerdata_analytics.svc/RP{{AccountDetails_ReportID}}QueryResults?$select=CBP_UUID,CCUST_ABC,CEMAIL_URI,CFRMTD_PSTL_ADDR,CGLN_ID,CINDS_SECTOR_CODE,CPHONE_NR,CSTATUS,CWEB_URI,TBP_UUID,TCUST_ABC,TINDS_SECTOR_CODE&sap-language=fr&$format=json&$filter=CBP_UUID eq 'CP100120'&$inlinecount=allpages",
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/bpm_businesspartnerdata_analytics.svc/RP{{AccountDetails_ReportID}}QueryResults?$select=CBP_UUID,CCUST_ABC,CEMAIL_URI,CFRMTD_PSTL_ADDR,CGLN_ID,CINDS_SECTOR_CODE,CPHONE_NR,CSTATUS,CWEB_URI,TBP_UUID,TCUST_ABC,TINDS_SECTOR_CODE&sap-language=en&$format=json&$filter=CBP_UUID eq 'CP100120'&$inlinecount=allpages",
 							"protocol": "https",
 							"host": [
 								"{{TenantHostname}}"
@@ -1260,7 +1298,7 @@
 								},
 								{
 									"key": "sap-language",
-									"value": "fr"
+									"value": "en"
 								},
 								{
 									"key": "$format",
@@ -1326,7 +1364,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8cb06f1b-bf7d-4c37-973f-7a6b6d9ed008",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -1381,7 +1418,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6155a30a-cdb8-41c9-a5ef-466ff7ed7a10",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -1435,7 +1471,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "e6d42dfb-5add-4deb-ba77-d611351eff46",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1445,7 +1480,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5aef5d82-3ce5-410d-88d8-307e7f57dd90",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1571,7 +1605,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2288bb8e-e5e7-41f9-ae40-22fab2b46c7b",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -1698,7 +1731,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2ccc0501-e72e-4937-a5b2-189421b85c4c",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -1938,7 +1970,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "7646fa17-26d6-4799-bc82-4d7034d1e3b7",
 								"exec": [
 									"// Set key date to filter account receivables open items",
 									"var keyDate = (new Date()).toISOString().substr(0,19);",
@@ -1951,7 +1982,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8757e3f8-0415-434b-8c07-59d14161c0c6",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"",
@@ -2010,6 +2040,228 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Report: Employee Lifecycle Events",
+			"item": [
+				{
+					"name": "Get metadata",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/fin_receivablesar_analytics.svc/$metadata?entityset=RPHCMPAU01_Q1001QueryResults&sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"fin_receivablesar_analytics.svc",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "entityset",
+									"value": "RPHCMPAU01_Q1001QueryResults"
+								},
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee Lifecycle Events by key date",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set key date to filter account receivables open items",
+									"let moment = require('moment');",
+									"",
+									"let startDate = moment().add(0,'day').toISOString().substr(0,10) + \"T00:00:00\";",
+									"pm.environment.set(\"TodayDateTime\", startDate);",
+									"",
+									"let endDate = moment().add(-1,'month').toISOString().substr(0,10) + \"T00:00:00\";",
+									"pm.environment.set(\"PastDateTime\", endDate);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/fin_receivablesar_analytics.svc/RPHCMPAU01_Q1001QueryResults?$inlinecount=allpages&$top=100&$format=json&$select=CEMPLOYEE_UUID,TEMPLOYEE_UUID,TRLU_UUID,TCCENTER_UUID,TJOB_UUID,KCCOUNT&$filter=PARA_COMPANY_UUID eq '1000' and (PARA_KEYDATE ge datetime'{{TodayDateTime}}' and PARA_KEYDATE le datetime'{{PastDateTime}}' )",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"fin_receivablesar_analytics.svc",
+								"RPHCMPAU01_Q1001QueryResults"
+							],
+							"query": [
+								{
+									"key": "$inlinecount",
+									"value": "allpages"
+								},
+								{
+									"key": "$top",
+									"value": "100"
+								},
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$select",
+									"value": "CEMPLOYEE_UUID,TEMPLOYEE_UUID,TRLU_UUID,TCCENTER_UUID,TJOB_UUID,KCCOUNT"
+								},
+								{
+									"key": "$filter",
+									"value": "PARA_COMPANY_UUID eq '1000' and (PARA_KEYDATE ge datetime'{{TodayDateTime}}' and PARA_KEYDATE le datetime'{{PastDateTime}}' )"
+								},
+								{
+									"key": "$orderby",
+									"value": "COED_PARTNER_C desc",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Report: Accounts Receivable - Open Items (FINGLAU08_Q0002)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Report: Planned Working Time and Absences",
+			"item": [
+				{
+					"name": "Get metadata",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/hcm_timeadministration_analytics.svc/$metadata?entityset=RPHCMRPMU01_Q1001QueryResults&sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"hcm_timeadministration_analytics.svc",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "entityset",
+									"value": "RPHCMRPMU01_Q1001QueryResults"
+								},
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get planned absenses by key date",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();",
+									"",
+									"// Validations",
+									"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/hcm_timeadministration_analytics.svc/RPHCMRPMU01_Q1001QueryResults?$inlinecount=allpages&$select=CCOMPANY,TCOMPANY,CEMPLOYEE,TEMPLOYEE,FCGROSS_CAPACITY,KCGROSS_CAPACITY,RCGROSS_CAPACITY,UCGROSS_CAPACITY,FCVACATION,KCVACATION,RCVACATION,UCVACATION&$filter=( PARA_KEYDATE ge datetime'2021-09-01T00:00:00' and PARA_KEYDATE le datetime'2021-12-01T00:00:00' )&$top=1000&$format=json",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"hcm_timeadministration_analytics.svc",
+								"RPHCMRPMU01_Q1001QueryResults"
+							],
+							"query": [
+								{
+									"key": "$inlinecount",
+									"value": "allpages"
+								},
+								{
+									"key": "$select",
+									"value": "CCOMPANY,TCOMPANY,CEMPLOYEE,TEMPLOYEE,FCGROSS_CAPACITY,KCGROSS_CAPACITY,RCGROSS_CAPACITY,UCGROSS_CAPACITY,FCVACATION,KCVACATION,RCVACATION,UCVACATION",
+									"description": "CCALENDAR_MONTH,CCALENDAR_WEEK,CCALENDAR_DAY"
+								},
+								{
+									"key": "$filter",
+									"value": "( PARA_KEYDATE ge datetime'2021-09-01T00:00:00' and PARA_KEYDATE le datetime'2021-12-01T00:00:00' )"
+								},
+								{
+									"key": "$top",
+									"value": "1000"
+								},
+								{
+									"key": "$format",
+									"value": "json"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {
@@ -2031,7 +2283,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "c20b5e38-3070-466f-be73-eda54fda3a46",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -2041,7 +2292,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "346bdac1-18e3-485c-a8cf-bbd8077e6be2",
 				"type": "text/javascript",
 				"exec": [
 					""

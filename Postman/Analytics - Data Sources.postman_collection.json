@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "770370eb-af7d-4fa4-9e4e-c2fea1cb19f0",
 		"name": "Analytics - Data Sources",
-		"description": "SAP Business ByDesign Analytics - OData Examples to extract Data Sources\n========================================================================\n\nThe SAP Business ByDesign OData API for Data Sources is designed to extract analytical raw data. Remote systems can extract ByD analytical raw data in flat tables, free of redundancies from ByD. The analytical raw data is then processed, combined and formatted in the remote system. Typically such remote systems are central business analytics application such as SAP Analytics Cloud.\n\nThis collection provides sample OData requests for the SAP Business ByDesign analytical data sources listed below.\n\nData sources: \n- *Sales Order Header* (CRMSLOHB)\n- *Sales Order Item* (CRMSLOIB)\n- *Material General data* (MAT_GENERAL)\n- *Account Details* (BPCSDB)\n- *Supplier Details* (BPSPPB)\n- *Supplier Master Data* (SUPPLIER)\n- *Stock Overview* (CRMSLOIB)\n- *G/L Account Items* (FINGLAU02)\n- *Company Master Data* (/MOM/COMPANY)\n- *Segment Master Data* (/MOM/SEGMENT)\n- *Forecasted Utilization* (HCMRPMU01)\n\nConfiguration: \n1. Enable the OData API for Data Sources in your ByD Business Configuration: *Built-in Services and Support* >> *System Management* >> *Analytics* >> *Do you want to enable analytical OData services for data sources?*\n2. Create a user to access the OData service: Create a Communication Arrangement for Communication Scenario *Analytics Data Sources OData* and maintain the technical user\n3. Expose your data sources in work center view *Business Analytics - Data Sources*\n \nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
+		"description": "SAP Business ByDesign Analytics - OData Examples to extract Data Sources\n========================================================================\n\nThe SAP Business ByDesign OData API for Data Sources is designed to extract analytical raw data. Remote systems can extract ByD analytical raw data in flat tables, free of redundancies from ByD. The analytical raw data is then processed, combined and formatted in the remote system. Typically such remote systems are central business analytics application such as SAP Analytics Cloud.\n\nThis collection provides sample OData requests for the SAP Business ByDesign analytical data sources listed below.\n\nData sources: \n- *Sales Order Header* (CRMSLOHB)\n- *Sales Order Item* (CRMSLOIB)\n- *Material General data* (MAT_GENERAL)\n- *Account Details* (BPCSDB)\n- *Supplier Details* (BPSPPB)\n- *Supplier Master Data* (SUPPLIER)\n- *Stock Overview* (CRMSLOIB)\n- *G/L Account Items* (FINGLAU02)\n- *Financial Statements* (FINGLAU04)\n- *Company Master Data* (/MOM/COMPANY)\n- *Segment Master Data* (/MOM/SEGMENT)\n- *Forecasted Utilization* (HCMRPMU01)\n\nConfiguration: \n1. Enable the OData API for Data Sources in your ByD Business Configuration: *Built-in Services and Support* >> *System Management* >> *Analytics* >> *Do you want to enable analytical OData services for data sources?*\n2. Create a user to access the OData service: Create a Communication Arrangement for Communication Scenario *Analytics Data Sources OData* and maintain the technical user\n3. Expose your data sources in work center view *Business Analytics - Data Sources*\n \nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -35,7 +35,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Hcmrpmu01.svc/$metadata",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/scminvv02.svc/$metadata?sap-label=true&sap-statistics=true",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -46,8 +46,18 @@
 						"odata",
 						"analytics",
 						"ds",
-						"Hcmrpmu01.svc",
+						"scminvv02.svc",
 						"$metadata"
+					],
+					"query": [
+						{
+							"key": "sap-label",
+							"value": "true"
+						},
+						{
+							"key": "sap-statistics",
+							"value": "true"
+						}
 					]
 				}
 			},
@@ -59,7 +69,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f4dddd6d-d112-4e7c-842d-e9089ef553e7",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -112,7 +121,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "659933bd-8678-458a-8c99-27546db12ea4",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -165,7 +173,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "aeab6220-d4f9-453e-848b-da53ad76ea95",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -218,7 +225,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "dff588ea-98a6-4074-a9e0-c6435cd3ade3",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -271,7 +277,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "0105622b-599b-4a51-86bd-4a1223b09427",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -329,7 +334,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "21b0a3ef-1d94-466d-aacf-9adc66156008",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -381,12 +385,11 @@
 			"response": []
 		},
 		{
-			"name": "Stock overview",
+			"name": "Stock overview (aggregated by logistics area)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "1d275a0c-e8eb-42fa-9204-93036981b678",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -401,7 +404,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/scminvv02.svc/Scminvv02?$format=json&$select=C_CoUuid,C_ImlUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom&$inlinecount=allpages",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/scminvv02.svc/Scminvv02?$format=json&$select=C_CoUuid,C_MaterialUuid,C_ImlUuid,C_LogAreaUuid,K_OnHandStock,C_OnHandStockUom&$inlinecount=allpages&$filter=C_CoUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_MaterialUuid eq guid'00163E04-2FFA-1ED2-99C0-71488497E655'",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -422,11 +425,73 @@
 						},
 						{
 							"key": "$select",
-							"value": "C_CoUuid,C_ImlUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom"
+							"value": "C_CoUuid,C_MaterialUuid,C_ImlUuid,C_LogAreaUuid,K_OnHandStock,C_OnHandStockUom"
 						},
 						{
 							"key": "$inlinecount",
 							"value": "allpages"
+						},
+						{
+							"key": "$filter",
+							"value": "C_CoUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_MaterialUuid eq guid'00163E04-2FFA-1ED2-99C0-71488497E655'",
+							"description": "Almika Inc "
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Stock overview (aggregated by company)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/scminvv02.svc/Scminvv02?$format=json&$select=C_CoUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom&$inlinecount=allpages&$filter=C_CoUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_MaterialUuid eq guid'00163E04-2FFA-1ED2-99C0-71488497E655'",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"scminvv02.svc",
+						"Scminvv02"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$select",
+							"value": "C_CoUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
+						},
+						{
+							"key": "$filter",
+							"value": "C_CoUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_MaterialUuid eq guid'00163E04-2FFA-1ED2-99C0-71488497E655'",
+							"description": "Almika Inc"
 						}
 					]
 				}
@@ -439,7 +504,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "1d275a0c-e8eb-42fa-9204-93036981b678",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -500,7 +564,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "709bd3c1-1428-4933-a676-cd00875dc21d",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -562,7 +625,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5f258521-20ab-430f-ae6a-e1275defd3e0",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -623,7 +685,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c673ea9e-c148-41ae-83a7-db391fe4c437",
 						"exec": [
 							"var jsonResponse = pm.response.json();",
 							"",
@@ -678,6 +739,66 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Financial Statements",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau04.svc/Finglau04?$format=json&$inlinecount=allpages&$top=1000&$select=C_Slatype,C_Oedcotype,C_Setofbks,C_Segment,C_Valuetype,C_Profitctr,C_VersionId,C_Partseg,C_Partprftct,C_Partcomp,C_Housebank,C_Glmovtype,C_Glacctyp,C_Glacct,C_Funcarea,C_Fiscvariant,C_Fiscyear,C_Structure,C_DfvrsInd,U_Compcurr,C_Company,C_Closestep,C_Chofacct,C_Accbtt,C_Balshtype,C_Glaccext,C_Fiscyearper,C_Fiscper,K_Balcomp,Count,K_Flowcomp,K_Flowcompcorr&$filter=C_Company eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_Setofbks eq '9011' and C_Fiscyear eq '2020' and C_Structure eq 'ZU10' and C_Balshtype eq '1'",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Finglau04.svc",
+						"Finglau04"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
+						},
+						{
+							"key": "$top",
+							"value": "1000"
+						},
+						{
+							"key": "$select",
+							"value": "C_Slatype,C_Oedcotype,C_Setofbks,C_Segment,C_Valuetype,C_Profitctr,C_VersionId,C_Partseg,C_Partprftct,C_Partcomp,C_Housebank,C_Glmovtype,C_Glacctyp,C_Glacct,C_Funcarea,C_Fiscvariant,C_Fiscyear,C_Structure,C_DfvrsInd,U_Compcurr,C_Company,C_Closestep,C_Chofacct,C_Accbtt,C_Balshtype,C_Glaccext,C_Fiscyearper,C_Fiscper,K_Balcomp,Count,K_Flowcomp,K_Flowcompcorr"
+						},
+						{
+							"key": "$filter",
+							"value": "C_Company eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_Setofbks eq '9011' and C_Fiscyear eq '2020' and C_Structure eq 'ZU10' and C_Balshtype eq '1'"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -699,7 +820,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "2cb400a3-a7c8-4b0b-b62a-39798b47e26e",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -709,7 +829,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "1a209054-a05d-4f51-a69b-de4943de691e",
 				"type": "text/javascript",
 				"exec": [
 					""
