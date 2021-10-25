@@ -8,7 +8,7 @@ This repository provides Postman collections with example SAP Business ByDesign 
 
 [SAP Business ByDesign](https://www.sap.com/products/business-bydesign.html) is a cloud ERP solution for small and mid-market companies. 
 SAP Business ByDesign (ByD) is designed as open business process platform and provides a comprehensive portfolio of APIs and integration capabilities. You find an overview of all ByD APIs in the SAP Community blog post [SAP Business ByDesign - API Overview](https://blogs.sap.com/2019/09/26/sap-business-bydesign-an-api-overview/). 
-The Postman collections of this repository illustrate hands-on how to access master data, business documents and analytical data in context of ByD business processes with a focus on ByD OData APIs.
+The Postman collections of this repository illustrate hands-on how to access master data, business documents and analytical data in context of ByD business processes with a focus on ByD OData APIs. Check my blog post [SAP Business ByDesign – OData API Examples](https://blogs.sap.com/2019/02/27/sap-business-bydesign-api-usage-samples/) for comments and questions regarding this repository.
 
 The repository is structured in API sample packages. 
 Each package contains Postman collections, a Postman environment and ByD Custom OData Services required to run the OData requests of the Postman collections.
