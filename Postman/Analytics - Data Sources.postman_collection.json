@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "770370eb-af7d-4fa4-9e4e-c2fea1cb19f0",
+		"_postman_id": "2b2c3851-7008-4a5d-870c-0a0aefa35938",
 		"name": "Analytics - Data Sources",
-		"description": "SAP Business ByDesign Analytics - OData Examples to extract Data Sources\n========================================================================\n\nThe SAP Business ByDesign OData API for Data Sources is designed to extract analytical raw data. Remote systems can extract ByD analytical raw data in flat tables, free of redundancies from ByD. The analytical raw data is then processed, combined and formatted in the remote system. Typically such remote systems are central business analytics application such as SAP Analytics Cloud.\n\nThis collection provides sample OData requests for the SAP Business ByDesign analytical data sources listed below.\n\nData sources: \n- *Sales Order Header* (CRMSLOHB)\n- *Sales Order Item* (CRMSLOIB)\n- *Material General data* (MAT_GENERAL)\n- *Account Details* (BPCSDB)\n- *Supplier Details* (BPSPPB)\n- *Supplier Master Data* (SUPPLIER)\n- *Stock Overview* (CRMSLOIB)\n- *G/L Account Items* (FINGLAU02)\n- *Financial Statements* (FINGLAU04)\n- *Company Master Data* (/MOM/COMPANY)\n- *Segment Master Data* (/MOM/SEGMENT)\n- *Forecasted Utilization* (HCMRPMU01)\n\nConfiguration: \n1. Enable the OData API for Data Sources in your ByD Business Configuration: *Built-in Services and Support* >> *System Management* >> *Analytics* >> *Do you want to enable analytical OData services for data sources?*\n2. Create a user to access the OData service: Create a Communication Arrangement for Communication Scenario *Analytics Data Sources OData* and maintain the technical user\n3. Expose your data sources in work center view *Business Analytics - Data Sources*\n \nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
+		"description": "# SAP Business ByDesign Analytics - OData Examples to extract Data Sources\n\nThe SAP Business ByDesign OData API for Data Sources is designed to extract analytical raw data. Remote systems can extract ByD analytical raw data in flat tables, free of redundancies from ByD. The analytical raw data is then processed, combined and formatted in the remote system. Typically such remote systems are central business analytics application such as SAP Analytics Cloud.\n\nThis collection provides sample OData requests for the SAP Business ByDesign analytical data sources listed below.\n\nData sources:\n\n*   *Sales Order Header* (CRMSLOHB)\n*   *Sales Order Item* (CRMSLOIB)\n*   *Material General Data* (MAT\\_GENERAL)\n*   *Material Master Data* (MATERIAL) \n*   *Account Details* (BPCSDB)\n*   *Supplier Details* (BPSPPB)\n*   *Supplier Master Data* (SUPPLIER)\n*   *Stock Overview* (CRMSLOIB)\n*   *G/L Account Items* (FINGLAU02)\n*   *Financial Statements* (FINGLAU04)\n*   *Company Master Data* (/MOM/COMPANY)\n*   *Segment Master Data* (/MOM/SEGMENT)\n*   *Forecasted Utilization* (HCMRPMU01)\n\nConfiguration:\n\n1.  Enable the OData API for Data Sources in your ByD Business Configuration: *Built-in Services and Support* >> *System Management* >> *Analytics* >> *Do you want to enable analytical OData services for data sources?*\n2.  Create a user to access the OData service: Create a Communication Arrangement for Communication Scenario *Analytics Data Sources OData* and maintain the technical user\n3.  Expose your data sources in work center view *Business Analytics - Data Sources*\n\nYou may need to clear cookies stored in Postman to retrigger authentication using the correct SAP ByDesign user.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -499,6 +499,68 @@
 			"response": []
 		},
 		{
+			"name": "Stock overview and expand",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/scminvv02.svc/Scminvv02?$format=json&$select=C_CoUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom,to_CoUuid/C_CoId,to_CoUuid/T_Name,to_MaterialUuid/C_MatrIntId,to_MaterialUuid/T_DescContent&$inlinecount=allpages&$filter=to_MaterialUuid/C_MatrIntId eq 'P300008'&$expand=to_CoUuid,to_MaterialUuid",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"scminvv02.svc",
+						"Scminvv02"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$select",
+							"value": "C_CoUuid,C_MaterialUuid,K_OnHandStock,C_OnHandStockUom,to_CoUuid/C_CoId,to_CoUuid/T_Name,to_MaterialUuid/C_MatrIntId,to_MaterialUuid/T_DescContent",
+							"description": "Incl. select on expanded sub-nodes"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
+						},
+						{
+							"key": "$filter",
+							"value": "to_MaterialUuid/C_MatrIntId eq 'P300008'",
+							"description": "Deep filter by material ID"
+						},
+						{
+							"key": "$expand",
+							"value": "to_CoUuid,to_MaterialUuid"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Forecasted Utilization",
 			"event": [
 				{
@@ -578,7 +640,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/Finglau02?$format=json&$inlinecount=allpages&$top=1000&$select=C_CompanyUuid,C_Setofbks,C_Fiscyearvar,C_Chofaccts,C_PostingDate,C_Fiscalyearperio,C_Glacct,Count&$filter=C_CompanyUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_Setofbks eq '7000' and C_Fiscyearvar eq '10' and C_Chofaccts eq 'ZIAS' and C_Fiscalyearperio eq '2018010' and ( C_PostingDate ge datetime'2018-10-01T00:00:00' and C_PostingDate le datetime'2018-12-31T00:00:00' )",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/Finglau02?$format=json&$inlinecount=allpages&$top=1000&$select=C_CompanyUuid,C_Setofbks,C_Fiscyearvar,C_Chofaccts,C_PostingDate,C_Fiscalyearperio,C_Glacct,Count&$filter=C_CompanyUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_Setofbks eq '7000' and C_Fiscyearvar eq '10' and C_Chofaccts eq 'ZIAS' and C_Fiscalyearperio eq '2018010' and ( C_PostingDate ge datetime'2018-10-01T00:00:00' and C_PostingDate le datetime'2018-12-31T00:00:00' )&$expand=to_CompanyUuid",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -613,6 +675,10 @@
 							"key": "$filter",
 							"value": "C_CompanyUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_Setofbks eq '7000' and C_Fiscyearvar eq '10' and C_Chofaccts eq 'ZIAS' and C_Fiscalyearperio eq '2018010' and ( C_PostingDate ge datetime'2018-10-01T00:00:00' and C_PostingDate le datetime'2018-12-31T00:00:00' )",
 							"description": "C_CompanyUuid eq guid'00300571-C7CC-02DB-B898-AB1DC7E899CA' and C_Setofbks eq 'AXUS' and C_Fiscyearvar eq '10' and C_Chofaccts eq 'CAUS' and C_Fiscalyearperio eq '2018011' and ( C_PostingDate ge datetime'2018-11-01T00:00:00' and C_PostingDate le datetime'2018-11-30T00:00:00' )"
+						},
+						{
+							"key": "$expand",
+							"value": "to_CompanyUuid"
 						}
 					]
 				}
@@ -734,6 +800,71 @@
 						{
 							"key": "$inlinecount",
 							"value": "allpages"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "G/L Account Items and expand",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Validations",
+							"pm.test(jsonResponse.d.__count + \" records returned\", function () { pm.response.to.have.status(200) });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/Finglau02?$format=json&$inlinecount=allpages&$top=1000&$select=C_CompanyUuid,C_Setofbks,C_Fiscyearvar,C_Chofaccts,C_PostingDate,C_Fiscalyearperio,C_Glacct,Count,to_CompanyUuid/C_CoId,to_CompanyUuid/T_Name&$filter=C_CompanyUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_Setofbks eq '7000' and C_Fiscyearvar eq '10' and C_Chofaccts eq 'ZIAS' and C_Fiscalyearperio eq '2018010' and ( C_PostingDate ge datetime'2018-10-01T00:00:00' and C_PostingDate le datetime'2018-12-31T00:00:00' )&$expand=to_CompanyUuid",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Finglau02.svc",
+						"Finglau02"
+					],
+					"query": [
+						{
+							"key": "$format",
+							"value": "json"
+						},
+						{
+							"key": "$inlinecount",
+							"value": "allpages"
+						},
+						{
+							"key": "$top",
+							"value": "1000"
+						},
+						{
+							"key": "$select",
+							"value": "C_CompanyUuid,C_Setofbks,C_Fiscyearvar,C_Chofaccts,C_PostingDate,C_Fiscalyearperio,C_Glacct,Count,to_CompanyUuid/C_CoId,to_CompanyUuid/T_Name",
+							"description": "Expand to company details: to_CompanyUuid/C_CoId,to_CompanyUuid/T_Name"
+						},
+						{
+							"key": "$filter",
+							"value": "C_CompanyUuid eq guid'00000000-0001-1DDF-B9FF-7CEB3214ABF2' and C_Setofbks eq '7000' and C_Fiscyearvar eq '10' and C_Chofaccts eq 'ZIAS' and C_Fiscalyearperio eq '2018010' and ( C_PostingDate ge datetime'2018-10-01T00:00:00' and C_PostingDate le datetime'2018-12-31T00:00:00' )"
+						},
+						{
+							"key": "$expand",
+							"value": "to_CompanyUuid"
 						}
 					]
 				}
