@@ -20,11 +20,12 @@ This repository contains the following API sample packages:
 	- Organizational Structure
 	- Material
 	- Service Product
-	- Sales Price
+	- Sales Price List
 	- Business Partner
 	- Customer
 	- Supplier
 	- Employee and Position
+	- Address Information
 	- Code lists
 - **Reference Scenarios**: Run ByD business processes using APIs to get insights how to create, change and read involved business documents and how to create business document relationships to achieve a meaningful document flow
 	- Lead to opportunity to quote
@@ -47,6 +48,7 @@ This repository contains the following API sample packages:
 	- Customer return to stock
 	- Pre-confirm payments using clearing house statements
 	- Confirm payments using bank statements
+	- Create follow-up sales orders
 	- Create sales orders using a nested create, batch and node-by-node
 	- Create sales orders with attachments
 	- Create sales orders with externally provided prices, discounts and surcharges
