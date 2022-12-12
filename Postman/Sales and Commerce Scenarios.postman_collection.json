@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "1cd53f7f-0f30-4945-935c-50265818db59",
+		"_postman_id": "5665439b-b4f4-4909-9fc8-d62651c38e56",
 		"name": "Sales and Commerce Scenarios",
-		"description": "SAP Business ByDesign API Samples - Sales and Commerce Scenarios\n================================================================\n\nThis Postman collection contains examples to create, change and read business objects and to run end-to-end business processes using *SAP Business ByDesign Custom OData Services*.\nEach collection folder corresponds to a business scenario; execute the web service requests in the listed order within each folder.\n\nAll sample data is aligned to and ready to run on *SAP Business ByDesign Partner Demo Tenants (Full scope US)* with preconfigured and loaded sample data provided by SAP.  \n&nbsp; \n\n\n**Web services and User:**\n\nThe OData services used in this collection require a SAP ByDesign business user for authorization.  \n&nbsp; \n\nSAP ByDesign business objects provide defaulting capabilities based on the organizational assignment of the user logged in. In many sample OData requests I use this defaulting to keep the OData requests simple.  \nTherefore, assign the employee or service agent that is associated to your business user to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.  \n&nbsp; \n\nThe OData requests in this collection use the following SAP Bydesign *Custom OData Services* assigned to the work center views in column *User authorization*. Assign the listed SAP ByDesign Work Center Views to your business user:\n\n| Custom OData Service | User authorization (ByD Work Center View) |  \n|----------------------|-------------------------------------------|  \n| *khsalesorder* | *Sales Orders - Sales Orders* |  \n| *khcustomerinvoicerequest* | *Customer Invoicing - Invoice Requests* |  \n| *khcustomerinvoice* | *Customer Invoicing - Invoice Documents* |  \n| *khcustomerreturn* | *Sales Orders - Returns* |\n| *khoutbounddeliveryrequest* | *Outbound Logistics - Delivery Proposals* |  \n| *khoutbounddelivery* | *Outbound Logistics - Outbound Deliveries* |  \n| *khinbounddelivery* | *Inbound Logistics - Inbound Delivery Notifications* |\n| *khconfirmedinbounddelivery* | *Inbound Logistics - Inbound Deliveries* |\n| *khhousebankaccount* | *Liquidity Management - My Banks* |\n| *khcompanypaymentfileregister* | *Liquidity Management - Inbound Files* |\n| *khhousebankstatement* | *Liquidity Management - Bank Statements* |\n| *khpayment* | *Payment Management - Payment Monitor* |\n| *khpaymentorderprocessingstatement* | *Payment Management - Clearing House Statements* |\n\n&nbsp; \n\nAdditionally this collection uses the SOAP Web Service APIs:  \n- *Manage Sales Orders* (required because external payment information cannot be created using OData)\n- *Manage Customer Invoice Requests* (required because external payment information cannot be created using OData)  \n\nSteps to configure SOAP the Web Service APIs:\n1. Work center view *Application and User Management - Communication Systems*: Create a communication system\n2. Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with web service APIs listed above\n3. Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials  \n&nbsp; \n\n\n**Business Configuration:**  \n\nThe following fine tuning settings are required additionally to the preconfigured and loaded sample data provided by the SAP Business ByDesign Partner Demo Tenant.  \n&nbsp; \n\nConfigure the determination methode for external references:  \nByD work center *Business Configuration*: Open the fine tuning activity *External Reference Number Determination for Customer Invoice* and set the determination method to *Copied from Predecessor Reference ID*.  \n&nbsp; \n\nCreate company payment file register:  \nOpen work center view *Liquidity Management - Inbound Files*, click on *New* > *Inbound File* and enter the following values:  \n\t*Type: Bank Statement* | *Company: 1000* | *Bank ID: 1000002* | *Import Format: BAI2 US*.  \nSave without adding an attachment.  \nThe system created a company payment file register for company 1000 that can now be used for file uploads via OData.  \n&nbsp; \n\nThe bank statements created in this collection are automatically allocated if you apply the following fine tuning settings:  \n1. Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  \nAdd row using the values: *Company ID: 1000* | *Bank ID: 1000002* | *Bank Statement Format: 02 - BAI2 US*\n2. Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  \nAdd row using the values: Seq.: 1 | Company: 1000 | Bank Country: * | Bank ID: * | Currency: * | Bank Account ID: * | Manual Post Necessary: False\n3. Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  \nAdd a rules: \n\t- Rule 1: *Description: Customer Return External Reference* | *Rule Type: 13* | *Rule Definition Mode: Expert* | *Regular Expression: (E-CRN-\\d{4}-\\d{2}-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2}\\d{2})*\n\t- Rule 2: *Description: Sales Order External Payment* | *Rule Type: 14* | *Rule Definition Mode: Expert* | *Regular Expression: (E-PAYTAREF-\\d{4}\\d{1,2}\\d{1,2}\\d{2}\\d{2}\\d{2})*\n4. Fine-Tuning activity *Automatically Generated Bank Statements* > *Edit import formats for automatic generated bank statements*:\nAdd two rows to Import Format \"02 - BAI2 US\":\n\t- Transaction code assignment 1: *External Transaction Code: 399* | *Description: Miscellaneous Credit* | *Debit/Credit: Increase* | *Payment Method: Payment Processing - Of Incoming External Payment*\n\t- Transaction code assignment 2: *External Transaction Code: 699* | *Description: Miscellaneous Debit* | *Debit/Credit: Decrease* | *Payment Method: Payment Processing - Of Outgoing Direct Debit*  \n\n\tRemark: Basically you can use any external transaction codes, you just have to make sure that the transaction codes match the codes used to create the bank statement file. The setting of transaction code assignment 2 is required to trigger the automated allocation of the bank statement line item to the credit memo open item related to customer returns (customer returns do not yet result in payments in transfer, but remain open items).  \n&nbsp; \n\n**New Payment Register/Payment Monitor:**  \n\nOData access to the SAP ByDesign *Payment Monitor* (business object *PaymentRegister*) requires to activate the new high-performance payment register/payment monitor.  \n\nYou can check if the new payment monitor is already active in your system by sending the following request:  \nPostman collection *Sales and Commerce Scenarios* > folder *Miscellaneous Samples* > request *Get payments (new payment monitor)*.  \nThe OData service request retrieves all payment register entries of the last 30 days; if the OData service response is empty and you see some entries in the payment monitor in ByD work center view *Payment Management - Payment Monitor*, then the new payment register is not active in your system.  \n\nYou can request to activate the new payment register by creating an SAP ByDesign incident.  \n&nbsp; \n\n\n**Additional Information:**  \nThe sales order origin type (*DataOriginTypeCode*) can be used integrate webshops with ByD. Relevant code values for the examples in collection are *1 - Manual data entry* and *4 - Internet order (webshop integration)*.  \nCompare blog post [Create ByD Sales Orders using Web Services](https://blogs.sap.com/2017/08/10/create-byd-sales-orders-using-web-services/) for more details.  \n&nbsp; \n\n\nScenario 1a: eCommerce - Sell from stock with external payment\n--------------------------------------------------------------\n\nScenario steps:\n1. Create and release sales order with external payment information (SOAP Web Service API)\n2. Get and check delivery proposal (Business object *OutboundDeliveryRequest*)\n3. Post goods issue\n4. Get, check and release outbound delivery (Business object *OutboundDelivery*)\n5. Get, check and release the customer invoice request\n6. Get, check and release customer invoice\n7. Check sales order status\n\nIf the availability check fails, you can fill up your stock using Postman collection **End-to-End Scenarios** and scenario **Procure to Stock**.  \n\nPayments in transfer created by this scenario can be confirmed using scenario **eCommerce - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 1b: eCommerce - Customer return to stock\n-------------------------------------------------\n\nScenario steps:\n1. Get and check the sales order and outbound delivery from scenario *eCommerce - Sell from stock with external payment*\n2. Create customer return notification (Business object *InboundDelivery*)\n3. Post goods receipt and check the confirmed inbound delivery (Business object *ConfirmedInboundDelivery*)\n4. Get and release the customer return\n5. Get the customer invoice request (credit memo) and update the payment reference (needed to allocate the bank statement line item)\n6. Get and release the customer credit memo\n7. Check the status of the customer return\n\nOpen items created by this scenario can be cleared using scenario **eCommerce - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 1c: eCommerce - Confirm payments using bank statements\n---------------------------------------------------------------\n\nScenario steps:\n1. Read previous bank statement to get the last closing balance (Business object *HouseBankStatement*)\n2. Get open items to be cleared and create BAI2 bank statement file\n\t- Get the customer invoice from scenario *eCommerce - Sell from stock with external payment* and the credit memo of scenario *eCommerce - Customer return to stock* and create a suitable bank statement file\n\t- Use the closing balance of step 1 as opening balance of the bank statement file\n3. Get company house bank account (Business object *HouseBankAccount*)\n4. Get company payment file register (Business object *CompanyPaymentFileRegister*)\n5. Create incoming file using the file of step 2 (Business object *CompanyPaymentFileRegister*)\n6. Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*) \n\n&nbsp; \n\n\nScenario 2a: Invoice External Billing Documents - Customer invoice with external payment\n----------------------------------------------------------------------------------------\n\nScenario steps:\n1. Create and release external customer invoice with external payment information (SOAP Web Service API)\n2. Get and check the customer invoice request\n3. Get and check the customer invoice\n\nPayments in transfer created by this scenario can be pre-confirmed using scenario **Invoice External Billing Documents - Pre-confirm payments using clearing house statements** and finally confirmed using scenario **Invoice External Billing Documents - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 2b: Invoice External Billing Documents - Pre-confirm payments using clearing house statements\n------------------------------------------------------------------------------------------------------\n\nScenario steps:\n1. Get customer invoice (payments in transfer) and create clearing house statement file (Get the customer invoice from scenario *Invoice External Billing Documents - Customer invoice with external payment* and create a suitable clearing house statement file).  \nAlternative in scenario **Invoice External Billing Documents - Pre-confirm payments using clearing house statements**: Get payments in transfer from the payment monitor (Business object *Payment*) and create clearing house statement file.\n2. Get company payment file register (Business object *CompanyPaymentFileRegister*)\n3. Create incoming file using the file of step 1 (Business object *CompanyPaymentFileRegister*)\n4. Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*) \n5. Check file upload status\n\nPayments pre-confirmed by this scenario can be confirmed using scenario **Invoice External Billing Documents - Confirm payments using bank statements**.  \n&nbsp; \n\n\nScenario 2c: Invoice External Billing Documents - Confirm payments using bank statements\n----------------------------------------------------------------------------------------\n\nScenario steps:\n1. Read previous bank statement to get the last closing balance (Business object *HouseBankStatement*)\n2. Get open items to be cleared and create BAI2 bank statement file\n\t- Get the clearing house statement from scenario *Invoice External Billing Documents - Pre-confirm payments using clearing house statements* and create a suitable bank statement file\n\t- Use the closing balance of step 1 as opening balance of the bank statement file\n3. Get company house bank account (Business object *HouseBankAccount*)\n4. Get company payment file register (Business object *CompanyPaymentFileRegister*)\n5. Create incoming file using the file of step 2 (Business object *CompanyPaymentFileRegister*)\n6. Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*) \n7. ByD UI: Open work center view *Liquidity Management - Bank Statements*, select the bank statement created in step 6, click on *Required* in column *Postprocessing*, select *Actions* > *Import clearing house statement* and select the clearing house statement selected in step 2. Check and post the allocation.\n\n&nbsp; \n\n\nScenario 3: Create Sales Order (nested create)\n----------------------------------------------\n\nScenario steps:  \n1. Create an internet sales order (sales order) with service item\n2. Get and check the sales order\n3. Release the customer request (submit the internet order)\n4. Release the sales order\n5. Get and check the sales order\n\n&nbsp; \n\n\nScenario 4: Create Sales Order using batch\n------------------------------------------\n\nScenario steps:  \n1. Create 2 sales orders and get the sales order data in one batch request\n\n&nbsp; \n\n\nScenario 5: Create Sales Order node by node\n-------------------------------------------\n\nScenario steps:  \n1. Create sales order\n2. Add sales unit\n3. Add account (buyer party)\n4. Update pricing terms\n5. Create an sales order item\n6. Update the item product\n7. Update item quantity (item schedule line)\n8. Release the customer request (submit the internet order)\n9. Get and check the sales order\n\n&nbsp; \n\n\nScenario 6: Create Sales Order with Attachments\n-----------------------------------------------\n\nScenario steps:  \n1. Create a sales order with attachments on header and item level\n2. Get the sales order\n3. Get the item attachment\n4. Delete the item attachment\n5. Add a new item attachment\n\nRemark:  \nThe attachment binaries are Base64-encodes files (here: base64-encoded images of a document icon, icecream and shoes).\n\n&nbsp; \n\n\nScenario 7: Create Sales Order with price components (net)\n----------------------------------------------------------\n\nScenario steps:  \n1. Create sales order with net pricing\n2. Get sales order with item price components\n3. Update item tax code\n4. Create custom list price for item 10\n5. Create further item price components: product discount, surcharge, surcharge (%)\n6. Get sales order with header price components\n7. Create header price components: overall discount, freight surcharge, surcharge\n\n&nbsp; \n\n\nScenario 8: Create Sales Order with price components (gross)\n------------------------------------------------------------\n\nScenario steps:  \n1. Create sales order with gross pricing\n2. Get sales order with item price components\n3. Update item tax code\n4. Create custom gross list price for item 10\n5. Create further item gross price components: product discount, surcharge, surcharge (%)\n6. Get sales order with header price components\n7. Create header gross price components: overall discount, freight surcharge, surcharge\n\n&nbsp; \n\n\nScenario 9: Miscellaneous Samples\n---------------------------------\n\nScenario steps:  \n1. Get metadata\n2. Get codelist for currency codes\n3. Get code list for item processing type codes\n2. Get sales orders using filter parameters\n2. Get sales orders using search parameters\n3. Get sales orders using a sales order query function import\n4. Get payments (new payment monitor)",
+		"description": "# SAP Business ByDesign API Samples - Sales and Commerce Scenarios\n\nThis Postman collection contains examples to create, change and read business objects and to run end-to-end business processes using *SAP Business ByDesign Custom OData Services*.  \nEach collection folder corresponds to a business scenario; execute the web service requests in the listed order within each folder.\n\nAll sample data is aligned to and ready to run on *SAP Business ByDesign Partner Demo Tenants (Full scope US)* with preconfigured and loaded sample data provided by SAP.\n\n**Web services and User:**\n\nThe OData services used in this collection require a SAP ByDesign business user for authorization.\n\nSAP ByDesign business objects provide defaulting capabilities based on the organizational assignment of the user logged in. In many sample OData requests I use this defaulting to keep the OData requests simple.  \nTherefore, assign the employee or service agent that is associated to your business user to the organizational unit *A1100* and job *System Administrator* to ensure proper defaulting based on your organizational assignment.\n\nThe OData requests in this collection use the following SAP Bydesign *Custom OData Services* assigned to the work center views in column *User authorization*. Assign the listed SAP ByDesign Work Center Views to your business user:\n\n| Custom OData Service | User authorization (ByD Work Center View) |\n| --- | --- |\n| *khsalesorder* | *Sales Orders - Sales Orders* |\n| *khcustomerinvoicerequest* | *Customer Invoicing - Invoice Requests* |\n| *khcustomerinvoice* | *Customer Invoicing - Invoice Documents* |\n| *khcustomerreturn* | *Sales Orders - Returns* |\n| *khoutbounddeliveryrequest* | *Outbound Logistics - Delivery Proposals* |\n| *khoutbounddelivery* | *Outbound Logistics - Outbound Deliveries* |\n| *khinbounddelivery* | *Inbound Logistics - Inbound Delivery Notifications* |\n| *khconfirmedinbounddelivery* | *Inbound Logistics - Inbound Deliveries* |\n| *khhousebankaccount* | *Liquidity Management - My Banks* |\n| *khcompanypaymentfileregister* | *Liquidity Management - Inbound Files* |\n| *khhousebankstatement* | *Liquidity Management - Bank Statements* |\n| *khpayment* | *Payment Management - Payment Monitor* |\n| *khpaymentorderprocessingstatement* | *Payment Management - Clearing House Statements* |\n\nAdditionally this collection uses the SOAP Web Service APIs:\n\n*   *Manage Sales Orders* (required because external payment information cannot be created using OData)\n*   *Manage Customer Invoice Requests* (required because external payment information cannot be created using OData)\n\nSteps to configure SOAP the Web Service APIs:\n\n1.  Work center view *Application and User Management - Communication Systems*: Create a communication system\n2.  Work center view *Application and User Management - Communication Scenarios*: Create a communication scenario with web service APIs listed above\n3.  Work center view *Application and User Management - Communication Arrangements*: Create communication arrangement for your scenario of step 2, the communication system of step 1 and enter the credentials\n\n**Business Configuration:**\n\nThe following fine tuning settings are required additionally to the preconfigured and loaded sample data provided by the SAP Business ByDesign Partner Demo Tenant.\n\nConfigure the determination methode for external references:  \nByD work center *Business Configuration*: Open the fine tuning activity *External Reference Number Determination for Customer Invoice* and set the determination method to *Copied from Predecessor Reference ID*.\n\nCreate company payment file register:  \nOpen work center view *Liquidity Management - Inbound Files*, click on *New* > *Inbound File* and enter the following values:  \n*Type: Bank Statement* | *Company: 1000* | *Bank ID: 1000002* | *Import Format: BAI2 US*.  \nSave without adding an attachment.  \nThe system created a company payment file register for company 1000 that can now be used for file uploads via OData.\n\nThe bank statements created in this collection are automatically allocated if you apply the following fine tuning settings:\n\n1.  Fine-Tuning activity *Automatically Generated Bank Statements* > *Assign import formats for bank statements*:  \n    Add row using the values: *Company ID: 1000* | *Bank ID: 1000002* | *Bank Statement Format: 02 - BAI2 US*\n    \n2.  Fine-Tuning activity *Settings for Posting Automatically Generated Bank Statements*:  \n    Add row using the values: Seq.: 1 | Company: 1000 | Bank Country: \\* | Bank ID: \\* | Currency: \\* | Bank Account ID: \\* | Manual Post Necessary: False\n    \n3.  Fine-Tuning activity *Global Settings for Payment* > *Create and edit rules for analyzing memo lines*:  \n    Add a rules:\n    \n    *   Rule 1: *Description: Customer Return External Reference* | *Rule Type: 13* | *Rule Definition Mode: Expert* | *Regular Expression: (E-CRN-\\\\d{4}-\\\\d{2}-\\\\d{4}\\\\d{1,2}\\\\d{1,2}\\\\d{2}\\\\d{2}\\\\d{2})*\n    *   Rule 2: *Description: Sales Order External Payment* | *Rule Type: 14* | *Rule Definition Mode: Expert* | *Regular Expression: (E-PAYTAREF-\\\\d{4}\\\\d{1,2}\\\\d{1,2}\\\\d{2}\\\\d{2}\\\\d{2})*\n4.  Fine-Tuning activity *Automatically Generated Bank Statements* > *Edit import formats for automatic generated bank statements*:  \n    Add two rows to Import Format \"02 - BAI2 US\":\n    \n    *   Transaction code assignment 1: *External Transaction Code: 399* | *Description: Miscellaneous Credit* | *Debit/Credit: Increase* | *Payment Method: Payment Processing - Of Incoming External Payment*\n        \n    *   Transaction code assignment 2: *External Transaction Code: 699* | *Description: Miscellaneous Debit* | *Debit/Credit: Decrease* | *Payment Method: Payment Processing - Of Outgoing Direct Debit*\n        \n        Remark: Basically you can use any external transaction codes, you just have to make sure that the transaction codes match the codes used to create the bank statement file. The setting of transaction code assignment 2 is required to trigger the automated allocation of the bank statement line item to the credit memo open item related to customer returns (customer returns do not yet result in payments in transfer, but remain open items).\n        \n\n**New Payment Register/Payment Monitor:**\n\nOData access to the SAP ByDesign *Payment Monitor* (business object *PaymentRegister*) requires to activate the new high-performance payment register/payment monitor.\n\nYou can check if the new payment monitor is already active in your system by sending the following request:  \nPostman collection *Sales and Commerce Scenarios* > folder *Miscellaneous Samples* > request *Get payments (new payment monitor)*.  \nThe OData service request retrieves all payment register entries of the last 30 days; if the OData service response is empty and you see some entries in the payment monitor in ByD work center view *Payment Management - Payment Monitor*, then the new payment register is not active in your system.\n\nYou can request to activate the new payment register by creating an SAP ByDesign incident.\n\n**Additional Information:**  \nThe sales order origin type (*DataOriginTypeCode*) can be used integrate webshops with ByD. Relevant code values for the examples in collection are *1 - Manual data entry* and *4 - Internet order (webshop integration)*.  \nCompare blog post [Create ByD Sales Orders using Web Services](https://blogs.sap.com/2017/08/10/create-byd-sales-orders-using-web-services/) for more details.\n\n## Scenario 1a: eCommerce - Sell from stock with external payment\n\nScenario steps:\n\n1.  Create and release sales order with external payment information (SOAP Web Service API)\n2.  Get and check delivery proposal (Business object *OutboundDeliveryRequest*)\n3.  Post goods issue\n4.  Get, check and release outbound delivery (Business object *OutboundDelivery*)\n5.  Get, check and release the customer invoice request\n6.  Get, check and release customer invoice\n7.  Check sales order status\n\nIf the availability check fails, you can fill up your stock using Postman collection **End-to-End Scenarios** and scenario **Procure to Stock**.\n\nPayments in transfer created by this scenario can be confirmed using scenario **eCommerce - Confirm payments using bank statements**.\n\n## Scenario 1b: eCommerce - Customer return to stock\n\nScenario steps:\n\n1.  Get and check the sales order and outbound delivery from scenario *eCommerce - Sell from stock with external payment*\n2.  Create customer return notification (Business object *InboundDelivery*)\n3.  Post goods receipt and check the confirmed inbound delivery (Business object *ConfirmedInboundDelivery*)\n4.  Get and release the customer return\n5.  Get the customer invoice request (credit memo) and update the payment reference (needed to allocate the bank statement line item)\n6.  Get and release the customer credit memo\n7.  Check the status of the customer return\n\nOpen items created by this scenario can be cleared using scenario **eCommerce - Confirm payments using bank statements**.\n\n## Scenario 1c: eCommerce - Confirm payments using bank statements\n\nScenario steps:\n\n1.  Read previous bank statement to get the last closing balance (Business object *HouseBankStatement*)\n    \n2.  Get open items to be cleared and create BAI2 bank statement file\n    \n    *   Get the customer invoice from scenario *eCommerce - Sell from stock with external payment* and the credit memo of scenario *eCommerce - Customer return to stock* and create a suitable bank statement file\n    *   Use the closing balance of step 1 as opening balance of the bank statement file\n3.  Get company house bank account (Business object *HouseBankAccount*)\n    \n4.  Get company payment file register (Business object *CompanyPaymentFileRegister*)\n    \n5.  Create incoming file using the file of step 2 (Business object *CompanyPaymentFileRegister*)\n    \n6.  Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*)\n    \n\n## Scenario 2a: Invoice External Billing Documents - Customer invoice with external payment\n\nScenario steps:\n\n1.  Create and release external customer invoice with external payment information (SOAP Web Service API)\n2.  Get and check the customer invoice request\n3.  Get and check the customer invoice\n\nPayments in transfer created by this scenario can be pre-confirmed using scenario **Invoice External Billing Documents - Pre-confirm payments using clearing house statements** and finally confirmed using scenario **Invoice External Billing Documents - Confirm payments using bank statements**.\n\n## Scenario 2b: Invoice External Billing Documents - Pre-confirm payments using clearing house statements\n\nScenario steps:\n\n1.  Get customer invoice (payments in transfer) and create clearing house statement file (Get the customer invoice from scenario *Invoice External Billing Documents - Customer invoice with external payment* and create a suitable clearing house statement file).  \n    Alternative in scenario **Invoice External Billing Documents - Pre-confirm payments using clearing house statements**: Get payments in transfer from the payment monitor (Business object *Payment*) and create clearing house statement file.\n2.  Get company payment file register (Business object *CompanyPaymentFileRegister*)\n3.  Create incoming file using the file of step 1 (Business object *CompanyPaymentFileRegister*)\n4.  Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*)\n5.  Check file upload status\n\nPayments pre-confirmed by this scenario can be confirmed using scenario **Invoice External Billing Documents - Confirm payments using bank statements**.\n\n## Scenario 2c: Invoice External Billing Documents - Confirm payments using bank statements\n\nScenario steps:\n\n1.  Read previous bank statement to get the last closing balance (Business object *HouseBankStatement*)\n    \n2.  Get open items to be cleared and create BAI2 bank statement file\n    \n    *   Get the clearing house statement from scenario *Invoice External Billing Documents - Pre-confirm payments using clearing house statements* and create a suitable bank statement file\n    *   Use the closing balance of step 1 as opening balance of the bank statement file\n3.  Get company house bank account (Business object *HouseBankAccount*)\n    \n4.  Get company payment file register (Business object *CompanyPaymentFileRegister*)\n    \n5.  Create incoming file using the file of step 2 (Business object *CompanyPaymentFileRegister*)\n    \n6.  Trigger file upload (Alternatively start the file upload via ByD work center view *Liquidity Management - Inbound Files*)\n    \n7.  ByD UI: Open work center view *Liquidity Management - Bank Statements*, select the bank statement created in step 6, click on *Required* in column *Postprocessing*, select *Actions* > *Import clearing house statement* and select the clearing house statement selected in step 2. Check and post the allocation.\n    \n\n## Scenario 3: Create Sales Order (nested create)\n\nScenario steps:\n\n1.  Create an internet sales order (sales order) with service item\n2.  Get and check the sales order\n3.  Release the customer request (submit the internet order)\n4.  Release the sales order\n5.  Get and check the sales order\n\n## Scenario 4: Create Follow-up Sales Order\n\nScenario steps:\n\n1.  Create a sales order\n2.  Release the sales order\n3.  Get and check the sales order\n4.  Create a new follow-up sales order with minimum header data only\n5.  Add the first sales order as reference to the follow-up sales order and copy the data from the first sales order\n6.  Get and check the follow-up sales order\n\n## Scenario 5: Create Sales Order using batch\n\nScenario steps:\n\n1.  Create 2 sales orders and get the sales order data in one batch request\n\n## Scenario 6: Create Sales Order node by node\n\nScenario steps:\n\n1.  Create sales order\n2.  Add sales unit\n3.  Add account (buyer party)\n4.  Update pricing terms\n5.  Create an sales order item\n6.  Update the item product\n7.  Update item quantity (item schedule line)\n8.  Release the customer request (submit the internet order)\n9.  Get and check the sales order\n\n## Scenario 7: Create Sales Order with Attachments\n\nScenario steps:\n\n1.  Create a sales order with attachments on header and item level\n2.  Get the sales order\n3.  Get the item attachment\n4.  Delete the item attachment\n5.  Add a new item attachment\n\nRemark:  \nThe attachment binaries are Base64-encodes files (here: base64-encoded images of a document icon, icecream and shoes).\n\n## Scenario 8: Create Sales Order with price components (net)\n\nScenario steps:\n\n1.  Create sales order with net pricing\n2.  Get sales order with item price components\n3.  Update item tax code\n4.  Create custom list price for item 10\n5.  Create further item price components: product discount, surcharge, surcharge (%)\n6.  Get sales order with header price components\n7.  Create header price components: overall discount, freight surcharge, surcharge\n\n## Scenario 9: Create Sales Order with price components (gross)\n\nScenario steps:\n\n1.  Create sales order with gross pricing\n2.  Get sales order with item price components\n3.  Update item tax code\n4.  Create custom gross list price for item 10\n5.  Create further item gross price components: product discount, surcharge, surcharge (%)\n6.  Get sales order with header price components\n7.  Create header gross price components: overall discount, freight surcharge, surcharge\n\n## Scenario 10: Miscellaneous Samples\n\nScenario steps:\n\n1.  Get metadata\n2.  Get codelist for currency codes\n3.  Get code list for item processing type codes\n4.  Get sales orders using filter parameters\n5.  Get sales orders using search parameters\n6.  Get sales orders using a sales order query function import\n7.  Get payments (new payment monitor)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -18,7 +18,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
 										"exec": [
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 											"",
@@ -32,7 +31,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "4b5f4d9c-55db-4cb2-a6b6-ffc9e31c7d2b",
 										"exec": [
 											"//Initialize dynamic environment variables",
 											"pm.environment.set(\"x-csrf-token\", \"\");",
@@ -80,7 +78,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "691edeb4-7bfd-4e5f-8c75-c140cf9f04a2",
 										"exec": [
 											"let jsonResponse = xml2Json(responseBody);",
 											"pm.environment.set(\"SalesOrderID\", jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:SalesOrderBundleMaintainConfirmation_sync'].SalesOrder.ID);",
@@ -99,7 +96,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "3e65b165-9326-4ac2-9a90-37c0ed7a5612",
 										"exec": [
 											"// Set External Reference",
 											"let todayDateTime = (new Date()).toISOString().substr(0,19);",
@@ -183,70 +179,7 @@
 									]
 								}
 							},
-							"response": [
-								{
-									"name": "Create production proposal (Soap 1.1)",
-									"originalRequest": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "text/xml"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:glob=\"http://sap.com/xi/SAPGlobal20/Global\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <glob:CreateProductionProposal>\r\n         <CreateProductionPlanningOrder>\r\n            <SequenceNumber>1</SequenceNumber>\r\n            <SupplyPlanningAreaID>P1100</SupplyPlanningAreaID>\r\n            <MaterialID>P100101</MaterialID>\r\n            <!-- <ProductRequirementSpecificationID>?</ProductRequirementSpecificationID> -->\r\n            <MaterialAvailabilityDateTime timeZoneCode=\"CET\">2019-02-05T12:00:00.0000000Z</MaterialAvailabilityDateTime>\r\n            <Quantity unitCode=\"EA\">1</Quantity>\r\n            <QuantityTypeCode>EA</QuantityTypeCode>\r\n         </CreateProductionPlanningOrder>\r\n      </glob:CreateProductionProposal>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>"
-										},
-										"url": {
-											"raw": "https://{{TenantHostname}}/sap/bc/srt/scs/sap/manageproductionproposalin",
-											"protocol": "https",
-											"host": [
-												"{{TenantHostname}}"
-											],
-											"path": [
-												"sap",
-												"bc",
-												"srt",
-												"scs",
-												"sap",
-												"manageproductionproposalin"
-											]
-										}
-									},
-									"status": "Unauthorized",
-									"code": 401,
-									"_postman_previewlanguage": "html",
-									"header": [
-										{
-											"key": "content-type",
-											"value": "text/html; charset=utf-8"
-										},
-										{
-											"key": "content-encoding",
-											"value": "gzip"
-										},
-										{
-											"key": "content-length",
-											"value": "505"
-										},
-										{
-											"key": "sap-system",
-											"value": "KHL"
-										},
-										{
-											"key": "www-authenticate",
-											"value": "Basic realm=\"SAP NetWeaver Application Server [KHL/171][alias]\""
-										},
-										{
-											"key": "strict-transport-security",
-											"value": "max-age=31536000; includeSubDomains"
-										}
-									],
-									"cookie": [],
-									"body": "<html>\n    <head>\n        <title>Logon Error Message</title>\n        <META http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n        <style type=\"text/css\">body { font-family:tahoma,helvetica,sans-serif;color:#333333;background-color:#FFFFFF; }td { font-family:tahoma,helvetica,sans-serif;font-size:70%;color:#333333; }h1 { font-family:tahoma,helvetica,sans-serif;font-size:160%;font-weight:bold;margin-top:15px;margin-bottom:3px;color:#003366; }h2 { font-family:verdana,helvetica,sans-serif;font-size:120%;font-style:italic;font-weight:bold;margin-top:6px;margin-bottom:6px;color:#999900; }p { font-family:tahoma,helvetica,sans-serif;color:#333333;margin-top:4px;margin-bottom:4px; }ul { font-family:tahoma,helvetica,sans-serif;color:#333333;list-style-type:square;margin-top:8px;margin-bottom:8px; }li { font-family:tahoma,helvetica,sans-serif;color:#33333;margin-top:4px; }.emphasize { color:#333333;background-color:#C8E3FF;padding:5px;}.note { color:#CC6600; }a { font-family:tahoma,helvetica,sans-serif;text-decoration:underline;color:#336699; }a:visited { color:#001166; }a:hover { text-decoration:none; }</style>\n    </head>\n    <body>\n        <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n            <tr>\n                <td>\n                    <h1>Logon failed</h1>\n                </td>\n            </tr>\n        </table>\n    </body>\n</html>"
-								}
-							]
+							"response": []
 						},
 						{
 							"name": "Get sales order",
@@ -254,7 +187,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 											"",
@@ -320,7 +252,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"OutboundDeliveryRequestObjectID\", jsonResponse.d.results[0].ObjectID);",
@@ -337,7 +268,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ca5c4394-50ed-4a15-8273-0397c44b5a57",
 										"exec": [
 											"// Delay and let the system complete the async. integration",
 											"setTimeout(function() {}, 6000); // wait 6 sec"
@@ -398,7 +328,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -463,7 +392,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -478,7 +406,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "f4250237-33ad-4ff1-98bb-4ffb6dd02d19",
 										"exec": [
 											""
 										],
@@ -559,7 +486,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"OutboundDeliveryObjectID\", jsonResponse.d.results[0].ObjectID);",
@@ -630,7 +556,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -696,7 +621,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -711,7 +635,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "f4250237-33ad-4ff1-98bb-4ffb6dd02d19",
 										"exec": [
 											""
 										],
@@ -762,7 +685,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -780,7 +702,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "546de23c-d88a-4193-ac90-d23d098e2b99",
 										"exec": [
 											"// Delay release of customer invoice request and let the system complete the async. integration between sales order and customer invoicing",
 											"setTimeout(function() {}, 6000); // wait 6 sec"
@@ -836,7 +757,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"// Validations",
 											"var jsonResponse = pm.response.json();",
@@ -849,7 +769,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "0d693a90-cc3f-4ca6-af65-cec87c532376",
 										"exec": [
 											""
 										],
@@ -904,7 +823,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -967,7 +885,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"CustomerInvoiceObjectID\", jsonResponse.d.results[0].ObjectID);",
@@ -1039,7 +956,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"// Validations",
 											"var jsonResponse = pm.response.json();",
@@ -1053,7 +969,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "67586dee-65df-4f49-ad4b-bf4ca694e3d7",
 										"exec": [
 											""
 										],
@@ -1104,7 +1019,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -1165,7 +1079,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 											"",
@@ -1189,7 +1102,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8e99ae63-a267-44da-a0d7-57459558a926",
 										"exec": [
 											"// Delay and let the system complete the async. integration ",
 											"setTimeout(function() {}, 5000); // wait 5 sec"
@@ -1239,9 +1151,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Customer return to stock",
@@ -1252,7 +1162,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 											"",
@@ -1282,7 +1191,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8e99ae63-a267-44da-a0d7-57459558a926",
 										"exec": [
 											""
 										],
@@ -1337,7 +1245,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"OutboundDeliveryObjectID\", jsonResponse.d.results[0].ObjectID);",
@@ -1408,7 +1315,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -1476,7 +1382,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"InboundDeliveryNotificationObjectID\", jsonResponse.d.results.ObjectID);",
@@ -1493,7 +1398,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 										"exec": [
 											"// Set inbound delivery notification ID of pattern R-CRN-<SalesOrderID-ItemID>-DateTime",
 											"let todayDateTime = (new Date()).toISOString().substr(0,19);",
@@ -1551,7 +1455,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 											"",
@@ -1613,7 +1516,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"// Validations",
 											"var jsonResponse = pm.response.json();",
@@ -1628,7 +1530,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8a3f7470-2b39-44aa-8f5f-4ef0f66df2cb",
 										"exec": [
 											""
 										],
@@ -1679,7 +1580,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"",
 											"var jsonResponse = pm.response.json();",
@@ -1697,7 +1597,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "4089e172-5058-427e-bfb0-48b581a30fa8",
 										"exec": [
 											"// Delay and let the system complete the async. process integrations",
 											"setTimeout(function() {}, 3000); // wait 3 sec"
@@ -1763,7 +1662,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"",
 											"var jsonResponse = pm.response.json();",
@@ -1830,7 +1728,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -1847,7 +1744,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "4089e172-5058-427e-bfb0-48b581a30fa8",
 										"exec": [
 											"// Delay and let the system complete the async. process integrations",
 											"setTimeout(function() {}, 6000); // wait 6 sec"
@@ -1913,7 +1809,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"let jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -1978,7 +1873,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"// Validations",
 											"var jsonResponse = pm.response.json();",
@@ -1995,7 +1889,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8a3f7470-2b39-44aa-8f5f-4ef0f66df2cb",
 										"exec": [
 											""
 										],
@@ -2046,7 +1939,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -2066,7 +1958,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "546de23c-d88a-4193-ac90-d23d098e2b99",
 										"exec": [
 											"// Delay release of customer invoice request and let the system complete the async. integration between sales order and customer invoicing",
 											"setTimeout(function() {}, 6000); // wait 6 sec"
@@ -2084,7 +1975,7 @@
 									}
 								],
 								"url": {
-									"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerinvoicerequest/CustomerInvoiceRequestCollection?$format=json&$expand=Item/ItemBusinessTransactionDocumentReference,PaymentControl/PaymentControlExternalPayment&$filter=BaseBusinessTransactionDocumentID eq '{{CustomerReturnID}}' and BaseBusinessTransactionDocumentTypeCode eq '32'",
+									"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khcustomerinvoicerequest/CustomerInvoiceRequestCollection?$format=json&$expand=Item/ItemBusinessTransactionDocumentReference,PaymentControl&$filter=BaseBusinessTransactionDocumentID eq '{{CustomerReturnID}}' and BaseBusinessTransactionDocumentTypeCode eq '32'",
 									"protocol": "https",
 									"host": [
 										"{{TenantHostname}}"
@@ -2105,7 +1996,7 @@
 										},
 										{
 											"key": "$expand",
-											"value": "Item/ItemBusinessTransactionDocumentReference,PaymentControl/PaymentControlExternalPayment"
+											"value": "Item/ItemBusinessTransactionDocumentReference,PaymentControl"
 										},
 										{
 											"key": "$filter",
@@ -2122,7 +2013,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7f6d5ad4-b168-4662-b4f9-8e2bfcf53877",
 										"exec": [
 											"// Validations",
 											"pm.test(\"Payment control updated\", function () { pm.response.to.have.status(204) });"
@@ -2133,7 +2023,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "e5abab81-f93e-4071-98f6-9f16f29b5651",
 										"exec": [
 											"let todayDateTime = (new Date()).toISOString().substr(0,19);",
 											"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");",
@@ -2206,7 +2095,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"// Validations",
 											"var jsonResponse = pm.response.json();",
@@ -2219,7 +2107,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "0d693a90-cc3f-4ca6-af65-cec87c532376",
 										"exec": [
 											""
 										],
@@ -2274,7 +2161,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -2337,7 +2223,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"CustomerInvoiceObjectID\", jsonResponse.d.results[0].ObjectID);",
@@ -2409,7 +2294,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"// Validations",
 											"var jsonResponse = pm.response.json();",
@@ -2423,7 +2307,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "67586dee-65df-4f49-ad4b-bf4ca694e3d7",
 										"exec": [
 											""
 										],
@@ -2474,7 +2357,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -2535,7 +2417,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"let jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -2594,9 +2475,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Confirm payments using bank statements",
@@ -2607,7 +2486,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4530b231-dcf4-4213-a5b0-ddc302f05671",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -2631,7 +2509,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "b3104f97-6b51-45d9-b75c-e93d5dbf90a5",
 										"exec": [
 											"// Initialize variables of the last bank statement",
 											"// These values apply if no bank statement has been posted before",
@@ -2698,7 +2575,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -2776,7 +2652,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "81136713-2039-47d6-8e37-0e7919c4abde",
 										"exec": [
 											"// Functions to create BAI2 bank statement file",
 											"postman.setGlobalVariable(\"BAI2StmtWriter\", function BAI2StmtWriter() {",
@@ -2955,7 +2830,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -3026,7 +2900,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -3082,7 +2955,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -3148,7 +3020,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"",
 											"var jsonResponse = pm.response.json();",
@@ -3210,7 +3081,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"IncomingFileObjectID\", jsonResponse.d.results.ObjectID);",
@@ -3226,7 +3096,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -3281,7 +3150,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -3296,7 +3164,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1cd91b58-00be-42d7-b851-ed2a9de347dd",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -3349,7 +3216,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -3370,7 +3236,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff74d5bf-5f46-47f2-a699-d12bf2ddc3da",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -3433,7 +3298,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4530b231-dcf4-4213-a5b0-ddc302f05671",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -3459,7 +3323,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "b3104f97-6b51-45d9-b75c-e93d5dbf90a5",
 										"exec": [
 											""
 										],
@@ -3516,12 +3379,9 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Invoice External Billing Documents",
@@ -3535,7 +3395,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "691edeb4-7bfd-4e5f-8c75-c140cf9f04a2",
 										"exec": [
 											"let jsonResponse = xml2Json(responseBody);",
 											"pm.environment.set(\"CustomerInvoiceRequestID\", jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:CustomerInvoiceRequestBundleMaintainConfirmation_sync'].CustomerInvoiceRequest.BaseBusinessTransactionDocumentID);",
@@ -3553,7 +3412,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "3e65b165-9326-4ac2-9a90-37c0ed7a5612",
 										"exec": [
 											"let todayDateTime = (new Date()).toISOString().substr(0,19);",
 											"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");",
@@ -3632,70 +3490,7 @@
 									]
 								}
 							},
-							"response": [
-								{
-									"name": "Create production proposal (Soap 1.1)",
-									"originalRequest": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "text/xml"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:glob=\"http://sap.com/xi/SAPGlobal20/Global\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <glob:CreateProductionProposal>\r\n         <CreateProductionPlanningOrder>\r\n            <SequenceNumber>1</SequenceNumber>\r\n            <SupplyPlanningAreaID>P1100</SupplyPlanningAreaID>\r\n            <MaterialID>P100101</MaterialID>\r\n            <!-- <ProductRequirementSpecificationID>?</ProductRequirementSpecificationID> -->\r\n            <MaterialAvailabilityDateTime timeZoneCode=\"CET\">2019-02-05T12:00:00.0000000Z</MaterialAvailabilityDateTime>\r\n            <Quantity unitCode=\"EA\">1</Quantity>\r\n            <QuantityTypeCode>EA</QuantityTypeCode>\r\n         </CreateProductionPlanningOrder>\r\n      </glob:CreateProductionProposal>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>"
-										},
-										"url": {
-											"raw": "https://{{TenantHostname}}/sap/bc/srt/scs/sap/manageproductionproposalin",
-											"protocol": "https",
-											"host": [
-												"{{TenantHostname}}"
-											],
-											"path": [
-												"sap",
-												"bc",
-												"srt",
-												"scs",
-												"sap",
-												"manageproductionproposalin"
-											]
-										}
-									},
-									"status": "Unauthorized",
-									"code": 401,
-									"_postman_previewlanguage": "html",
-									"header": [
-										{
-											"key": "content-type",
-											"value": "text/html; charset=utf-8"
-										},
-										{
-											"key": "content-encoding",
-											"value": "gzip"
-										},
-										{
-											"key": "content-length",
-											"value": "505"
-										},
-										{
-											"key": "sap-system",
-											"value": "KHL"
-										},
-										{
-											"key": "www-authenticate",
-											"value": "Basic realm=\"SAP NetWeaver Application Server [KHL/171][alias]\""
-										},
-										{
-											"key": "strict-transport-security",
-											"value": "max-age=31536000; includeSubDomains"
-										}
-									],
-									"cookie": [],
-									"body": "<html>\n    <head>\n        <title>Logon Error Message</title>\n        <META http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n        <style type=\"text/css\">body { font-family:tahoma,helvetica,sans-serif;color:#333333;background-color:#FFFFFF; }td { font-family:tahoma,helvetica,sans-serif;font-size:70%;color:#333333; }h1 { font-family:tahoma,helvetica,sans-serif;font-size:160%;font-weight:bold;margin-top:15px;margin-bottom:3px;color:#003366; }h2 { font-family:verdana,helvetica,sans-serif;font-size:120%;font-style:italic;font-weight:bold;margin-top:6px;margin-bottom:6px;color:#999900; }p { font-family:tahoma,helvetica,sans-serif;color:#333333;margin-top:4px;margin-bottom:4px; }ul { font-family:tahoma,helvetica,sans-serif;color:#333333;list-style-type:square;margin-top:8px;margin-bottom:8px; }li { font-family:tahoma,helvetica,sans-serif;color:#33333;margin-top:4px; }.emphasize { color:#333333;background-color:#C8E3FF;padding:5px;}.note { color:#CC6600; }a { font-family:tahoma,helvetica,sans-serif;text-decoration:underline;color:#336699; }a:visited { color:#001166; }a:hover { text-decoration:none; }</style>\n    </head>\n    <body>\n        <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n            <tr>\n                <td>\n                    <h1>Logon failed</h1>\n                </td>\n            </tr>\n        </table>\n    </body>\n</html>"
-								}
-							]
+							"response": []
 						},
 						{
 							"name": "Get customer invoice request",
@@ -3703,7 +3498,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -3723,7 +3517,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "546de23c-d88a-4193-ac90-d23d098e2b99",
 										"exec": [
 											""
 										],
@@ -3778,7 +3571,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"CustomerInvoiceObjectID\", jsonResponse.d.results[0].ObjectID);",
@@ -3849,7 +3641,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -3904,9 +3695,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Pre-confirm payments using clearing house statements",
@@ -3917,7 +3706,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -3986,7 +3774,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "81136713-2039-47d6-8e37-0e7919c4abde",
 										"exec": [
 											"// Functions to create Clearing House Statement file",
 											"postman.setGlobalVariable(\"ClearingHouseStatementWriter\", function ClearingHouseStatementWriter() {",
@@ -4143,7 +3930,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -4214,7 +4000,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -4280,7 +4065,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"",
 											"var jsonResponse = pm.response.json();",
@@ -4342,7 +4126,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"IncomingFileObjectID\", jsonResponse.d.results.ObjectID);",
@@ -4359,7 +4142,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 										"exec": [
 											""
 										],
@@ -4412,7 +4194,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -4427,7 +4208,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1cd91b58-00be-42d7-b851-ed2a9de347dd",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -4480,7 +4260,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -4501,7 +4280,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff74d5bf-5f46-47f2-a699-d12bf2ddc3da",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -4558,9 +4336,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Confirm payments using bank statements",
@@ -4571,7 +4347,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4530b231-dcf4-4213-a5b0-ddc302f05671",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -4595,7 +4370,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "b3104f97-6b51-45d9-b75c-e93d5dbf90a5",
 										"exec": [
 											"// Initialize variables of the last bank statement",
 											"// These values apply if no bank statement has been posted before",
@@ -4662,7 +4436,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -4743,7 +4516,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "81136713-2039-47d6-8e37-0e7919c4abde",
 										"exec": [
 											"// Functions to create BAI2 bank statement file",
 											"postman.setGlobalVariable(\"BAI2StmtWriter\", function BAI2StmtWriter() {",
@@ -4917,7 +4689,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -4988,7 +4759,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -5044,7 +4814,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -5110,7 +4879,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"",
 											"var jsonResponse = pm.response.json();",
@@ -5172,7 +4940,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"IncomingFileObjectID\", jsonResponse.d.results.ObjectID);",
@@ -5188,7 +4955,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 										"exec": [
 											""
 										],
@@ -5241,7 +5007,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -5256,7 +5021,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1cd91b58-00be-42d7-b851-ed2a9de347dd",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -5309,7 +5073,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -5330,7 +5093,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff74d5bf-5f46-47f2-a699-d12bf2ddc3da",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -5393,7 +5155,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4530b231-dcf4-4213-a5b0-ddc302f05671",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -5419,7 +5180,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "b3104f97-6b51-45d9-b75c-e93d5dbf90a5",
 										"exec": [
 											""
 										],
@@ -5476,12 +5236,9 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Invoice External Billing Documents with Payment Monitor",
@@ -5495,7 +5252,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "691edeb4-7bfd-4e5f-8c75-c140cf9f04a2",
 										"exec": [
 											"let jsonResponse = xml2Json(responseBody);",
 											"pm.environment.set(\"CustomerInvoiceRequestID\", jsonResponse['soap-env:Envelope']['soap-env:Body']['n0:CustomerInvoiceRequestBundleMaintainConfirmation_sync'].CustomerInvoiceRequest.BaseBusinessTransactionDocumentID);",
@@ -5513,7 +5269,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "3e65b165-9326-4ac2-9a90-37c0ed7a5612",
 										"exec": [
 											"let todayDateTime = (new Date()).toISOString().substr(0,19);",
 											"todayDateTime = todayDateTime.replace(\"-\",\"\").replace(\"-\",\"\").replace(\"T\",\"\").replace(\":\",\"\").replace(\":\",\"\");",
@@ -5592,70 +5347,7 @@
 									]
 								}
 							},
-							"response": [
-								{
-									"name": "Create production proposal (Soap 1.1)",
-									"originalRequest": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "text/xml"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:glob=\"http://sap.com/xi/SAPGlobal20/Global\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <glob:CreateProductionProposal>\r\n         <CreateProductionPlanningOrder>\r\n            <SequenceNumber>1</SequenceNumber>\r\n            <SupplyPlanningAreaID>P1100</SupplyPlanningAreaID>\r\n            <MaterialID>P100101</MaterialID>\r\n            <!-- <ProductRequirementSpecificationID>?</ProductRequirementSpecificationID> -->\r\n            <MaterialAvailabilityDateTime timeZoneCode=\"CET\">2019-02-05T12:00:00.0000000Z</MaterialAvailabilityDateTime>\r\n            <Quantity unitCode=\"EA\">1</Quantity>\r\n            <QuantityTypeCode>EA</QuantityTypeCode>\r\n         </CreateProductionPlanningOrder>\r\n      </glob:CreateProductionProposal>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>"
-										},
-										"url": {
-											"raw": "https://{{TenantHostname}}/sap/bc/srt/scs/sap/manageproductionproposalin",
-											"protocol": "https",
-											"host": [
-												"{{TenantHostname}}"
-											],
-											"path": [
-												"sap",
-												"bc",
-												"srt",
-												"scs",
-												"sap",
-												"manageproductionproposalin"
-											]
-										}
-									},
-									"status": "Unauthorized",
-									"code": 401,
-									"_postman_previewlanguage": "html",
-									"header": [
-										{
-											"key": "content-type",
-											"value": "text/html; charset=utf-8"
-										},
-										{
-											"key": "content-encoding",
-											"value": "gzip"
-										},
-										{
-											"key": "content-length",
-											"value": "505"
-										},
-										{
-											"key": "sap-system",
-											"value": "KHL"
-										},
-										{
-											"key": "www-authenticate",
-											"value": "Basic realm=\"SAP NetWeaver Application Server [KHL/171][alias]\""
-										},
-										{
-											"key": "strict-transport-security",
-											"value": "max-age=31536000; includeSubDomains"
-										}
-									],
-									"cookie": [],
-									"body": "<html>\n    <head>\n        <title>Logon Error Message</title>\n        <META http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n        <style type=\"text/css\">body { font-family:tahoma,helvetica,sans-serif;color:#333333;background-color:#FFFFFF; }td { font-family:tahoma,helvetica,sans-serif;font-size:70%;color:#333333; }h1 { font-family:tahoma,helvetica,sans-serif;font-size:160%;font-weight:bold;margin-top:15px;margin-bottom:3px;color:#003366; }h2 { font-family:verdana,helvetica,sans-serif;font-size:120%;font-style:italic;font-weight:bold;margin-top:6px;margin-bottom:6px;color:#999900; }p { font-family:tahoma,helvetica,sans-serif;color:#333333;margin-top:4px;margin-bottom:4px; }ul { font-family:tahoma,helvetica,sans-serif;color:#333333;list-style-type:square;margin-top:8px;margin-bottom:8px; }li { font-family:tahoma,helvetica,sans-serif;color:#33333;margin-top:4px; }.emphasize { color:#333333;background-color:#C8E3FF;padding:5px;}.note { color:#CC6600; }a { font-family:tahoma,helvetica,sans-serif;text-decoration:underline;color:#336699; }a:visited { color:#001166; }a:hover { text-decoration:none; }</style>\n    </head>\n    <body>\n        <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n            <tr>\n                <td>\n                    <h1>Logon failed</h1>\n                </td>\n            </tr>\n        </table>\n    </body>\n</html>"
-								}
-							]
+							"response": []
 						},
 						{
 							"name": "Get customer invoice request",
@@ -5663,7 +5355,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -5683,7 +5374,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "546de23c-d88a-4193-ac90-d23d098e2b99",
 										"exec": [
 											""
 										],
@@ -5738,7 +5428,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"CustomerInvoiceObjectID\", jsonResponse.d.results[0].ObjectID);",
@@ -5809,7 +5498,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -5864,9 +5552,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Pre-confirm payments using clearing house statements",
@@ -5877,7 +5563,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -5941,7 +5626,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "81136713-2039-47d6-8e37-0e7919c4abde",
 										"exec": [
 											"// Set payments filter date: today (format: 2019-05-15T00:00:00.0000000Z)",
 											"let moment = require('moment');",
@@ -6105,7 +5789,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -6176,7 +5859,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -6242,7 +5924,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"",
 											"var jsonResponse = pm.response.json();",
@@ -6304,7 +5985,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"IncomingFileObjectID\", jsonResponse.d.results.ObjectID);",
@@ -6321,7 +6001,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 										"exec": [
 											""
 										],
@@ -6374,7 +6053,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -6389,7 +6067,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1cd91b58-00be-42d7-b851-ed2a9de347dd",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -6442,7 +6119,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -6463,7 +6139,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff74d5bf-5f46-47f2-a699-d12bf2ddc3da",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -6520,9 +6195,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Confirm payments using bank statements",
@@ -6533,7 +6206,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4530b231-dcf4-4213-a5b0-ddc302f05671",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -6557,7 +6229,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "b3104f97-6b51-45d9-b75c-e93d5dbf90a5",
 										"exec": [
 											"// Initialize variables of the last bank statement",
 											"// These values apply if no bank statement has been posted before",
@@ -6624,7 +6295,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -6705,7 +6375,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "81136713-2039-47d6-8e37-0e7919c4abde",
 										"exec": [
 											"// Functions to create BAI2 bank statement file",
 											"postman.setGlobalVariable(\"BAI2StmtWriter\", function BAI2StmtWriter() {",
@@ -6879,7 +6548,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -6950,7 +6618,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -7006,7 +6673,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -7072,7 +6738,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"",
 											"var jsonResponse = pm.response.json();",
@@ -7134,7 +6799,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"IncomingFileObjectID\", jsonResponse.d.results.ObjectID);",
@@ -7150,7 +6814,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 										"exec": [
 											""
 										],
@@ -7203,7 +6866,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"",
@@ -7218,7 +6880,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "1cd91b58-00be-42d7-b851-ed2a9de347dd",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -7271,7 +6932,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -7292,7 +6952,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "ff74d5bf-5f46-47f2-a699-d12bf2ddc3da",
 										"exec": [
 											"// Delay request\r",
 											"setTimeout(function() {}, 3000); // wait 3 sec\r",
@@ -7355,7 +7014,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4530b231-dcf4-4213-a5b0-ddc302f05671",
 										"exec": [
 											"var jsonResponse = pm.response.json();",
 											"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -7381,7 +7039,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "b3104f97-6b51-45d9-b75c-e93d5dbf90a5",
 										"exec": [
 											""
 										],
@@ -7438,12 +7095,9 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Create Sales Order using nested create",
@@ -7454,7 +7108,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -7473,7 +7126,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "4b5f4d9c-55db-4cb2-a6b6-ffc9e31c7d2b",
 								"exec": [
 									"//Initialize dynamic environment variables",
 									"pm.environment.set(\"x-csrf-token\", \"\");",
@@ -7522,7 +7174,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
 								"type": "text/javascript",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -7541,7 +7192,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "25c89d78-824a-437d-b5fc-b234e9389390",
 								"type": "text/javascript",
 								"exec": [
 									"//Initialize dynamic environment variables",
@@ -7595,7 +7245,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Get sales order ID and set variable for filtering",
 									"//var jsonResponse = xml2Json(responseBody);",
@@ -7623,7 +7272,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Set External Reference of pattern KH-<UTC datetime>",
 									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
@@ -7679,7 +7327,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -7753,7 +7400,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0b50fcc9-9d81-49c6-afe7-adf9c96a8a5d",
 								"type": "text/javascript",
 								"exec": [
 									"// Validations",
@@ -7810,7 +7456,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b54faab5-424f-444a-9ce5-6aa8297099ad",
 								"type": "text/javascript",
 								"exec": [
 									"// Validations",
@@ -7867,7 +7512,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7288997b-8a67-4eda-a761-852bea77f42f",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -7941,7 +7585,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "62e7970b-a897-41c8-8ea8-f2ce155983ea",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -7951,18 +7594,16 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f356b732-53d3-44dd-b61c-4a9c42181a1c",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
-			"name": "Create Sales Order using batch",
+			"name": "Create Follow-up Sales Order",
 			"item": [
 				{
 					"name": "Get collections",
@@ -7970,7 +7611,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -7989,7 +7629,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "157c5a67-4e10-4ebe-a5c5-44f1a37e03db",
 								"exec": [
 									"//Initialize dynamic environment variables",
 									"pm.environment.set(\"x-csrf-token\", \"\");",
@@ -8038,7 +7677,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
 								"type": "text/javascript",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -8057,7 +7695,724 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "6ba446ed-9def-4127-b41f-1114dbf92652",
+								"type": "text/javascript",
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									"pm.environment.set(\"SalesOrderExternalReference\", \"\");",
+									"pm.environment.set(\"SalesOrderObjectID\", \"\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/$metadata?sap-label=true&sap-language=en",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"$metadata"
+							],
+							"query": [
+								{
+									"key": "sap-label",
+									"value": "true"
+								},
+								{
+									"key": "sap-language",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create sales order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Get sales order ID and set variable for filtering",
+									"//var jsonResponse = xml2Json(responseBody);",
+									"//console.log(jsonResponse);",
+									"//var jsonResponseData = JSON.parse(jsonResponse);",
+									"//console.log(jsonResponse['d:\"http://schemas.microsoft.com/ado/2007/08/dataservices\"']['m:\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\"'].entry.content['m:properties']['d:ID']);",
+									"//pm.environment.set(\"ID\", jsonResponseData.entry.content.properties.ID);",
+									"",
+									"//var jsonRequest = pm.request.json();",
+									"var jsonRequest = JSON.parse(request.data);",
+									"//console.log(jsonRequest.BuyerID);",
+									"pm.environment.set(\"SalesOrderExternalReference\", jsonRequest.ExternalReference);",
+									"",
+									"// Validations",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});",
+									"pm.test(\"201 - Sales order created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set External Reference of pattern KH-<UTC datetime>",
+									"var generatedBuyerID = \"FO-\" + (new Date()).toISOString().substr(0,16);",
+									"pm.environment.set(\"SalesOrderExternalReference\", generatedBuyerID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}\",\n\t\"Name\": \"Sample Sales Order\",\n\t\"DataOriginTypeCode\": \"4\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID2}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": false\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TAN\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"ID\": \"20\",\n\t\t\t\t\"ProcessingTypeCode\": \"TASC\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{ServiceProductID}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"HUR\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order and expand",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"//console.log(jsonResponse.d.results[0].ID);",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"//pm.environment.set(\"BuyerPartyObjectID\", jsonResponse.d.results[0].SalesOrderBuyerParty.ObjectID);",
+									"//pm.environment.set(\"PricingTermsObjectID\", jsonResponse.d.results[0].SalesOrderPricingTerms.ObjectID);",
+									"//pm.environment.set(\"ItemProductObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemProduct.ObjectID);",
+									"//pm.environment.set(\"ItemScheduleLineObjectID\", jsonResponse.d.results[0].SalesOrderItem[0].SalesOrderItemScheduleLine[0].ObjectID);",
+									"",
+									"// Validations",
+									"pm.test(\"201 - Sales order data returned\", function () { pm.response.to.have.status(200) });",
+									"pm.test(\"Check Pricing Terms\", function () { pm.expect(jsonResponse.d.results[0].PricingTerms.CurrencyCode).to.eql(\"EUR\") });",
+									"pm.test(\"Item 10 created\", function () { pm.expect(jsonResponse.d.results[0].Item[0].ID).to.eql(\"10\") });",
+									"pm.test(\"Item 20 created\", function () { pm.expect(jsonResponse.d.results[0].Item[1].ID).to.eql(\"20\") });",
+									"pm.test(\"Sales Order consistent\", function () { pm.expect(jsonResponse.d.results[0].ConsistencyStatusCodeText).to.eql(\"Consistent\") });",
+									"pm.test(\"Sales Order released\", function () { pm.expect(jsonResponse.d.results[0].ReleaseStatusCodeText).to.eql(\"Not Released\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine&$filter=ExternalReference eq '{{SalesOrderExternalReference}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine"
+								},
+								{
+									"key": "$filter",
+									"value": "ExternalReference eq '{{SalesOrderExternalReference}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Release customer request (submit internet order)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});",
+									"pm.test(\"200 - Customer request released\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderReleaseCustomerRequest2?ObjectID='{{SalesOrderObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderReleaseCustomerRequest2"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{SalesOrderObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Release sales order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Validations",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});",
+									"pm.test(\"200 - Sales order released\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderRelease3?ObjectID='{{SalesOrderObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderRelease3"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{SalesOrderObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sales order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"SalesOrderID\", jsonResponse.d.results[0].ID);",
+									"",
+									"// Validations",
+									"pm.test(\"201 - Sales order data returned\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Sales Order consistent\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].ConsistencyStatusCodeText).to.eql(\"Consistent\");",
+									"});",
+									"pm.test(\"Sales Order released\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].ReleaseStatusCodeText).to.eql(\"Released\");",
+									"});",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=Item&$filter=ExternalReference eq '{{SalesOrderExternalReference}}'&$select=ExternalReference,ObjectID,ID,Name,ReleaseStatusCode,ReleaseStatusCodeText,ConsistencyStatusCode,ConsistencyStatusCodeText,Item/ID,Item/ObjectID,Item/ReleaseStatusCode,Item/ReleaseStatusCodeText,Item/ExecutionReleaseStatusCode,Item/ExecutionReleaseStatusCodeText",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "Item"
+								},
+								{
+									"key": "$filter",
+									"value": "ExternalReference eq '{{SalesOrderExternalReference}}'"
+								},
+								{
+									"key": "$select",
+									"value": "ExternalReference,ObjectID,ID,Name,ReleaseStatusCode,ReleaseStatusCodeText,ConsistencyStatusCode,ConsistencyStatusCodeText,Item/ID,Item/ObjectID,Item/ReleaseStatusCode,Item/ReleaseStatusCodeText,Item/ExecutionReleaseStatusCode,Item/ExecutionReleaseStatusCodeText"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create follow-up sales order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Get sales order ID and set variable for filtering",
+									"//var jsonResponse = xml2Json(responseBody);",
+									"//console.log(jsonResponse);",
+									"//var jsonResponseData = JSON.parse(jsonResponse);",
+									"//console.log(jsonResponse['d:\"http://schemas.microsoft.com/ado/2007/08/dataservices\"']['m:\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\"'].entry.content['m:properties']['d:ID']);",
+									"//pm.environment.set(\"ID\", jsonResponseData.entry.content.properties.ID);",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"FollowUpOrder_ObjectID\", jsonResponse.d.results.ObjectID);",
+									"pm.environment.set(\"FollowUpOrder_ID\", jsonResponse.d.results.ID);",
+									"",
+									"// Validations",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});",
+									"pm.test(\"Follow-up sales order created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\t\n\t\"Name\": \"Follow-up Sales Order\",\n\t\"DataOriginTypeCode\": \"1\"\n}    \t"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add reference and copy data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validations",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});",
+									"pm.test(\"Follow-up order linked to predecessor order\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/AddReferenceWithDataProvision?ObjectID='{{FollowUpOrder_ObjectID}}'&BusinessTransactionDocumentKey_BusinessTransactionDocumentTypeCode='114'&BusinessTransactionDocumentKey_BusinessTransactionDocumentID='{{SalesOrderID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"AddReferenceWithDataProvision"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{FollowUpOrder_ObjectID}}'"
+								},
+								{
+									"key": "BusinessTransactionDocumentKey_BusinessTransactionDocumentTypeCode",
+									"value": "'114'",
+									"description": "114 = Sales Order"
+								},
+								{
+									"key": "BusinessTransactionDocumentKey_BusinessTransactionDocumentID",
+									"value": "'{{SalesOrderID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get follow-up order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"var jsonResponse = pm.response.json();",
+									"pm.environment.set(\"FollowUpOrder_ObjectID\", jsonResponse.d.results[0].ObjectID);",
+									"pm.environment.set(\"FollowUpOrder_ID\", jsonResponse.d.results[0].ID);",
+									"",
+									"// Validations",
+									"pm.test(\"Follow-up order data returned\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Sales Order consistent\", function () {",
+									"    pm.expect(jsonResponse.d.results[0].ConsistencyStatusCode).to.eql(\"3\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/SalesOrderCollection?$format=json&$expand=BuyerParty,SalesUnitParty,PricingTerms,DocumentReference,Item/ItemProduct,Item/ItemScheduleLine,Item/ItemPriceAndTaxCalculation&$filter=ID eq '{{FollowUpOrder_ID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"SalesOrderCollection"
+							],
+							"query": [
+								{
+									"key": "$format",
+									"value": "json"
+								},
+								{
+									"key": "$expand",
+									"value": "BuyerParty,SalesUnitParty,PricingTerms,DocumentReference,Item/ItemProduct,Item/ItemScheduleLine,Item/ItemPriceAndTaxCalculation"
+								},
+								{
+									"key": "$filter",
+									"value": "ID eq '{{FollowUpOrder_ID}}'"
+								},
+								{
+									"key": "$select",
+									"value": "ExternalReference,ObjectID,ID,Name,ReleaseStatusCode,ReleaseStatusCodeText,ConsistencyStatusCode,ConsistencyStatusCodeText,Item/ID,Item/ObjectID,Item/ReleaseStatusCode,Item/ReleaseStatusCodeText,Item/ExecutionReleaseStatusCode,Item/ExecutionReleaseStatusCodeText",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Create Sales Order using batch",
+			"item": [
+				{
+					"name": "Get collections",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Initialize dynamic environment variables",
+									"pm.environment.set(\"x-csrf-token\", \"\");",
+									"pm.environment.set(\"SalesOrderExternalReference\", \"\");",
+									"pm.environment.set(\"SalesOrderObjectID\", \"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"200 - Response OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Cross site request forgery token:  received\", function () {",
+									"    pm.response.to.have.header(\"x-csrf-token\");",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
 								"type": "text/javascript",
 								"exec": [
 									"//Initialize dynamic environment variables",
@@ -8111,7 +8466,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1bc87aee-2d90-451f-aaf1-2cb391af6300",
 								"exec": [
 									""
 								],
@@ -8121,7 +8475,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "480884b9-6708-4048-a355-2bc5d209de37",
 								"exec": [
 									"// Set External Reference of pattern KH-<UTC datetime>",
 									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
@@ -8166,9 +8519,68 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Create and update sales orders + get (batch)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set External Reference of pattern KH-<UTC datetime>",
+									"//var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
+									"//pm.environment.set(\"SalesOrderExternalReference\", generatedBuyerID);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/mixed; boundary=batch_1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n--batch_1\nContent-Type: multipart/mixed; boundary=changeset_1\n\n--changeset_1\nContent-Type: application/http \nContent-Transfer-Encoding: binary\n\nPOST SalesOrderCollection HTTP/1.1\nContent-Type: application/json\nContent-ID: 1\nContent-Length: 10000\nAccept: application/json\n\n{\t\n\t\"ExternalReference\": \"{{SalesOrderExternalReference}}-3\",\n\t\"Name\": \"Sample Sales Order 3 (batch)\",\n\t\"DataOriginTypeCode\": \"1\",\n\t\"SalesUnitParty\":\n\t\t{\t\n\t\t\t\"PartyID\": \"{{SalesUnitID}}\"\n\t\t}, \t\n\t\"BuyerParty\":\n\t\t{\n\t\t\t\"PartyID\": \"{{CustomerID2}}\"\n\t\t},\n\t\"PricingTerms\":\n\t\t{\n\t\t\t\"CurrencyCode\": \"EUR\",\n\t\t\t\"GrossAmountIndicator\": false\n\t\t},\n\t\"Item\":\n\t\t[\n\t\t\t{\n\t\t\t\t\"ID\": \"10\",\n\t\t\t\t\"ProcessingTypeCode\": \"TAN\",\n\t\t\t\t\"ItemProduct\":\n\t\t\t\t\t{\n\t\t\t\t\t\t\"ProductID\": \"{{MaterialID_stock}}\"\n\t\t\t\t\t},\n\t\t\t\t\"ItemScheduleLine\":\n\t\t\t\t\t[\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"Quantity\": \"2\",\n\t\t\t\t\t\t\t\"unitCode\": \"EA\"\n\t\t\t\t\t\t}\n\t\t\t\t\t]\n\t\t\t}\n\t\t]\n}    \t\n\n--changeset_1\nContent-Type: application/http \nContent-Transfer-Encoding: binary\n\nPATCH SalesOrderCollection('{{SalesOrderExternalReference}}-2') HTTP/1.1\nContent-Type: application/json\nContent-ID: 1\nContent-Length: 10000\nAccept: application/json\n\n{\t\n    \"ObjectID\": \"00163E7306A31EEBADF594103F618583\",\n\t\"Name\": \"Sample Sales Order 2-update (batch)\"\n}    \t\n\n--changeset_1--\n\n\n--batch_1\nContent-Type: application/http\nContent-Transfer-Encoding: binary\n\nGET SalesOrderCollection?$format=json&$expand=BuyerParty/BuyerPartyName,SalesUnitParty/SalesUnitPartyName,PricingTerms,Item/ItemProduct,Item/ItemScheduleLine&$filter=startswith(ExternalReference,'{{SalesOrderExternalReference}}') HTTP/1.1\n\n\n--batch_1--"
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/$batch",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"cust",
+								"v1",
+								"khsalesorder",
+								"$batch"
+							]
+						}
+					},
+					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Create Sales Order node by node",
@@ -8179,7 +8591,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "75577150-4aaa-4880-9ee4-c206aee1d3c9",
 								"type": "text/javascript",
 								"exec": [
 									"",
@@ -8239,7 +8650,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "510deefb-6650-4ff1-818e-7b70d0162e4e",
 								"exec": [
 									"// Set environment variables",
 									"var jsonResponse = pm.response.json();",
@@ -8256,7 +8666,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "b0eff683-5300-451e-8bde-426c08cceb24",
 								"exec": [
 									"// Set External Reference of pattern KH-<UTC datetime>",
 									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
@@ -8312,7 +8721,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e071df17-ad9b-4808-8547-98437a761e18",
 								"exec": [
 									"",
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -8385,7 +8793,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "dde7e485-8849-4a24-826f-43f26685ebd8",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales unit party created ... ok\", function () {",
@@ -8441,7 +8848,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0750ddd8-3d86-4603-b475-1165717da398",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Buyer party added ... ok\", function () {",
@@ -8470,7 +8876,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\t\n\t\"ObjectID\": \"{{BuyerPartyObjectID}}\",\n\t\"PartyID\": \"{{CustomerID2}}\"\n}    \t"
+							"raw": "{\t\n\t\"ObjectID\": \"{{BuyerPartyObjectID}}\",\n    \"ParentObjectID\": \"{{SalesOrderObjectID}}\",\n\t\"PartyID\": \"{{CustomerID2}}\"\n}    \t"
 						},
 						"url": {
 							"raw": "https://{{TenantHostname}}/sap/byd/odata/cust/v1/khsalesorder/BuyerPartyCollection('{{BuyerPartyObjectID}}')",
@@ -8497,7 +8903,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b06e8088-66a6-4a89-9b1c-424f08d0c06f",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Update pricing terms ... ok\", function () {",
@@ -8553,7 +8958,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c85e789f-be4f-43ed-abf7-44ea3fd269a9",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Item created ... ok\", function () {",
@@ -8609,7 +9013,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7b157ad3-df67-485e-b51a-5dd326cc1ca3",
 								"exec": [
 									"",
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -8682,7 +9085,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a8561c32-35c9-4a9c-b67d-e480cdee725e",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Update item product\", function () {",
@@ -8738,7 +9140,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7cb97c99-ddff-4b47-bc6e-ccb21ce40084",
 								"exec": [
 									"",
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -8811,7 +9212,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e6c00b8e-9b04-4ea8-ba2e-2e1ba543a9b1",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Update item quantity\", function () {",
@@ -8916,7 +9316,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7cb97c99-ddff-4b47-bc6e-ccb21ce40084",
 								"exec": [
 									"",
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -8988,7 +9387,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "c81c315c-2066-46ea-ac66-e3c7f926a7cc",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -8998,15 +9396,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "6e1cce4e-1bd6-47a3-bcd9-781db596a27c",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Create Sales Order with Attachments",
@@ -9017,7 +9413,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
 								"type": "text/javascript",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -9036,7 +9431,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "43002d5b-0c70-4769-8278-9de67558d992",
 								"type": "text/javascript",
 								"exec": [
 									"//Initialize dynamic environment variables",
@@ -9090,7 +9484,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "21ff1eaa-b09f-4001-9117-e791b4adef1a",
 								"exec": [
 									"// Get sales order ID and set variable for filtering",
 									"//var jsonResponse = xml2Json(responseBody);",
@@ -9118,7 +9511,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "ff990dde-5b63-43bc-ac00-0fa57b2996c3",
 								"exec": [
 									"// Set BuyerID of pattern KH-<UTC datetime>",
 									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
@@ -9176,7 +9568,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "70784133-1e3f-4485-b3a0-2581bbae4d18",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -9260,7 +9651,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6f134c15-adc5-42cf-938e-e778a244bfa6",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -9317,7 +9707,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f3cde6c0-cfa4-420a-a56f-b64abc5a60f6",
 								"exec": [
 									"// Validations",
 									"pm.test(\"204 - Attachment deleted\", function () {",
@@ -9371,7 +9760,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e9920369-b0a3-4ca6-af69-beb6640eaa9f",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Successful POST request - Attachment added\", function () {",
@@ -9426,7 +9814,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "0d4d74bf-ff74-4dcb-9608-3391963d2496",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -9436,15 +9823,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3857f6d0-4d7c-4b47-a658-a13155b06109",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Create Sales Order with price components (net)",
@@ -9455,7 +9840,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -9469,7 +9853,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "b2e8f837-8860-4a09-9931-7d6db97f5cdf",
 								"exec": [
 									""
 								],
@@ -9515,7 +9898,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results.ObjectID);",
@@ -9534,7 +9916,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Set External Reference of pattern KH-<UTC datetime>",
 									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
@@ -9590,7 +9971,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -9675,7 +10055,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Tax code updated\", function () { pm.response.to.have.status(204) });",
@@ -9687,7 +10066,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									""
 								],
@@ -9740,7 +10118,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Custom list price component created\", function () { pm.response.to.have.status(201) });",
@@ -9752,7 +10129,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -9806,7 +10182,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Product discount created\", function () { pm.response.to.have.status(201) });",
@@ -9818,7 +10193,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -9872,7 +10246,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Surcharge price component created\", function () { pm.response.to.have.status(201) });",
@@ -9884,7 +10257,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -9938,7 +10310,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Surcharge (%) price component created\", function () { pm.response.to.have.status(201) });",
@@ -9950,7 +10321,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -10004,7 +10374,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -10027,7 +10396,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "d61a7eee-f189-4894-9bb4-a2c6b3c5e0ff",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -10087,7 +10455,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"pm.environment.set(\"SalesOrderPriceComponentObjectID\", jsonResponse.d.results.ObjectID);",
@@ -10102,7 +10469,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -10156,7 +10522,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"pm.environment.set(\"SalesOrderPriceComponentObjectID\", jsonResponse.d.results.ObjectID);",
@@ -10171,7 +10536,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -10225,7 +10589,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"pm.environment.set(\"SalesOrderPriceComponentObjectID\", jsonResponse.d.results.ObjectID);",
@@ -10240,7 +10603,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -10294,7 +10656,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -10317,7 +10678,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "3a937124-e387-455d-8671-0e48f577e0ba",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -10371,8 +10731,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Create Sales Order with price components (gross)",
@@ -10383,7 +10742,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -10397,7 +10755,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "b2e8f837-8860-4a09-9931-7d6db97f5cdf",
 								"exec": [
 									""
 								],
@@ -10443,7 +10800,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"pm.environment.set(\"SalesOrderObjectID\", jsonResponse.d.results.ObjectID);",
@@ -10463,7 +10819,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Set External Reference of pattern KH-<UTC datetime>",
 									"var generatedBuyerID = \"KH-\" + (new Date()).toISOString().substr(0,16);",
@@ -10519,7 +10874,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -10604,7 +10958,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Tax code updated\", function () { pm.response.to.have.status(204) });",
@@ -10616,7 +10969,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									""
 								],
@@ -10669,7 +11021,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Custom list price component created\", function () { pm.response.to.have.status(201) });",
@@ -10681,7 +11032,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -10735,7 +11085,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Product discount created\", function () { pm.response.to.have.status(201) });",
@@ -10747,7 +11096,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 3000); // wait 3 sec"
@@ -10801,7 +11149,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Surcharge price component created\", function () { pm.response.to.have.status(201) });",
@@ -10813,7 +11160,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 3000); // wait 3 sec"
@@ -10867,7 +11213,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"// Validations",
 									"pm.test(\"Sales order item: Surcharge (%) price component created\", function () { pm.response.to.have.status(201) });",
@@ -10879,7 +11224,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 3000); // wait 3 sec"
@@ -10933,7 +11277,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -10956,7 +11299,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "d61a7eee-f189-4894-9bb4-a2c6b3c5e0ff",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -11016,7 +11358,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"pm.environment.set(\"SalesOrderPriceComponentObjectID\", jsonResponse.d.results.ObjectID);",
@@ -11031,7 +11372,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 3000); // wait 3 sec"
@@ -11085,7 +11425,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"pm.environment.set(\"SalesOrderPriceComponentObjectID\", jsonResponse.d.results.ObjectID);",
@@ -11100,7 +11439,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 3000); // wait 3 sec"
@@ -11154,7 +11492,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0b9bbf9-6725-4134-89e9-f2347dde8747",
 								"exec": [
 									"var jsonResponse = pm.response.json();",
 									"pm.environment.set(\"SalesOrderPriceComponentObjectID\", jsonResponse.d.results.ObjectID);",
@@ -11169,7 +11506,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "8c48396a-8f50-4024-8dfa-a3c7594fd8a6",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 3000); // wait 3 sec"
@@ -11223,7 +11559,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c38f9015-76c9-4c82-98d1-4b7251b30302",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -11246,7 +11581,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "3a937124-e387-455d-8671-0e48f577e0ba",
 								"exec": [
 									"// Delay request\r",
 									"setTimeout(function() {}, 2000); // wait 2 sec"
@@ -11300,8 +11634,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Miscellaneous Samples",
@@ -11312,7 +11645,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5e62e94d-f718-4db5-86fa-22e27ebb5825",
 								"type": "text/javascript",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -11331,7 +11663,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "65823112-7d5a-4ed2-ab1b-c78b1ba6c0cc",
 								"type": "text/javascript",
 								"exec": [
 									"//Initialize dynamic environment variables",
@@ -11385,7 +11716,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e2b4e734-e01c-45a9-97ce-cb86306ea5d6",
 								"type": "text/javascript",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -11441,7 +11771,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e2b4e734-e01c-45a9-97ce-cb86306ea5d6",
 								"type": "text/javascript",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -11497,7 +11826,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "83cee03a-84bf-4457-9cad-1845665e18b2",
 								"exec": [
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
 									"",
@@ -11569,7 +11897,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bc5c7d0b-8e34-4678-9484-ccf2c8266885",
 								"exec": [
 									"",
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -11649,7 +11976,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 								"exec": [
 									"",
 									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
@@ -11725,7 +12051,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6abbca20-e715-4e12-83bf-4f59a566f089",
 								"exec": [
 									""
 								],
@@ -11735,7 +12060,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "81136713-2039-47d6-8e37-0e7919c4abde",
 								"exec": [
 									"// Set payments filter date: today (format: 2019-05-15T00:00:00.0000000Z)",
 									"let moment = require('moment');",
@@ -11802,8 +12126,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		}
 	],
 	"auth": {
@@ -11825,7 +12148,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "457c4747-d131-4824-836f-816f890c576d",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -11835,13 +12157,11 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "7824a77b-890c-46e3-983c-d87f376443b0",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
