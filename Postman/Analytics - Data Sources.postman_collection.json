@@ -8,9 +8,26 @@
 	"item": [
 		{
 			"name": "Get exposed data sources",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "x-csrf-token",
+						"value": "fetch",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/",
 					"protocol": "https",
@@ -35,7 +52,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/scminvv02.svc/$metadata?sap-label=true&sap-statistics=true",
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/$metadata?sap-label=true&sap-statistics=true",
 					"protocol": "https",
 					"host": [
 						"{{TenantHostname}}"
@@ -46,7 +63,7 @@
 						"odata",
 						"analytics",
 						"ds",
-						"scminvv02.svc",
+						"Finglau02.svc",
 						"$metadata"
 					],
 					"query": [
@@ -866,6 +883,63 @@
 							"key": "$expand",
 							"value": "to_CompanyUuid"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "G/L Account Items by Batch-request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-csrf-token",
+						"value": "{{x-csrf-token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "multipart/mixed; boundary=batch_1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\n--batch_1\nContent-Type: application/http\nContent-Transfer-Encoding: binary\n\nGET Finglau02?$format=json&$inlinecount=allpages&$top=1000&$select=C_CompanyUuid,C_Setofbks,C_Fiscyearvar,C_Chofaccts,C_PostingDate,C_Fiscalyearperio,C_Glacct,Count&$filter=C_CompanyUuid%20eq%20guid%2700000000-0001-1DDF-B9FF-7CEB3214ABF2%27%20and%20C_Setofbks%20eq%20%277000%27%20and%20C_Fiscyearvar%20eq%20%2710%27%20and%20C_Chofaccts%20eq%20%27ZIAS%27%20and%20C_Fiscalyearperio%20eq%20%272018010%27%20and%20(%20C_PostingDate%20ge%20datetime%272018-10-01T00:00:00%27%20and%20C_PostingDate%20le%20datetime%272018-12-31T00:00:00%27%20)&$expand=to_CompanyUuid HTTP/1.1\n\n\n--batch_1\nContent-Type: application/http\nContent-Transfer-Encoding: binary\n\nGET xMOMxSegment?$format=json&$top=100&$select=C_SgmtUuid,C_SgmtId,T_Name&$inlinecount=allpages HTTP/1.1\n\n\n--batch_1--"
+				},
+				"url": {
+					"raw": "https://{{TenantHostname}}/sap/byd/odata/analytics/ds/Finglau02.svc/$batch",
+					"protocol": "https",
+					"host": [
+						"{{TenantHostname}}"
+					],
+					"path": [
+						"sap",
+						"byd",
+						"odata",
+						"analytics",
+						"ds",
+						"Finglau02.svc",
+						"$batch"
 					]
 				}
 			},
