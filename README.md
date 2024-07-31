@@ -56,6 +56,10 @@ This repository contains the following API sample packages:
 	- Goods movement
 - **New Business**: Run processes to generate new business such as leads, opportunities and quotes
 	- Create Sales Quote with net price components
+- **Supplier Invoicing**: Supplier Invoice with E-Invocing scenario
+	- Creates supplier invoicing staging object
+	- Creates attachment with supplier invoice in e-invoicing xml input file
+	- Processes supplier invoice staging object using XSLT transformation to create relevant supplier invoice
 
 Please check the description of the respective Postman collection for more information.
 
