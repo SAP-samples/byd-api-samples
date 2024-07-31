@@ -58,7 +58,7 @@ This repository contains the following API sample packages:
 	- Create Sales Quote with net price components
 - **Supplier Invoicing**: Supplier Invoice with E-Invocing scenario
 	- Creates supplier invoicing staging object
-	- Creates attachment with supplier invoice in e-invoicing xml input file
+	- Updates supplier invoicing staging object with BLOB (Binary Large Object) of supplier e-invoice xml as attachment
 	- Processes supplier invoice staging object using XSLT transformation to create relevant supplier invoice
 
 Please check the description of the respective Postman collection for more information.
