@@ -1,0 +1,279 @@
+{
+	"info": {
+		"_postman_id": "ee496772-62cc-4b19-9e3b-d139d73ba3d4",
+		"name": "Supplier Invoicing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7339878"
+	},
+	"item": [
+		{
+			"name": "E-Invoicing",
+			"item": [
+				{
+					"name": "Get entity sets and CSRF-token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"x-csrf-token\", postman.getResponseHeader(\"x-csrf-token\"));",
+									"",
+									"// Validations",
+									"pm.test(\"Cross-site request forgery token received\", function () { pm.response.to.have.header(\"x-csrf-token\") });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "fetch"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/v1/scannedinvoicestagingodata/ScannedInvoiceStagingObjectCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"v1",
+								"scannedinvoicestagingodata",
+								"ScannedInvoiceStagingObjectCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Root Creation (Scanned Invoice Staging Object )",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonResponse = xml2Json(responseBody);\r",
+									"\r",
+									"pm.environment.set(\"ScannedSIVObjectID\", jsonResponse['entry']['content']['m:properties']['d:ObjectID']);\r",
+									"\r",
+									"pm.test(\"ScannedSIVObjectID : \"+ jsonResponse['entry']['content']['m:properties']['d:ObjectID']);\r",
+									"\r",
+									"// Validations\r",
+									"pm.test(\"Scanned invoice staging object created with successfully \", function () { pm.response.to.have.status(201) });\r",
+									"\r",
+									"pm.environment.set(\"Scanned invoice staging object created with file name : \"+ jsonResponse['entry']['content']['m:properties']['d:FileName']);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"FileName\": \"{{SIV-Einvoice-FileName}}\",\r\n\t\"TransformationDate\": \"{{SIV-XSLT-TransformationDate}}\",\r\n\t\"TypeCode\": \"02\",\r\n\t\"CountryCode\": \"DE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/v1/scannedinvoicestagingodata/ScannedInvoiceStagingObjectCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"v1",
+								"scannedinvoicestagingodata",
+								"ScannedInvoiceStagingObjectCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attachment Node Creation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonResponse = xml2Json(responseBody);\r",
+									"\r",
+									"// Validations\r",
+									"pm.test(\"File attached to Scanned invoice staging object with status \", function () { pm.response.to.have.status(201) });\r",
+									"\r",
+									"pm.environment.set(\"File attached to Scanned invoice staging object with file name : \"+ jsonResponse['entry']['content']['m:properties']['d:Title']);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"ParentObjectID\": \"{{ScannedSIVObjectID}}\",\r\n\t\"Name\": \"{{SIV-Einvoice-FileName}}\",\r\n\t\"MimeType\": \"application/xml\",\r\n    \"TypeCode\": \"10001\",\r\n\t\"CategoryCode\": \"2\",\r\n\t\"Binary\": \"{{SIV-Einvoice-BLOB}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/v1/scannedinvoicestagingodata/ScannedInvoiceStagingObjectAttachmentFolderCollection",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"v1",
+								"scannedinvoicestagingodata",
+								"ScannedInvoiceStagingObjectAttachmentFolderCollection"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Processing of SIV file",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonResponse = xml2Json(responseBody);\r",
+									"\r",
+									"// Validations\r",
+									"pm.test(\"Processing of Supplier Invoice is done sucessfully \" , function () { pm.response.to.have.status(200) });\r",
+									"\r",
+									"pm.environment.set(\"Supplier Invoice Created is : \"+ jsonResponse['entry']['content']['m:properties']['d:CreatedInvoiceID']);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-csrf-token",
+								"value": "{{x-csrf-token}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "https://{{TenantHostname}}/sap/byd/odata/v1/scannedinvoicestagingodata/processFile?ObjectID='{{ScannedSIVObjectID}}'",
+							"protocol": "https",
+							"host": [
+								"{{TenantHostname}}"
+							],
+							"path": [
+								"sap",
+								"byd",
+								"odata",
+								"v1",
+								"scannedinvoicestagingodata",
+								"processFile"
+							],
+							"query": [
+								{
+									"key": "ObjectID",
+									"value": "'{{ScannedSIVObjectID}}'"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{Password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{User}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
